@@ -85,7 +85,19 @@ private:
 	CLabelEx*		labFameSho;              //´´½¨ÃûÉù
 	CLabelEx*		labStateName;
 	CLabelEx*		labStateJob;
-
+	//add new labels here for cha extend attr
+	CLabelEx* RankArenaLabel{nullptr};//ATTR_ARENA_RANK 
+	CLabelEx* ArenaBattle{ nullptr };//ATTR_ARENA_BATTLE
+	CLabelEx* ArenaVictory{ nullptr };//ATTR_ARENA_VICTORY
+	CLabelEx* ArenaKill{ nullptr };//ATTR_ARENA_KILL
+	CLabelEx* ArenaDeath{ nullptr };//ATTR_ARENA_DEATH
+	CLabelEx* ArenaPoint{ nullptr };//ATTR_ARENA_POINT
+	CLabelEx* ChaosRank{ nullptr };//ATTR_CHAOS_RANK
+	CLabelEx* ChaosBattle{ nullptr };//ATTR_CHAOS_BATTLE
+	CLabelEx* ChaosVictory{ nullptr };//ATTR_CHAOS_VICTORY
+	CLabelEx* ChaosKill{ nullptr };//ATTR_CHAOS_KILL
+	CLabelEx* ChaosDeath{ nullptr };//ATTR_CHAOS_DEATH
+	CLabelEx* ChaosPoint{ nullptr };//ATTR_CHAOS_POINT
 
 };
 

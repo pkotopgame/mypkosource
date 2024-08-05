@@ -7540,11 +7540,11 @@ char*	ChaExtendAttr2String(CCharacter *pCCha, char *szAttrBuf, int nLen)
 	if (!pCCha || !szAttrBuf)
 		return NULL;
 
-	sprintf(szAttrBuf, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-						(int)pCCha->getAttr(ATTR_EXTEND0), (int)pCCha->getAttr(ATTR_EXTEND1), (int)pCCha->getAttr(ATTR_EXTEND2), 
-						(int)pCCha->getAttr(ATTR_EXTEND3), (int)pCCha->getAttr(ATTR_EXTEND4), (int)pCCha->getAttr(ATTR_EXTEND5), 
-						(int)pCCha->getAttr(ATTR_EXTEND6), (int)pCCha->getAttr(ATTR_EXTEND7), (int)pCCha->getAttr(ATTR_EXTEND8), 
-						(int)pCCha->getAttr(ATTR_EXTEND9));
+	sprintf(szAttrBuf, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+						(int)pCCha->getAttr(ATTR_ARENA_RANK), (int)pCCha->getAttr(ATTR_ARENA_BATTLE), (int)pCCha->getAttr(ATTR_ARENA_VICTORY),
+						(int)pCCha->getAttr(ATTR_ARENA_KILL), (int)pCCha->getAttr(ATTR_ARENA_DEATH), (int)pCCha->getAttr(ATTR_ARENA_POINT),
+						(int)pCCha->getAttr(ATTR_CHAOS_RANK), (int)pCCha->getAttr(ATTR_CHAOS_BATTLE), (int)pCCha->getAttr(ATTR_CHAOS_VICTORY),
+						(int)pCCha->getAttr(ATTR_CHAOS_KILL), (int)pCCha->getAttr(ATTR_CHAOS_DEATH), (int)pCCha->getAttr(ATTR_CHAOS_DEATH));
 	return szAttrBuf;
 }
 
@@ -7554,12 +7554,12 @@ bool		Strin2ChaExtendAttr(CCharacter *pCCha, std::string &strAttr)
 	if (!pCCha || strAttr.length() < 19)
 		return false;
 
-	int val[10];
+	int val[12];
 
-	sscanf(strAttr.c_str(), "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", &val[0], &val[1], &val[2], &val[3], &val[4], &val[5], 
-															&val[6], &val[7], &val[8], &val[9]);
+	sscanf(strAttr.c_str(), "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", &val[0], &val[1], &val[2], &val[3], &val[4], &val[5], 
+															&val[6], &val[7], &val[8], &val[9], &val[10], &val[11]);
 
-	for(int i=0;i<10;i++)
+	for(int i=0;i<12;i++)
 	{
 		pCCha->setAttr(ATTR_COUNT_BASE10 + i, val[i]);
 	}

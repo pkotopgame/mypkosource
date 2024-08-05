@@ -116,6 +116,48 @@ bool CStateMgr::Init()
 	//labCriticalShow  = 	( CLabelEx *)frmState->Find( "labCriticalShow" );
 	//labMfShow        = 	( CLabelEx *)frmState->Find( "labMfShow" );
 	labPhysDefineShow=  ( CLabelEx *)frmState->Find( "labPhysDefineShow" );
+
+	//here add custom new labels 
+	//RankArenaLabel
+	if (RankArenaLabel = dynamic_cast<CLabelEx*>(frmState->Find("RankArenaLabel")); !RankArenaLabel)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "RankArenaLabel");
+	//ArenaBattle
+	if (ArenaBattle = dynamic_cast<CLabelEx*>(frmState->Find("ArenaBattle")); !ArenaBattle)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ArenaBattle");
+	//ArenaVictory
+	if (ArenaVictory = dynamic_cast<CLabelEx*>(frmState->Find("ArenaVictory")); !ArenaVictory)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ArenaVictory");
+	//ArenaKill
+	if (ArenaKill = dynamic_cast<CLabelEx*>(frmState->Find("ArenaKill")); !ArenaKill)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ArenaKill");
+	//ArenaDeath
+	if (ArenaDeath = dynamic_cast<CLabelEx*>(frmState->Find("ArenaDeath")); !ArenaDeath)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ArenaDeath");
+	//ArenaPoint
+	if (ArenaPoint = dynamic_cast<CLabelEx*>(frmState->Find("ArenaPoint")); !ArenaPoint)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ArenaPoint");
+	//ChaosRank
+	if (ChaosRank = dynamic_cast<CLabelEx*>(frmState->Find("ChaosRank")); !ChaosRank)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosRank");
+	//ChaosBattle
+	if (ChaosBattle = dynamic_cast<CLabelEx*>(frmState->Find("ChaosBattle")); !ChaosBattle)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosBattle");
+	//ChaosVictory
+	if (ChaosVictory = dynamic_cast<CLabelEx*>(frmState->Find("ChaosVictory")); !ChaosVictory)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosVictory");
+	//ChaosKill
+	if (ChaosKill = dynamic_cast<CLabelEx*>(frmState->Find("ChaosKill")); !ChaosKill)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosKill");
+	//ChaosDeath
+	if (ChaosDeath = dynamic_cast<CLabelEx*>(frmState->Find("ChaosDeath")); !ChaosDeath)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosDeath");
+	//ChaosPoint
+	if (ChaosPoint = dynamic_cast<CLabelEx*>(frmState->Find("ChaosPoint")); !ChaosPoint)
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosPoint");
+	//add more labels here same way copy past rename name 
+
+	//end of custom labels 
+
 	return true;
 
 
@@ -388,12 +430,21 @@ void CStateMgr::RefreshStateFrm()
 		sprintf( pszCha , "%d" , pCChaAttr->get(ATTR_PDEF)); // �����ֿ�
 		labPhysDefineShow->SetCaption( (const char* ) pszCha);
 	}
-
 	if(labFameShow)
 	{
 		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_FAME));	// ����
 		labFameShow->SetCaption( (const char* ) pszCha);
 	}
+
+	//add custom labels show here 
+	//show rank arena label 
+	if (RankArenaLabel)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_RANK));
+		RankArenaLabel->SetCaption((const char*)pszCha);
+	}
+
+	//end custom labels 
 }
 
 void CStateMgr::MainMouseDown(CGuiData *pSender, int x, int y, DWORD key)

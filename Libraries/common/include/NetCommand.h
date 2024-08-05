@@ -504,7 +504,7 @@
 
 	#define CMD_MC_COLOUR_NOTICE	CMD_MC_ROLEBASE + 92
 	#define CMD_MC_UPDATEGUILDBANKGOLD	CMD_MC_ROLEBASE + 93
-
+#define CMD_MC_KillPanel	CMD_MC_ROLEBASE + 97
 //�����
 #define CMD_MC_LIFESKILL_BGING  CMD_MC_BASE + 100	//����ܿ�ʼ
 #define CMD_MC_LIFESKILL_ASR	CMD_MC_BASE + 101	//��������ˣ��ϳɣ��ֽ�ȵ�����
@@ -529,7 +529,8 @@
 #define CMD_MC_GUILDNOTICE  CMD_MC_BASE + 112
 
 #define CMD_MC_REQUESTPIN  CMD_MC_BASE + 113
-
+#define	CMD_MC_PORTALTIMES			 CMD_MC_BASE + 126	// Portal time opening / closing
+#define CMD_MC_UpdateVipSet (CMD_MC_BASE + 127) //vip system @mothannakh
 
 /*=====================================================================================================
 *					Ga(t)eServer <->Ga(m)eServer
@@ -542,7 +543,7 @@
 #define CMD_TM_MAPENTRY_NOMAP	CMD_TM_BASE + 8
 #define CMD_TM_KICKCHA			CMD_TM_BASE + 9
 #define CMD_TM_OFFLINE_MODE		CMD_TM_BASE + 11
-
+#define CMD_TM_PORTALTIMES		CMD_MT_BASE + 16	//Portal time opening/closing)	// Ga(t)eServer   -> Ga(m)eServer
 //---------------------------------------------------
 
 #define CMD_MT_LOGIN			CMD_MT_BASE + 1		//GameServer��½GateServer

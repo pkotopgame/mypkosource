@@ -451,6 +451,7 @@
     <ClCompile Include="..\src\UIPicture.cpp" />
     <ClCompile Include="..\src\UIPKDialog.cpp" />
     <ClCompile Include="..\src\UIPKSilverForm.cpp" />
+    <ClCompile Include="..\src\UIPortalTime.cpp" />
     <ClCompile Include="..\src\UIProgressBar.cpp" />
     <ClCompile Include="..\src\UIPurifyForm.cpp" />
     <ClCompile Include="..\src\UIRender.cpp" />
@@ -671,6 +672,7 @@
     <ClInclude Include="..\src\UIPicture.h" />
     <ClInclude Include="..\src\UIPKDialog.h" />
     <ClInclude Include="..\src\UIPKSilverForm.h" />
+    <ClInclude Include="..\src\UIPortalTime.h" />
     <ClInclude Include="..\src\UIProgressBar.h" />
     <ClInclude Include="..\src\UIPurifyForm.h" />
     <ClInclude Include="..\src\UIRender.h" />
