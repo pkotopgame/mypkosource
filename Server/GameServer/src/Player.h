@@ -62,6 +62,12 @@ public:
 	dbc::Long	GetHandle(void) {return m_lHandle;}
 	void		SetHoldID(dbc::Long lID) {m_lHoldID = lID;}
 	dbc::Long	GetHoldID(void) {return m_lHoldID;}
+	//vip systrm atm used for nitro 
+	void Setvip(long long vip, bool firstLogin = false);
+	void VipTimerCheck();
+	long long GetVipRemaningSeconds() const;
+	long long GetVipTime() const { return NitroVipTime; }
+	bool IsPlayerNitroVip() const { return IsNitroVip; }
 
 	bool		IsPlayer(void) {return bIsValid && (GetGate() ? true : false);}
 
@@ -279,7 +285,9 @@ private:
 	long	m_lMoBean;		//摩豆数量
 	long	m_lRplMoney;	//代币数量
 	long	m_lVipID;		//VIP类型
-
+	// for nitro checks
+	bool IsNitroVip{ false };
+	long long NitroVipTime{ 0 };
     DWORD       m_dwLoginID;    //  Account DB ID
 	DWORD		m_dwDBActId;	// 数据库账户ID
 	dbc::Char	m_chGMLev;		// GM等级

@@ -7,6 +7,7 @@
 #include "procirculate.h"
 #include "UIBoothForm.h"
 #include "UIStoreForm.h"
+#include "UIPortalTime.h" //maze portal timer
 _DBC_USING
 #include "blake2.h"
 #include "hex.h"
@@ -39,6 +40,8 @@ void CS_Disconnect(int reason)
 	//fix stall bugs with offline stalls @mothannakh
 	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->Disconnect(reason);
+	// clear maze portals
+	g_stUIPortalTime.ClearList();
 }
 
 void CS_SendPrivateKey()
@@ -54,6 +57,8 @@ void CS_SendPrivateKey()
 void CS_Login(const char *accounts,const char *password, const char* passport)
 {
 	g_NetIF->m_pCProCir->Login(accounts,password,passport);
+	// clear maze portals
+	g_stUIPortalTime.ClearList();
 }
 
 //------------------------
@@ -64,6 +69,8 @@ void CS_Logout()
 	//fix stall bugs with offline stalls @mothannakh
 	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->Logout();
+	// clear maze portals
+	g_stUIPortalTime.ClearList();
 	return;
 }
 
@@ -94,6 +101,8 @@ void CS_BeginPlay(char cha_index)
 //------------------------
 void CS_EndPlay()
 {
+	// clear maze portals
+	g_stUIPortalTime.ClearList();
 	//fix stall bugs with offline stalls @mothannakh
 	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->EndPlay();

@@ -19,6 +19,7 @@
 #include <iostream>
 //in header include 
 #include "uiminimapform.h"
+#include "UIPortalTime.h"
 #ifdef _TEST_CLIENT
 #include "..\..\TestClient\testclient.h"
 #endif
@@ -35,6 +36,7 @@ CLogName	 g_LogName;
 extern short g_sClientVer;
 
 #include "uidoublepwdform.h"
+#include "MapSet.h"
 extern CDoublePwdMgr	g_stUIDoublePwd;
 using namespace std;
 
@@ -62,8 +64,8 @@ BOOL NetIF::HandlePacketMessage(DataSocket *datasock,LPRPACKET pk)
 		return true;
 	}
 						 // update vip states
-	case CMD_MC_UpdateVipSet:
-		return SC_UpdateVipSet(pk);
+	//case CMD_MC_UpdateVipSet:
+	//	return SC_UpdateVipSet(pk);
 	case CMD_MC_LOGIN:		 return SC_Login(pk);
 	case CMD_MC_ENTERMAP:	 return SC_EnterMap(pk);
 	case CMD_MC_BGNPLAY:     return SC_BeginPlay(pk);
@@ -280,6 +282,40 @@ BOOL NetIF::HandlePacketMessage(DataSocket *datasock,LPRPACKET pk)
 	case CMD_MC_REQUEST_EXP_RATE: return SC_RequestExpRate(pk);
 	case CMD_TC_DISCONNECT: return SC_Disconnect(pk);
 	case CMD_PC_REFRESH_SELECT: return SC_RefreshSelectScreen(pk);
+	case CMD_MC_PORTALTIMES: {
+		// clear old list before adding new one : "note moved this to logout/switching for multi gameserver using :
+		// g_stUIPortalTime.ClearList();
+		// adding new map list to portal ui
+		for (auto portalCount = pk.ReverseReadShort(); portalCount > 0; --portalCount) {
+			static char buf[500]{};
+			const auto MapName = pk.ReadString(); // map name
+			const time_t EntryFirstTm = pk.ReadLongLong();	 // Time when the entry was first executed
+			time_t tEntryTmDis = pk.ReadLongLong();			 // After the entry is executed for the first time, the time interval between subsequent executions
+			const time_t tEntryOutTmDis = pk.ReadLongLong(); // The time interval to disappear after each entry is executed
+			const time_t tMapClsTmDis = pk.ReadLongLong();	 // The time interval from when the entry is executed to the map close
+			std::string AreaName = MapName;
+			if (const auto areaName = GetMapInfo(MapName); areaName) {
+
+				AreaName = areaName->szName;
+			}
+			// portal location
+			const auto location = pk.ReadString(); // map name
+			const auto EntryPoseX = pk.ReadLong(); // pose x
+			const auto EntryPosey = pk.ReadLong(); // pose y
+			std::string finalLocation = location;
+			std::string finalCordPose = " : Dynamic Cords!";
+			if (const auto areaName = GetMapInfo(location); areaName) {
+				if (EntryPoseX != 0 || EntryPosey != 0) {
+					finalCordPose = " : " + to_string(EntryPoseX) + "," + to_string(EntryPosey);
+				}
+				finalLocation = areaName->szName;
+			}
+			finalLocation += finalCordPose;
+			g_stUIPortalTime.Add({ AreaName, EntryFirstTm, tEntryTmDis, tEntryOutTmDis, tMapClsTmDis,finalLocation });
+		}
+
+	} break;
+						   // timer end
 	}
 
 	//LG("net_r", "msgRecv Unknown Packet Msg Value = [%u]!\n", sCmdType);

@@ -484,13 +484,15 @@ BOOL CGameApp::Init()
 	
 	m_CItemRecordSet		= new CItemRecordSet(0, nItemRecordNum);LoadTable(m_CItemRecordSet, szItemInfoName);
 
-	//·ÀÍâ¹ÒÔÝÊ±²»ÉÏ
-	/*m_PicSet = new CPicSet();
-	if(!m_PicSet->init())
-	{
-		LG( "init", "msg¶ÁÈ¡Í¼Æ¬Ê§°Ü£¡" );
-		return FALSE;
-	}*/
+	//init anti cheat pictures @mothannakh
+	if (g_Config.EnableAntiBot) {
+
+		m_PicSet = new CPicSet();
+		if (!m_PicSet->init()) {
+			LG("init", "msgCPicSet::init() failed!");
+			return FALSE;
+		}
+	}
 	
 	g_pCItemAttr = new CItemRecordAttr[nItemRecordNum];
 	for (int i = 0; i < nItemRecordNum; i++)

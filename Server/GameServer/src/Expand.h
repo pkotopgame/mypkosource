@@ -5463,6 +5463,37 @@ End:
 	return 1;
 }
 
+//Map Portal timer helper @mothannakh
+inline int lua_ShowInPortalTimer(lua_State* pLS)
+{
+
+	
+
+	if (int nParaNum = lua_gettop(pLS); nParaNum != 4)
+	{
+
+
+		lua_pushnumber(pLS, 0);
+		return 1;
+	}
+
+	CMapRes* pCMap = (CMapRes*)lua_touserdata(pLS, 1);
+	if (!pCMap)
+	{
+
+		lua_pushnumber(pLS, 0);
+		return 1;
+	}
+	pCMap->SetShowInPortalTimer(lua_tonumber(pLS, 2) != 0 ? true : false);
+	// setup  permanent portal for future use for portal timer this will work upon open gameserver only @mothannakh
+	pCMap->permanentEntryPos.x = lua_tonumber(pLS, 3);
+	pCMap->permanentEntryPos.y = lua_tonumber(pLS, 4);
+	//
+
+	lua_pushnumber(pLS, 1);
+
+	return 1;
+}
 // 开始取副本的玩家角色
 // 参数：副本对象
 // 返回值：无
@@ -7845,5 +7876,6 @@ REGFN(SetIMP);
 //Add by Mdr
 REGFN(LookEnergy);
 REGFN(SetExpiration);
+REGFN(ShowInPortalTimer);	//maze timer helper 
 // End
 T_E}

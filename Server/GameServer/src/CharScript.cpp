@@ -5941,8 +5941,102 @@ inline int lua_GetPlayerByActName(lua_State *L) {
 	return 0;
 	T_E
 }
+//set vip system
+inline int lua_SetPlayerVIp(lua_State* L) {
+	const BOOL bValid = (lua_gettop(L) == 2 & lua_islightuserdata(L, 1) & lua_isnumber(L, 2));
+	if (!bValid) {
+		E_LUAPARAM
+			return 0;
+	}
+	const auto pChar = static_cast<CCharacter*>(lua_touserdata(L, 1));
+	if (!pChar) {
+		E_LUAPARAM
+			return 0;
+	}
+	const auto ply = pChar->GetPlayer();
+	if (!ply) {
+		E_LUAPARAM
+			return 0;
+	}
+	const auto vip = lua_tonumber(L, 2);
+	ply->Setvip(static_cast <long long>(vip));
+	game_db.UpdateVip(ply);
+	//update ingame states
+	WPacket l_wpk = GETWPACKET();
+	WRITE_CMD(l_wpk, CMD_MC_UpdateVipSet);
+	WRITE_LONG(l_wpk, ply->IsPlayerNitroVip() ? 1 : 0);
+	pChar->ReflectINFof(pChar, l_wpk);
+	//end of update 
 
+	return 0;
+}
+inline int lua_GetPlayerVIp(lua_State* L) {
+	const BOOL bValid = (lua_gettop(L) == 1 & lua_islightuserdata(L, 1));
+	if (!bValid) {
+		E_LUAPARAM
+			LG("lua_GetPlayerVIp", "invalid parma\n");
+		return 0;
+	}
+	const auto pChar = static_cast<CCharacter*>(lua_touserdata(L, 1));
+	if (!pChar) {
+		E_LUAPARAM
+			LG("lua_GetPlayerVIp", "pChar  NULL\n");
+		return 0;
+	}
+	const auto ply = pChar->GetPlayer();
+	if (!ply) {
+		E_LUAPARAM
+			LG("lua_GetPlayerVIp", "GetPlayer  NULL\n");
+		return 0;
+	}
 
+	lua_pushboolean(L, ply->IsPlayerNitroVip());
+
+	return 1;
+}
+//get nitro time in seconds
+inline int lua_GetPlayerNitroTimeS(lua_State* L) {
+	const BOOL bValid = lua_gettop(L) == 1 && lua_islightuserdata(L, 1);
+	if (!bValid) {
+		E_LUAPARAM
+			return 0;
+	}
+
+	const auto pChar = static_cast<CCharacter*>(lua_touserdata(L, 1));
+	if (!pChar) {
+		E_LUANULL
+			return 0;
+	}
+	const auto ply = pChar->GetPlayer();
+	if (!ply) {
+		E_LUAPARAM
+			return 0;
+	}
+	lua_pushnumber(L, ply->GetVipTime());
+
+	return 1;
+}
+inline static int lua_GetNitroRemainSecondS(lua_State* L) {
+	const BOOL bValid = lua_gettop(L) == 1 && lua_islightuserdata(L, 1);
+	if (!bValid) {
+		E_LUAPARAM
+			return 0;
+	}
+
+	const auto pChar = static_cast<CCharacter*>(lua_touserdata(L, 1));
+	if (!pChar) {
+		LG("GetNitroRemainSecondS", "pChar was nullptr \n");
+		return 0;
+	}
+	const auto ply = pChar->GetPlayer();
+	if (!ply) {
+		LG("GetNitroRemainSecondS", "pChar->GetPlayer() was nullptr \n");
+		return 0;
+	}
+	lua_pushnumber(L, ply->GetVipRemaningSeconds());
+
+	return 1;
+}
 inline int lua_GetItemQuantity(lua_State* pLS) {
 	T_B
 		bool bSuccess = true;
@@ -6545,7 +6639,11 @@ BOOL RegisterCharScript()
 
 	REGFN(RemoveOfflineMode);
 	REGFN(ChangePlayerName)
-		REGFN(VerifyName) // for change name, using with card
+	REGFN(SetPlayerVIp);
+	REGFN(GetPlayerVIp);
+	REGFN(GetPlayerNitroTimeS)
+	REGFN(GetNitroRemainSecondS)
+	REGFN(VerifyName) // for change name, using with card
 	// AI�����Ǽ�
 	RegisterLuaAI(g_pLuaState);
 	

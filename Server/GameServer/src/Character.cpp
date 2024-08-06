@@ -7219,9 +7219,8 @@ unsigned long CCharacter::GetMasterDBID()
 	return game_db.GetPlayerMasterDBID(GetPlayer());
 }
 
-void CCharacter::InitCheatX()
-{
-	m_sCheatX.dwInterval =  GetCheatInterval(0);
+void CCharacter::InitCheatX() {
+	m_sCheatX.dwInterval = GetCheatInterval(0);
 	m_sCheatX.dwLastTime = GetTickCount();
 	m_sCheatX.Xerror = 0;
 	m_sCheatX.Xnum.clear();
@@ -7230,7 +7229,7 @@ void CCharacter::InitCheatX()
 	m_sCheatX.Xcount = 0;
 	m_sCheatX.Xn = 2;
 }
-
+//anti bot timer happen every 30 mins or 40 mins for correct answers or every 2-3 minsfor incorrect answers can be edited here if needed
 DWORD CCharacter::GetCheatInterval(int state)
 {
 	#define RAND_IN_NUM(x) (rand() % ((x) + 1))
@@ -7241,16 +7240,18 @@ DWORD CCharacter::GetCheatInterval(int state)
 	
 	switch(state)
 	{
-	case 0://刚上线
-		ret = 20 * MS_IN_ONE_SECOND + 100 * RAND_IN_NUM(MS_IN_ONE_SECOND);
+	case 0:
+		ret = 20 * MS_IN_ONE_SECOND + 100 * RAND_IN_NUM(MS_IN_ONE_SECOND);//109700 ms around 1.82mind to 3 mins of waiting first start
 		break;
-	case 1://回答问题限时
-		ret = 65 * MS_IN_ONE_SECOND;
+	case 1:
+		ret = 65 * MS_IN_ONE_SECOND;//65000 ms means 65 seconds min and 5 seconds 
 		break;
-	case 3://提问间隔
+	case 3://depends on correct answer if its more than 3 use (40 * MS_IN_ONE_MINUTE) 2400000 40 mins for more than 3 correct answer
+		// if its less thantwo use (60 * RAND_IN_NUM(MS_IN_ONE_SECOND) + 10 * m_sCheatX.Xn * MS_IN_ONE_MINUTE)1253820 between 10 to 20 mints 
 		ret = (m_sCheatX.Xn > 3) ? (40 * MS_IN_ONE_MINUTE) : (60 * RAND_IN_NUM(MS_IN_ONE_SECOND) + 10 * m_sCheatX.Xn * MS_IN_ONE_MINUTE);
 		break;
 	default:
+		//by default 109700 is 1 min and half up to 3 mins 
 		ret = 20 * MS_IN_ONE_SECOND + 100 * RAND_IN_NUM(MS_IN_ONE_SECOND);
 		break;
 	}
@@ -7400,7 +7401,7 @@ void CCharacter::CheatConfirm()
 	else
 	{
 		//LG("Cheat", "玩家 %s 使用外挂,被踢下线!\n", GetName());
-		LG("Cheat", "character %s use waigua,kick it!\n", GetName());
+		LG("CheatConfirm", "character %s use CheatConfirm,kick it!\n", GetName());
 
 		GatePlayer *pGatePlyer = (GatePlayer *)GetPlayer();
 		g_gmsvr->KickPlayer2(pGatePlyer);

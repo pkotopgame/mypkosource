@@ -486,6 +486,52 @@ void CGameApp::ProcessPacket(GateServer* pGate, RPACKET pkt)
 	//		break;
 	//	}
 	//	//End
+		//portal timer @mothannakh
+	case CMD_TM_PORTALTIMES: {
+		if (m_mapnum <= 0) {
+			break;
+		}
+
+		const auto gatePlayer = READ_LONG(pkt);
+		auto wpk = GETWPACKET();
+		WRITE_CMD(wpk, CMD_MC_PORTALTIMES);
+
+		unsigned short maps_with_portal = 0;
+		for (auto i = 0; i < m_mapnum; ++i) {
+
+			auto& map = m_MapList[i];
+			if (map) {
+
+				if (strcmp(map->m_szEntryMapName, "") == 0) {
+					continue;
+				}
+				if (!map->GetShowInPortalTimer()) {
+					continue;
+				}
+				if (time(nullptr) < map->m_tEntryFirstTm) {
+					continue;
+				}
+
+				//WRITE_CHAR(wpk, map->GetMapID());
+				//will send map name instead of id ,so can search by name and do not need matching lua to mapinfo client side
+				WRITE_STRING(wpk, map->GetName()); // mapname  
+				WRITE_LONGLONG(wpk, map->m_tEntryFirstTm);
+				WRITE_LONGLONG(wpk, map->m_tEntryTmDis);
+				WRITE_LONGLONG(wpk, map->m_tEntryOutTmDis);
+				WRITE_LONGLONG(wpk, map->m_tMapClsTmDis);
+				//send location name and cord
+				WRITE_STRING(wpk, map->m_szEntryMapName); // entry location name 
+				WRITE_LONG(wpk, map->permanentEntryPos.x); // cord x
+				WRITE_LONG(wpk, map->permanentEntryPos.y); // cord y
+				++maps_with_portal;
+			}
+		}
+		WRITE_SHORT(wpk, maps_with_portal);
+		WRITE_LONG(wpk, gatePlayer);
+
+		pGate->SendData(wpk);
+	} break;
+						   // end
 
 	case CMD_TM_ENTERMAP:
 	{

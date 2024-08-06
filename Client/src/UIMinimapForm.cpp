@@ -277,6 +277,16 @@ void CMiniMapMgr::_MiniFormMouseEvent(CCompent *pSender, int nMsgType, int x, in
 
 			frmRadar->SetIsShow( !frmRadar->GetIsShow() );
 	}
+	else if (name == "btnPortalTimer") //this add one to your minimap.clu next to rank or what ever 
+	{
+		CForm* f = CFormMgr::s_Mgr.Find("frmPortalTime");
+		if (f) {
+			if (!f->GetIsShow())
+				f->Show();
+			else
+				f->Hide();
+		}
+	}
 	else if (name == "btnStall")
 	{
 		g_stUIBooth.SearchAllStalls();

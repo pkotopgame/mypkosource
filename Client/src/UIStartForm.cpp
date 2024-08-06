@@ -352,10 +352,10 @@ bool CStartMgr::Init()
 		if (frmMonsterInfo)
 		{
 			frmMonsterInfo->Refresh();
-			lstMobDrop = dynamic_cast<CForm*>(frmMonsterInfo->Find("lstMobDrop"));
+			/*lstMobDrop = dynamic_cast<CForm*>(frmMonsterInfo->Find("lstMobDrop"));
 			assert(lstMobDrop != NULL);
 			lstMobInfo = dynamic_cast<CForm*>(frmMonsterInfo->Find("lstMobInfo"));
-			assert(lstMobInfo != NULL);
+			assert(lstMobInfo != NULL);*/
 			listInfo = dynamic_cast<CPage*>(frmMonsterInfo->Find("pgeSkill"));
 			assert(listInfo != NULL);
 			listInfo->evtSelectPage = _evtMobPageIndexChange;
@@ -1173,7 +1173,7 @@ void  CStartMgr::_evtChaHeartChange(CGuiData *pSender)
 
 void GUI::CStartMgr::_evtMobPageIndexChange(CGuiData* pSender)
 {
-	int index = g_stUIStart.listInfo->GetIndex();
+	/*int index = g_stUIStart.listInfo->GetIndex();
 	if (index == 0)
 	{
 		g_stUIStart.lstList = g_stUIStart.lstMobDrop;
@@ -1182,7 +1182,7 @@ void GUI::CStartMgr::_evtMobPageIndexChange(CGuiData* pSender)
 	{
 		g_stUIStart.lstList = g_stUIStart.lstMobInfo;
 	}
-	g_stUIStart.FetchRates();
+	g_stUIStart.FetchRates();*/
 }
 
 void CStartMgr::RefreshMainLifeNum( long num, long max )

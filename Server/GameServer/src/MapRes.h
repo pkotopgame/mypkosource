@@ -155,6 +155,10 @@ public:
 	void		SetCanStall(bool bCan = true){m_bCanStall = bCan;}//设置能否摆摊
 	void		SetCanGuild(bool bCan = true) { m_bCanGuild = bCan; }
 	void		SetGuildWar(bool bGuildWar) { m_bGuildWar = bGuildWar; }
+	//map portal timer helper m_ShowInPortalTimer
+	void		SetShowInPortalTimer(bool show = false) { m_ShowInPortalTimer = show; }
+	bool		GetShowInPortalTimer() { return m_ShowInPortalTimer; }
+	//helper end 
 	bool		CanGuildWar() { return m_bGuildWar; }
 	bool		CanTeam(void) {return m_bCanTeam;}
 	bool		CanStall(void) {return m_bCanStall;}//能否摆摊
@@ -221,6 +225,7 @@ public:
 	struct
 	{
 		dbc::Char	m_szEntryMapName[MAX_MAPNAME_LENGTH];
+		Point permanentEntryPos{}; //here we save orginal entery pose for send it to client @mothannakh for portal timer 
 		Point		m_SEntryPos;
 		dbc::Char	m_chEntryState;		// 入口状态：EMapEntryState
 
@@ -258,6 +263,7 @@ private:
 		bool	m_bCanTeam;		// 角色在该地图上是否可以操作队伍
 		bool	m_bCanStall;	// 角色在该地图是否可以摆摊
 		bool	m_bCanGuild;
+		bool	m_ShowInPortalTimer{ false };	//check if map allowed to show in map portal timer or not 
 	};
 
 	CTimer	m_timeMgr;

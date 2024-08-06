@@ -118,6 +118,7 @@ public:
 	short	m_sGuildTryNum;
 	BOOL	m_bOfflineMode;
 	BOOL	m_bDiscStall;
+	BOOL EnableAntiBot{ FALSE }; //anti bot capture option @mothannakh
 	BOOL	m_bBlindChaos;
 	char	m_szChaosMap[32];
 	DWORD	m_dwStallTime;		

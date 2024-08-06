@@ -1203,3 +1203,107 @@ void CPlayer::Run(DWORD dwCurTime)
 			ClearChallengeObj(false);
 		}
 }
+//use this function to return remaning seconds of player vip 
+long long CPlayer::GetVipRemaningSeconds() const {
+	if (!IsPlayerNitroVip())
+		return 0;
+	using namespace std::chrono;
+	auto TimeNow = system_clock::now(); //current system time 
+	auto vipTimePoint = system_clock::time_point(seconds(NitroVipTime)); //convert vip second to date time
+	const auto secondsremain = duration_cast<seconds>(vipTimePoint - TimeNow).count(); // calculate different
+	return 	max(0, secondsremain);
+}
+//vip system now it works as adding duration per day 
+void CPlayer::Setvip(const long long vip, const bool firstLogin) {
+	T_B
+		using namespace std::chrono;
+	//if we are not removing it we add new days 
+	if (vip > 0) {
+		// we check if its first login we just check for time and update client and database
+		auto TimeNow = system_clock::now();
+		if (firstLogin) {
+			NitroVipTime = vip;
+			// convert time to seconds
+			const auto TimeInseconds = system_clock::to_time_t(TimeNow);
+			// check if current
+			IsNitroVip = NitroVipTime >= TimeInseconds;
+			if (!IsNitroVip) {
+				// set player time to zero and mark it as false
+				NitroVipTime = 0;
+				// update database?
+				const auto result = game_db.UpdateVip(this);
+				if (!result)
+					LG("Setvip", "firstLogin setvip failed to update \n");
+			}
+			//if its first login we don't need to process anything below 
+			return;
+		}
+		// use old vip duration to overwrite old vip day and add extra  days to current one ?
+		if (NitroVipTime > 0) {
+			// check also if time valid before add it
+			auto vipTimePoint = system_clock::time_point(seconds(NitroVipTime));
+			const auto secondsremain = duration_cast<seconds>(vipTimePoint - TimeNow).count();
+			if (secondsremain > 0) {
+				vipTimePoint += hours(vip * 24);
+				NitroVipTime = system_clock::to_time_t(vipTimePoint);
+				// update database
+				const auto result = game_db.UpdateVip(this);
+				if (!result)
+					LG("Setvip", "secondsremain > 0 setvip failed to update \n");
+				return;
+			}
+
+		}
+		// //otherwise just create new time duration in seconds
+		TimeNow += hours(vip * 24);
+		const auto newt = system_clock::to_time_t(TimeNow);
+		NitroVipTime = newt;
+		IsNitroVip = true; // we set it as vip player
+		// update database
+		const auto result = game_db.UpdateVip(this);
+		if (!result)
+			LG("Setvip", "vip > 0 setvip failed to update \n");
+		return;
+
+	}
+	//if its zero we just remove without create new time
+	NitroVipTime = vip;
+	IsNitroVip = false; //we set player as not nitro
+	//remove boosted buff from player
+	g_CParser.DoString("RemoveVipBuffs", enumSCRIPT_RETURN_NONE, 0, enumSCRIPT_PARAM_LIGHTUSERDATA, 1, GetMainCha(), DOSTRING_PARAM_END);
+
+	T_E
+}
+//we run check for players inside the game every 20mins if they has nitro access or not 
+void CPlayer::VipTimerCheck() {
+	T_B
+		//if has stall just return ;
+		if (GetMainCha()->GetStallData()) return;
+	if (IsNitroVip && NitroVipTime > 0) {
+		using namespace std::chrono;
+
+		const auto TimeNow = system_clock::to_time_t(system_clock::now());
+		//means player time expired 
+		if (TimeNow >= NitroVipTime) {
+			//set player time to zero and mark it as false 
+			NitroVipTime = 0;
+			IsNitroVip = false; // we set player as not nitro
+			//update database?
+			const auto result = game_db.UpdateVip(this);
+			if (!result)
+				LG("Setvip", "VipTimerCheck setvip failed to update \n");
+			//remove boosted buff from player
+			g_CParser.DoString("RemoveVipBuffs", enumSCRIPT_RETURN_NONE, 0, enumSCRIPT_PARAM_LIGHTUSERDATA, 1, GetMainCha(), DOSTRING_PARAM_END);
+			// update ingame states
+			WPacket l_wpk = GETWPACKET();
+			WRITE_CMD(l_wpk, CMD_MC_UpdateVipSet);
+			WRITE_LONG(l_wpk, 0);
+			const auto cha = this->GetCtrlCha();
+			if (cha)
+				cha->ReflectINFof(cha, l_wpk);
+			// end of update 
+		}
+	}
+
+	T_E
+}

@@ -3304,32 +3304,51 @@ bool CTableAct::ReadAllData(CPlayer *pPlayer, DWORD ato_id)
 {T_B
 	if(!pPlayer) return false;
 
-	string buf[3]; 
-    char param[] = "jmes, ato_nome, IMP";
+	string buf[4]; 
+    char param[] = "jmes, ato_nome, IMP,VIP";
     char filter[80]; sprintf(filter, "ato_id=%d", ato_id);
-    int r = _get_row(buf, 3, param, filter);
+    int r = _get_row(buf, 4, param, filter);
 	int	r1 = get_affected_rows();
 	if (DBOK(r) && r1 > 0)
     {
         pPlayer->SetGMLev(Str2Int(buf[0]));
 		pPlayer->SetActName(buf[1].c_str());
 		pPlayer->SetIMP(Str2Int(buf[2].c_str()));
+		pPlayer->Setvip(Str2Int(buf[3]), true);
 		return true;
     }
 
     return false;
 T_E}
 
-bool CTableAct::SaveIMP(CPlayer *pPlayer){T_B
-	int IMP = pPlayer->GetMainCha()->GetIMP();
-	int actID = pPlayer->GetMainCha()->GetID();
-	sprintf(g_sql, "Update %s set IMP = %d where atorID = %d;", "character",IMP,actID);
-	short l_sqlret = exec_sql_direct(g_sql);
-	if (!DBOK(l_sqlret) || get_affected_rows() == 0){
+bool CTableAct::SaveVIP( CPlayer* pPlayer) {
+
+	T_B
+		if (!pPlayer)
+			return false;
+	const auto vip = pPlayer->GetVipTime();
+	const int actID = pPlayer->GetDBActId();
+	_snprintf_s(g_sql, sizeof(g_sql), _TRUNCATE, "Update %s set VIP = %lld where ato_id = %d;", _get_table(), vip, actID);
+	const short l_sqlret = exec_sql_direct(g_sql);
+	if (!DBOK(l_sqlret) || get_affected_rows() == 0) {
 		return false;
 	}
 	return true;
-T_E}
+	T_E
+}
+
+bool CTableAct::SaveIMP(CPlayer* pPlayer) {
+	T_B
+		int IMP = pPlayer->GetMainCha()->GetIMP();
+	int actID = pPlayer->GetMainCha()->GetID();
+	sprintf(g_sql, "Update %s set IMP = %d where atorID = %d;", "character", IMP, actID);
+	short l_sqlret = exec_sql_direct(g_sql);
+	if (!DBOK(l_sqlret) || get_affected_rows() == 0) {
+		return false;
+	}
+	return true;
+	T_E
+}
 
 bool CTableAct::SaveGmLv(CPlayer *pPlayer)
 {T_B

@@ -51,7 +51,7 @@
 #include "UIMailForm.h"
 #include "UINumAnswer.h"
 #include "UIChurchChallenge.h"
-
+#include "UIPortalTime.h" //maze portal timer
 using namespace std;
 
 namespace GUI
@@ -132,7 +132,8 @@ CChurchChallengeMgr g_stChurchChallenge;
 
 CCozeForm          g_stUICozeForm;
 CChannelSwitchForm g_stUIChannelSwitch;
-
+// maze portal timer
+CPortalTime g_stUIPortalTime;
 bool CUIInterface::_IsAllInit = false;
 
 CUIInterface::CUIInterface()

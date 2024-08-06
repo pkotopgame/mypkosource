@@ -323,6 +323,9 @@ bool CGameConfig::Load(char *pszFileName)
 		{
 			strncpy_s( m_szChaosMap, sizeof(m_szChaosMap), strValue.c_str(), _TRUNCATE );
 		}
+		else if (strKey == "EnableAntiBot") {
+			EnableAntiBot = Str2Int(strValue);
+		}
 		else if(strKey=="stall_interval")
 		{
 			m_dwStallTime = Str2Int(strValue);
@@ -402,6 +405,9 @@ bool CGameConfig::Reload(char *pszFileName)
 		else if(strKey=="chaos_blind")
 		{
 			m_bBlindChaos = Str2Int(strValue);
+		}
+		else if (strKey == "EnableAntiBot") {
+			EnableAntiBot = Str2Int(strValue);
 		}
 	}
 	in.close();

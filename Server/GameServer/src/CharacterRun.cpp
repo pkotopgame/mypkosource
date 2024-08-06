@@ -51,12 +51,13 @@ void CCharacter::Run(DWORD dwCurTime)
 		}
 	}
 
-	//防外挂暂时不上
-	/*if(IsPlayerCha() && !IsGMCha2() && ((!(GetAreaAttr() & enumAREA_TYPE_NOT_FIGHT)) || IsBoat()) && !GetPlyCtrlCha()->GetSubMap()->GetMapRes()->CanPK())
-	{
-		GetPlyMainCha()->CheatRun(dwCurTime);
-	}*/
+	//anti bot capcha as option @mothannakh
+	if (g_Config.EnableAntiBot) {
 
+		if (IsPlayerCha() && !IsGMCha2() && ((!(GetAreaAttr() & enumAREA_TYPE_NOT_FIGHT)) || IsBoat()) && !GetPlyCtrlCha()->GetSubMap()->GetMapRes()->CanPK()) {
+			GetPlyMainCha()->CheatRun(dwCurTime);
+		}
+	}
 	//add by jilinlee 2007/4/20
 	//是否在读书状态
 	if (IsReadBook())
@@ -161,7 +162,17 @@ void CCharacter::Run(DWORD dwCurTime)
 	m_dwCellRunTime[chCount++] = t.End();
 	t.Begin();
 	if (bIsLiveing)
-		if (m_timerDBUpdate.IsOK(dwCurTime))   OnDBUpdate(dwCurTime);
+	{
+		if (m_timerDBUpdate.IsOK(dwCurTime)) 
+		{
+			// we check vip players here too
+			if (IsPlayerCha() && !IsBoat()) {
+				GetPlayer()->VipTimerCheck();
+			}
+			// here database update default every 20min 
+			OnDBUpdate(dwCurTime);
+		}
+	}
 	m_dwCellRunTime[chCount++] = t.End();
 
 	t.Begin();

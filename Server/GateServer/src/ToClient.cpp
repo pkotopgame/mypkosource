@@ -214,7 +214,7 @@ void ToClient::OnConnected(DataSocket* datasock)
 		try
 		{
 			////if (datasock->IsServer()) return;
-			l_ply->srvPrivateKey.GenerateRandomWithKeySize(l_ply->rng, 3072);
+			l_ply->srvPrivateKey.GenerateRandomWithKeySize(l_ply->rng, 1821);
 			CryptoPP::RSA::PublicKey srvPublicKey(l_ply->srvPrivateKey);
 
 			l_ply->handshakeDone = false;
@@ -1046,7 +1046,21 @@ void ToClient::CM_BGNPLAY(DataSocket* datasock, RPacket& recvbuf)
 		SendData(datasock, l_wpk);
 		return;
 	}
-
+	//get gameserver list in this source been deleted 
+	GameServer* _game_list = g_gtsvr->gm_conn->GetGameList();
+	for (GameServer* t_game = _game_list; t_game; t_game = t_game->next)
+	{
+		////portal timer send to all gameservers @mothannakh
+		if (t_game && l_ply)
+		{
+			auto wpk = g_gtsvr->gm_conn->GetWPacket();
+			wpk.WriteCmd(CMD_TM_PORTALTIMES);
+			wpk.WriteLong(ToAddress(l_ply));
+			SendData(t_game->m_datasock, wpk);	//send to all gameserver lists 
+		}
+		// portal timer end //
+	}
+	//
 	l_ply->m_status = ClientConnection::Status::Playing;
 	l_game->m_plynum++;
 

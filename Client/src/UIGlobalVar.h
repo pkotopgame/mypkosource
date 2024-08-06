@@ -109,6 +109,7 @@ namespace GUI
 	class CMailMgr;
 	class CNumAnswerMgr;
 	class CChurchChallengeMgr;
+	class CPortalTime;	//maze portal timer 
 	extern CTextParse		g_TextParse;
 
 class CUIInterface // �û�������Ϣ
@@ -198,3 +199,5 @@ extern CChurchChallengeMgr g_stChurchChallenge;
 //extern CChannelSwitchForm g_stUIChannelSwitch;
 
 
+//maze portal timer 
+extern CPortalTime g_stUIPortalTime;

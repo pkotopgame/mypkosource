@@ -212,6 +212,17 @@ void ToGameServer::OnProcessData(DataSocket* datasock, RPacket &recvbuf)
 	{
 		switch (l_cmd)
 		{
+			// maze portal timer @moth
+		case CMD_MC_PORTALTIMES: {
+			RPacket rpk = recvbuf;
+			
+			if (auto player = ToPointer<ClientConnection>(rpk.ReverseReadLong()); player) {
+
+				rpk.DiscardLast(sizeof(sizeof(uLong)));
+				auto wpk = WPacket(rpk).Duplicate();
+				g_gtsvr->cli_conn->SendData(player->m_datasock, wpk);
+			}
+		} break;
 		case CMD_MP_GM1SAY: {
 			g_gtsvr->gp_conn->SendData(g_gtsvr->gp_conn->get_datasock(), WPacket(recvbuf));
 			break;

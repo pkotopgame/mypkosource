@@ -12,11 +12,12 @@
 void CCharacter::WriteBaseInfo(WPACKET &pkret, Char chLookType)
 {
 	CPlayer	*pCPlayer = GetPlayer();
-
+	long vip = 0;
 	WRITE_LONG(pkret, GetCat());
 	WRITE_LONG(pkret, GetID());
 	if (pCPlayer)
 	{
+		vip = pCPlayer->IsPlayerNitroVip() ? 1 : 0;
 		if (g_Config.m_bBlindChaos && IsPlayerCha() && LOOK_OTHER == chLookType && IsPKSilver())
 		{
 			WRITE_LONG(pkret, pCPlayer->GetMainCha()->GetID());
@@ -61,6 +62,8 @@ void CCharacter::WriteBaseInfo(WPACKET &pkret, Char chLookType)
 		WRITE_LONG(pkret, guildPermission);
 		WRITE_STRING(pkret, GetStallName());
 	}
+	//send vip info
+	WRITE_LONG(pkret, vip);
 	WRITE_SHORT(pkret, GetExistState());
 	WRITE_LONG(pkret, GetPos().x);
 	WRITE_LONG(pkret, GetPos().y);

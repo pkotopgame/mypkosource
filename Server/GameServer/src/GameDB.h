@@ -304,6 +304,7 @@ public:
 	bool ReadAllData(CPlayer *pPlayer, DWORD ato_id);
 	bool SaveIMP(CPlayer *pPlayer);
 	bool SaveGmLv(CPlayer *pPlayer);
+	bool SaveVIP( CPlayer* pPlayer);
 };
 
 class CTableBoat : public cfl_rs
@@ -991,7 +992,9 @@ public:
 	bool UpdateIMP(CPlayer* ply){
 		return _tab_act->SaveIMP(ply);
 	}
-
+	bool UpdateVip(CPlayer* ply) {
+		return _tab_act->SaveVIP(ply);
+	}
 	bool SaveGmLv(CPlayer* ply)
 	{
 		return _tab_act->SaveGmLv(ply);

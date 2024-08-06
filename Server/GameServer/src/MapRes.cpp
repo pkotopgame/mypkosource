@@ -198,7 +198,9 @@ bool CMapRes::InitCtrl(void)
 	SetRepatriateDie(true);
 	SetType();
 	SetCopyStartType();
-
+	SetShowInPortalTimer(false); // maze portal helper //
+	permanentEntryPos.x = 0;
+	permanentEntryPos.y = 0;
 	g_CParser.DoString("init_entry", enumSCRIPT_RETURN_NONE, 0, enumSCRIPT_PARAM_LIGHTUSERDATA, 1, this, DOSTRING_PARAM_END);
 	g_CParser.DoString("config", enumSCRIPT_RETURN_NONE, 0, enumSCRIPT_PARAM_LIGHTUSERDATA, 1, this, DOSTRING_PARAM_END);
 
