@@ -28,3 +28,6 @@ extern MPEditor g_Editor;
 
 
 
+//nitro option enable disable and nitro emoji index start
+constexpr auto IsNitroOn = true;
+constexpr auto NitroIndexStart = 25; //emoji index to start filter them 

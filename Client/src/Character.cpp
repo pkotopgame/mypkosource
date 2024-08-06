@@ -42,6 +42,7 @@
 #include "MountRecord.h"
 
 #include "PacketCmd.h"
+#include "GameConfig.h"
 
 extern CGameApp*		g_pGameApp;
 extern bool				g_IsShowModel;
@@ -427,6 +428,12 @@ void CCharacter::_UpdateValid(BOOL bValid)
 		if (CLOAKGlow[enumEQUIP_CLOAK] && IsPlayer())
 		{
 			RemoveCloakGlow();
+		}
+		//delete unvalid 
+		if (VipEffect)
+		{
+			VipEffect->SetValid(FALSE);
+			VipEffect = nullptr;
 		}
 		setSideID( 0 );
 		if( GetDrunkState() ) CCharacterModel::SetDrunkState( FALSE );
@@ -1853,6 +1860,12 @@ bool CCharacter::UpdataItem( int nItem, DWORD nLink )
 			{
 				RemoveCloakGlow();
 			}
+			//hide vip 
+			if (VipEffect)
+			{
+				VipEffect->SetValid(FALSE);
+				VipEffect = nullptr;
+			}
 			return false;
 		}
 		
@@ -1864,7 +1877,38 @@ bool CCharacter::UpdataItem( int nItem, DWORD nLink )
 			}
 			int ID = GetPart().SLink[nLink].sID;
 			
-			
+			//render vip players effect 
+
+			if (GetPlayerVip())
+			{
+				//check if effect not exist so we canrender it 
+				if (!VipEffect)
+				{
+					if (auto&& pEffect = _pScene->GetFirstInvalidEffObj(); pEffect) {
+
+						if (pEffect->Create(g_Config.VipStatesEffect)) {
+							pEffect->setLoop(true);
+							pEffect->setFollowObj(this, NODE_CHA, g_Config.VIPEffectDummy);
+							pEffect->Emission(-1, nullptr, nullptr);
+							pEffect->SetValid(TRUE);
+							pEffect->SetScale(1.f, 1.f, 1.f);
+							pEffect->setHeightOff(g_Config.VIPEffectHeightOff);
+							VipEffect = pEffect;
+
+						}
+					}
+				}
+
+			}
+			else
+			{
+				//remove vip if player not vip states 
+				if (VipEffect)
+				{
+					VipEffect->SetValid(FALSE);
+					VipEffect = nullptr;
+				}
+			}
 			if(nLink==enumEQUIP_FAIRY){
 				
 				if(_ShowApparel && GetPart().SLink[enumEQUIP_FAIRYAPP].sID != 0 && ID != 0){
@@ -2200,47 +2244,35 @@ void CCharacter::SynchroSkillState( stSkillState* pState, int nCount )
 		}
 	}
 
-	if (set.IsTrue(enumChaStateMove) != _ChaState.IsTrue(enumChaStateMove)) {
-	    if (set.IsTrue(enumChaStateMove)) {
-	    	PlayPoseContinue();
-		}
-	    else 
-		{
-	        if (GetCurPoseType() != POSE_SEAT && IsPlayer() && !IsMonster()) {
-	            GetActor()->OverAllState();
+	if (set.IsTrue(static_cast<unsigned>(eChaState::enumChaStateMove)) != _ChaState.IsTrue(static_cast<unsigned>(eChaState::enumChaStateMove))) {
+		if (set.IsFalse(static_cast<unsigned>(eChaState::enumChaStateMove))) {
+			// small trick to fix stun bugs like fbs and other states   @mothannakh
+			if (GetCurPoseType() != POSE_SEAT && IsPlayer()) {
+				GetActor()->OverAllState(); // seems this fixed it ?
 			}
-	        PlayPosePause();
-	    }
+			//PlayPosePause();
+		}
+
 	}
 
-	if( set.IsTrue( enumChaStateNoDizzy ) != _ChaState.IsTrue( enumChaStateNoDizzy ) )
-	{
-		if( _pDefaultChaInfo->IsCyclone() )
-		{
-			if( set.IsTrue( enumChaStateNoDizzy ) )
-			{
-				CCharacterModel::SetDrunkState( FALSE );
-				//GetActor()->ClearQueueState();
-				//CDizzyState* pState = dynamic_cast<CDizzyState*>(GetActor()->GetCurState());
-				//if( pState ) pState->Stop();
+	if (set.IsTrue(static_cast<unsigned>(eChaState::enumChaStateNoDizzy)) != _ChaState.IsTrue(static_cast<unsigned>(eChaState::enumChaStateNoDizzy))) {
+		if (_pDefaultChaInfo->IsCyclone()) {
+			if (set.IsTrue(static_cast<unsigned>(eChaState::enumChaStateNoDizzy))) {
+				SetDrunkState(FALSE);
+				if (IsPlayer())
+					GetActor()->ClearQueueState();
+				// CDizzyState* pState = dynamic_cast<CDizzyState*>(GetActor()->GetCurState());
+				// if( pState ) pState->Stop();
 			}
-			else
-			{
-				CCharacterModel::SetDrunkState( TRUE );
-				if (GetCurPoseType() != POSE_SEAT)
-				{
-					//GetActor()->OverAllState();	//seems this fixed it ?
+			else {
+				SetDrunkState(TRUE);
+				if (GetCurPoseType() != POSE_SEAT && IsPlayer()) {
+					GetActor()->OverAllState(); // seems this fixed it ?
 				}
-				//GetActor()->OverAllState();
-				//CDizzyState* pState = new CDizzyState(GetActor());
-				//GetActor()->SwitchState( pState );
-
-				//set.SetFalse( enumChaStateMove );
-				//set.SetFalse( enumChaStateAttack );
-				//set.SetFalse( enumChaStateUseSkill );
 			}
 		}
 	}
+
 
 	_ChaState = set;
 }
@@ -2398,7 +2430,11 @@ void CCharacter::SetHide(BOOL bHide)
 
 	_bHide = bHide;
 	RefreshShadow();
-
+	//hide vip effect
+	if (VipEffect)
+	{
+		VipEffect->SetHide(bHide);
+	}
 	int i;
 	for( i=0; i<enumEQUIP_NUM; i++ )
 		if( _pHandItem[i] )

@@ -20,6 +20,7 @@
 #include "UIBoatForm.h"
 #include "UIGlobalVar.h"
 #include "UIMiniMapForm.h"
+#include "GlobalVar.h"
 
 using namespace std;
 
@@ -1006,6 +1007,7 @@ void CCozeForm::SendMsg()
 				const string pcnsenderface = "#21";
 				const string preplaceface = "#99";
 				ReplaceSpecialFace(strMsg,preplaceface,pcnsenderface);
+				ParseNitroEmojies(strMsg);
 				//End
 				CS_Say(strMsg.c_str());
 				preStr=strMsg;
@@ -1029,6 +1031,7 @@ void CCozeForm::SendMsg()
 						ResetPages();
 					}
 					CTextFilter::Filter(CTextFilter::DIALOG_TABLE, strMsg);
+					ParseNitroEmojies(strMsg);
 					CS_Say2All(strMsg.c_str());
 				}
 				else
@@ -1054,6 +1057,7 @@ void CCozeForm::SendMsg()
 						ResetPages();
 					}
 					CTextFilter::Filter(CTextFilter::DIALOG_TABLE, strMsg);
+					ParseNitroEmojies(strMsg);
 					CS_Say2Trade(strMsg.c_str());
 				}
 				else
@@ -1079,6 +1083,7 @@ void CCozeForm::SendMsg()
 					{
 						ResetPages();
 					}
+					ParseNitroEmojies(strMsg);
 					CS_Say2Team(strMsg.c_str());
 				}
 			}
@@ -1091,6 +1096,7 @@ void CCozeForm::SendMsg()
 				ResetPages();
 			}
 			CTextFilter::Filter(CTextFilter::DIALOG_TABLE, strMsg);
+			ParseNitroEmojies(strMsg);
 			CS_Say2Guild(strMsg.c_str());
 			break;
 		}
@@ -1718,6 +1724,8 @@ void CCozeForm::EventCardSelected(CGuiData *pSender)
 void CCozeForm::EventFacePanelSwitchClick(CGuiData *pSender, int x, int y, DWORD key)
 {
 	CCozeForm *pThis=CCozeForm::GetInstance();
+	if (!pThis->m_grdFacePanel->GetIsShow())
+		pThis->EventFaceShow();
 	pThis->m_grdFacePanel->SetIsShow(!pThis->m_grdFacePanel->GetIsShow());
 	pThis->m_lstCallingCard->SetIsShow(false);
 	pThis->m_grdBrowPanel->SetIsShow(false);
@@ -1732,25 +1740,53 @@ void CCozeForm::EventFacePanelSwitchClick(CGuiData *pSender, int x, int y, DWORD
 //	pThis->m_grdFacePanel->MouseRun(pThis->m_grdFacePanel->GetX()-1, pThis->m_grdFacePanel->GetY()-1, 0);
 //}
 
-void CCozeForm::EventFaceSelected(CGuiData *pSender)
-{
-	CCozeForm *pThis=CCozeForm::GetInstance();
+void CCozeForm::EventFaceSelected(CGuiData* pSender) {
+	CCozeForm* pThis = CCozeForm::GetInstance();
 	pThis->m_grdFacePanel->SetIsShow(false);
 
-	if ((int)strlen(pThis->m_edtMsg->GetCaption())>pThis->m_edtMsg->GetMaxNum()-3)
-	{
+	if ((int)strlen(pThis->m_edtMsg->GetCaption()) > pThis->m_edtMsg->GetMaxNum() - 3) {
 		return;
 	}
 
-	if (pThis->m_grdFacePanel->GetSelect())
-	{
+	if (pThis->m_grdFacePanel->GetSelect()) {
 		pThis->m_edtMsg->SetActive(pThis->m_edtMsg);
-		char lpszFace[10];
-		sprintf(lpszFace, "#%02d", pThis->m_grdFacePanel->GetSelectIndex());
+		char lpszFace[10]{};
+		auto index = pThis->m_grdFacePanel->GetSelectIndex();
+		//nitro check need check vip 
+		CCharacter* pChar = CGameScene::GetMainCha();
+		if (!pChar) {
+			return;
+		}
+		if (IsNitroOn && !pChar->GetPlayerVip()) {
+			if (index >= NitroIndexStart) {
+				g_pGameApp->ShowMidText("selected Emoji avilable for vip/nitro players! buy your package first!");
+				return;
+			}
+		}
+		//
+
+		_snprintf_s(lpszFace, _TRUNCATE, "#%02d", pThis->m_grdFacePanel->GetSelectIndex());
+
 		pThis->m_edtMsg->ReplaceSel(lpszFace);
 	}
 }
-
+void CCozeForm::EventFaceShow()  {
+	if ( CCharacter* pChar = CGameScene::GetMainCha()) {
+		static bool NeedUpdate = false; //store vip states then we use it to compare if changed or not 
+		if (static bool firstrun = true; firstrun || NeedUpdate != pChar->GetPlayerVip()) {
+			firstrun = false;
+			for (auto i = NitroIndexStart; i <= g_TextParse.GetFaceCount(); i++) {
+				if (const auto Graph = m_grdFacePanel->GetGraph(i); Graph) {
+					if (!pChar->GetPlayerVip())
+						Graph->GetImage()->SetColor(COLOR_GRAY);
+					else
+						Graph->GetImage()->SetColor(COLOR_WHITE);
+				}
+			}
+			NeedUpdate = pChar->GetPlayerVip();
+		}
+	}
+}
 void CCozeForm::EventBrowPanelSwitchClick(CGuiData *pSender, int x, int y, DWORD key)
 {
 	CCozeForm *pThis=CCozeForm::GetInstance();
@@ -1823,5 +1859,22 @@ void GUI::CCozeForm::DisableChatBox()
 	if (IsChatBoxActive())
 	{
 		CCompent::SetActive(nullptr);
+	}
+}
+void CCozeForm::ParseNitroEmojies(std::string& strMsg) {
+	if (!IsNitroOn)
+		return;
+	CCharacter* pChar = CGameScene::GetMainCha();
+	if (pChar) {
+		if (pChar->GetPlayerVip()) {
+			return;
+		}
+	}
+	char buf[10]{ "" };
+	const string preplaceface = "#10";
+	size_t i = NitroIndexStart;
+	for (i; i <= g_TextParse.GetFaceCount(); i++) {
+		_snprintf_s(buf, _TRUNCATE, "#%.2d", i);
+		ReplaceSpecialFace(strMsg, preplaceface, buf);
 	}
 }

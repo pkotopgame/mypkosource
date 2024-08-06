@@ -71,7 +71,18 @@ bool CMiniMapMgr::Init()
 	//server timer
 	labClock = dynamic_cast<CLabelEx*>(frmMinimap->Find("labClock"));
 	if (!labClock) return Error(g_oLangRec.GetString(45), frmMinimap->GetName(), "labClock");
-		
+	labPanel = dynamic_cast<CLabelEx*>(frmMinimap->Find("labPanel"));
+	if (!labPanel)
+		return Error(g_oLangRec.GetString(45), frmMinimap->GetName(), "labPanel");
+	//@mothannakh
+	panelimg = frmMinimap->Find("panelbackdrop");
+	if (!panelimg)
+		return Error(g_oLangRec.GetString(45), frmMinimap->GetName(), "panelbackdrop");
+	if (labPanel && panelimg) {
+		panelimg->GetImage()->LoadImage("texture/ui/panel.png", panelimg->GetWidth(), panelimg->GetHeight(), 0, 0, 0);
+		panelimg->SetIsShow(FALSE);
+	}
+
 	// ���ͼ
 	frmBigmap =  _FindForm("frmBigmap");
 	if( !frmBigmap ) return false;
@@ -910,4 +921,20 @@ void CMiniMapMgr::_evtShowNPCList(CGuiData *pSender,int x,int y ,DWORD key)
 	bool b = !f->GetIsShow();
 	g_stUIStart.ShowNPCHelper(g_stUIStart.GetCurrMapName(),b);
 	
+
+
+}
+
+void CMiniMapMgr::RefreshPanel(const char* data) const {
+	if (labPanel) {
+		const std::string str(data);
+		if (const std::string str2("hide"); str.find(str2) != std::string::npos) {
+			panelimg->SetIsShow(FALSE);
+			labPanel->SetCaption("");
+		}
+		else {
+			panelimg->SetIsShow(TRUE);
+			labPanel->SetCaption(data);
+		}
+	}
 }

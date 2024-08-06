@@ -391,7 +391,7 @@ extern BOOL    SC_AStateBeginSee(LPRPACKET pk);
 
 // Э��S->C : ������ɫ(���������)��ʧ
 extern BOOL	SC_AStateEndSee(LPRPACKET pk);
-
+extern BOOL SC_UpdateVipSet(LPRPACKET pk);
 
 // �������
 extern BOOL	SC_Cha_Emotion(LPRPACKET pk);

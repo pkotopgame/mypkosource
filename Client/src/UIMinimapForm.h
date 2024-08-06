@@ -41,7 +41,7 @@ public:
 
 	CLabelEx*		GetLabMapPos(){return labMapPos;}
 	static void	ShowRadar(const char * szX,const char * szY);
-
+	void RefreshPanel(const char* data) const;
 protected:
 	virtual bool Init();
     virtual void End();
@@ -73,7 +73,8 @@ private:
 	//С��ͼ����
 	CForm*		frmMinimap;
 	CCompent*	MinimatRect;
-
+	CLabelEx* labPanel{ nullptr };
+	CCompent* panelimg{ nullptr };
 	enum 
 	{
 		MAP_POS_MAX = 10,

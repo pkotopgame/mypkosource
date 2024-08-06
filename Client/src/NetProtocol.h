@@ -190,7 +190,7 @@ struct stNetActorCreate				// ������ɫ����Ϣ
 	char			chSeeType{enumENTITY_SEEN_NEW};		// ���ֵ�����,EEntitySeenType
 	char			chGMLv{};			// GM�ȼ�
 	int 			chIsPlayer{};
-	
+	long isvip{ 0 };
 	
 	stNetChaSideInfo	SSideInfo{};	// �ֱ���Ϣ
 	stNetLookInfo		SLookInfo{};

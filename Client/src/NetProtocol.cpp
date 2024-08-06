@@ -464,7 +464,7 @@ void NetActorMove( unsigned int id, stNetNotiMove& list )
         }
 	}
 }
-
+//
 void stNetActorCreate::SetValue( CCharacter* pCha )
 {
 	pCha->setAttachID( ulWorldID );
@@ -482,7 +482,7 @@ void stNetActorCreate::SetValue( CCharacter* pCha )
 	pCha->setSecondName(strMottoName.c_str());
 	pCha->setPhotoID(sIcon);
 	pCha->setShopName( strStallName.c_str() );
-
+	pCha->SetPlayerVip(isvip == 1);
 	pCha->setGuildID(lGuildID);
 	pCha->setGuildName(strGuildName.c_str());
 	pCha->setGuildMotto(strGuildMotto.c_str());
@@ -1900,7 +1900,7 @@ void NetStallDelGoods( DWORD dwCharID, BYTE byGrid, BYTE byCount )
 
 void NetStallClose( DWORD dwCharID )
 {
-	g_stUIBooth.PullBoothSuccess( dwCharID);
+	g_stUIBooth.PullBoothSuccess();
 }
 
 void NetStallSuccess( DWORD dwCharID )

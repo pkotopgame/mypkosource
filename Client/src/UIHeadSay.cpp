@@ -1,17 +1,21 @@
 #include "StdAfx.h"
 #include "uiheadsay.h"
-#include "GameApp.h"
+
 #include "Character.h"
+#include "chastate.h"
+#include "GameApp.h"
+#include "globalvar.h"
+#include "MapSet.h"
+#include "SkillStateRecord.h"
+
+#include "uiboatform.h"
+#include "uiequipform.h"
+
 #include "uiitem.h"
 #include "UILabel.h"
-#include "UIProgressBar.h"
-#include "SkillStateRecord.h"
-#include "chastate.h"
-#include "uiboatform.h"
 #include "uiMiniMapForm.h"
+#include "UIProgressBar.h"
 #include "uistartForm.h"
-#include "globalvar.h"
-#include "uiequipform.h"
 
 using namespace std;
 using namespace GUI;
@@ -495,15 +499,21 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 		
 			s_dwNamePartsColors[NAME_INDEX][0] = _dwNameColor;
 		
-			// Added by Mdr.st May 2020 - FPO alpha
-			/* if (_ShowEnemyNames == true && _pOwn->GetIsPK() && !_pOwn->IsMainCha() && !_pOwn->IsNPC() ) {
-				s_dwNamePartsColors[NAME_INDEX][0] = COLOR_RED;
+			//is enemy/friend mode@moth
+			if (_pOwn->GetIsPK())
+			{
+				if (_pOwn->IsPlayer())
+				{
+					//this one color only other players green/red and keep your orginial color 
+					isTeamMember || isGuildMember ? _pOwn->IsMainCha() ? s_dwNamePartsColors[NAME_INDEX][0] : s_dwNamePartsColors[NAME_INDEX][0] = COLOR_GREEN : s_dwNamePartsColors[NAME_INDEX][0] = COLOR_RED;
+					//if had guild side/ team side //
+					if (strcmp("ChaosIcicle", CGameApp::GetCurScene()->GetCurMapInfo()->szDataName) == 0 || strcmp("secretgarden", CGameApp::GetCurScene()->GetCurMapInfo()->szDataName) == 0)	//for teaming maps 
+					{
+						(_pOwn->getSideID() == 1) ? s_dwNamePartsColors[NAME_INDEX][0] = COLOR_GREEN : s_dwNamePartsColors[NAME_INDEX][0] = COLOR_RED;
+					}
+				}
 			}
-			if (_ShowEnemyNames == true && _pOwn->GetHeadSay()->isTeamMember && _pOwn->GetHeadSay()->isGuildMember && !_pOwn->IsMainCha() && _pOwn->GetIsPK()){
-				s_dwNamePartsColors[NAME_INDEX][0] = COLOR_GREEN;
-			} */
-			
-			// End
+			//mod end @
 			
 			// _dwNameColor;
 			if (_pOwn->IsBoat())

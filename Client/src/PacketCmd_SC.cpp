@@ -3313,7 +3313,16 @@ BOOL SC_RefreshSelectScreen(LPRPACKET pk) {
 
 
 
+BOOL SC_UpdateVipSet(LPRPACKET pk) {
+	T_B
 
+		const auto vip = pk.ReadLong();
+	if (CCharacter* pCMainCha = CGameScene::GetMainCha()) {
+		pCMainCha->SetPlayerVip(vip);
+	}
+	return TRUE;
+	T_E
+}
 
 // �������ݱ�=======================================================================
 void ReadChaBasePacket(LPRPACKET pk, stNetActorCreate &SCreateInfo)
@@ -3334,6 +3343,7 @@ void ReadChaBasePacket(LPRPACKET pk, stNetActorCreate &SCreateInfo)
 	SCreateInfo.strGuildMotto = pk.ReadString(); // ����������
 	SCreateInfo.chGuildPermission = pk.ReadLong(); // ����������
 	SCreateInfo.strStallName = pk.ReadString(); // ����������
+	SCreateInfo.isvip = pk.ReadLong();
 	SCreateInfo.sState = pk.ReadShort();
 	SCreateInfo.SArea.centre.x = pk.ReadLong();
 	SCreateInfo.SArea.centre.y = pk.ReadLong();

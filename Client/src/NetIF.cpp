@@ -17,6 +17,8 @@
 #include "uiglobalvar.h"
 #include <fstream>
 #include <iostream>
+//in header include 
+#include "uiminimapform.h"
 #ifdef _TEST_CLIENT
 #include "..\..\TestClient\testclient.h"
 #endif
@@ -53,6 +55,15 @@ BOOL NetIF::HandlePacketMessage(DataSocket *datasock,LPRPACKET pk)
 	BOOL bRet = FALSE;
 	switch(sCmdType)
 	{
+	case CMD_MC_KillPanel: {
+		char szData[1024];
+		strncpy_s(szData, sizeof(szData), pk.ReadString(), _TRUNCATE);
+		g_stUIMap.RefreshPanel(szData);
+		return true;
+	}
+						 // update vip states
+	case CMD_MC_UpdateVipSet:
+		return SC_UpdateVipSet(pk);
 	case CMD_MC_LOGIN:		 return SC_Login(pk);
 	case CMD_MC_ENTERMAP:	 return SC_EnterMap(pk);
 	case CMD_MC_BGNPLAY:     return SC_BeginPlay(pk);

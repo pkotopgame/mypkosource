@@ -45,7 +45,9 @@ public:
     int         m_nMaxItemType;
     BOOL        m_bEnableMusic;
 	BOOL		m_bCheckOvermax;
-
+	int			VipStatesEffect{ 4560 }; //custom states to render effect can setup from.kop
+	int			VIPEffectDummy{ -1 }; //to move it to right postion 
+	int			VIPEffectHeightOff{ 15 }; //the vip effect Height Off
 	// 网络
     BOOL        m_nSendHeartbeat;       // 多少时间发送一次心跳,单位:s,最小值10s,关闭0
 	DWORD		m_nConnectTimeOut;		// 网络连接超时

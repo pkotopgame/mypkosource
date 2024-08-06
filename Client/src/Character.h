@@ -142,7 +142,10 @@ public:
 	CCharacter*		GetMountOwner()					{return mountOwner;}
 	void			SetMountOwner(CCharacter* owner)			{ mountOwner = owner;}
 
-
+	void SetPlayerVip(bool vip) {
+		IsVip = vip;
+	}
+	bool GetPlayerVip() { return IsVip; }
 	bool			LoadBoat( stNetChangeChaPart& stPart );
 	static xShipInfo*	ConvertPartTo8DWORD( stNetChangeChaPart& stPart, DWORD* dwBuf );
 
@@ -229,6 +232,9 @@ public:
 	bool			GetIsFly(); // �Ƿ����?
 
 
+	
+
+
 	//////////////////////// Mounts
 	bool			SpawnMount(int mountID);
 	bool			RespawnMount();
@@ -237,6 +243,7 @@ public:
 	int				GetIsMountEquipped()			{return IsMountEquip;}
 	void			SetIsMountEquipped(int x) { IsMountEquip = x;}
 	bool			GetIsOnMount()				{	return bIsOnMount; }
+	bool			GetCanPkOnMount();
 	void			SetIsOnMount(bool x)		{  bIsOnMount = x;}
 	CCharacter*		GetMount();
 	int				GetApparelID(SItemGrid app);
@@ -259,13 +266,14 @@ private:		// �ƶ�
 	int				IsMountEquip; // Mount
 	int				lastMount;
 	char			ownerName[50];
-
+	bool			IsVip{ false };
 
 	bool			_isArrive;
     bool            _isStopMove;
 	float			_fMapHeight;	    // �ڵ�ͼ�ϵ��ܸ߶ȣ���λ����
 	CSceneHeight*	_pSceneHeight;
-	
+	//handle the effect from vip states 
+	CEffectObj* VipEffect{ nullptr };
 	static			bool _IsShowName;
     
 private:

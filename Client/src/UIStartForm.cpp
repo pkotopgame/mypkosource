@@ -216,7 +216,7 @@ void CStartMgr::SetTargetInfo(CCharacter* pTargetCha)
 
 void CStartMgr::RefreshTargetModel(CCharacter* pChaPointer) 
 {
-    if (pTarget &&  pChaPointer) {
+    if (pTarget && pChaPointer) {
         static stNetTeamChaPart stTeamPart;
         stTeamPart.Convert(pChaPointer->GetPart());
 
@@ -1625,7 +1625,8 @@ void  CStartMgr::PopMenu( CCharacter* pCha )
 				pItem->SetIsEnabled( pMain!=pCha && pCha->IsPlayer() && pMain->getGameAttr() && pMain->getGameAttr()->get(ATTR_LV) > 40 );
 							//&& pCha->getGameAttr()  && pCha->getGameAttr()->get(ATTR_LV) <= 40 );
 			}else if( stricmp( pItem->GetString(), "Check Eq" )==0 ){
-				if (pCha->IsPlayer()){ // pMain->getGMLv()	 == 99  Enabling for Non-GMs Mdr.st May 2020 - FPO Alpha
+				if (pCha->IsPlayer() && pMain->getGMLv() == 99) { // pMain->getGMLv()	 == 99  Enabling for Non-GMs Mdr.st May 2020 - FPO Alpha
+
 					pItem->SetIsEnabled( pMain!=pCha );
 					pItem->SetIsHide(false);
 				}else{

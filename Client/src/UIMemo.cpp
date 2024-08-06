@@ -386,7 +386,7 @@ inline void CMemo::RenderRowAsFunction(int row) {
 		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY, 0xFF0000FF);
 	}
 	else {
-		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY + 1, 0xFF0000aF);
+		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY + 1, 0xFFFF0000);
 	}
 }
 

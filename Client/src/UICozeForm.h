@@ -181,7 +181,8 @@ protected:
 	void UpdatePages();
 	void ResetPages();
 	void ChangePrivatePlayerName(std::string strName);
-
+	void ParseNitroEmojies(std::string& strMsg);
+	void EventFaceShow() ;
 	CCharMsg::eChannel	GetCmdFromMsg(std::string strMsg);
 
 protected:

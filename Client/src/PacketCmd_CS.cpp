@@ -5,7 +5,7 @@
 #include "Character.h"
 #include "actor.h"
 #include "procirculate.h"
-
+#include "UIBoothForm.h"
 #include "UIStoreForm.h"
 _DBC_USING
 #include "blake2.h"
@@ -36,6 +36,8 @@ bool CS_Connect(dbc::cChar *hostname,dbc::uShort port,dbc::uLong timeout)
 //------------------------
 void CS_Disconnect(int reason)
 {
+	//fix stall bugs with offline stalls @mothannakh
+	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->Disconnect(reason);
 }
 
@@ -59,16 +61,10 @@ void CS_Login(const char *accounts,const char *password, const char* passport)
 //------------------------
 void CS_Logout()
 {
-
+	//fix stall bugs with offline stalls @mothannakh
+	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->Logout();
 	return;
-
-	// ��Ϊ�������˳���ʱ,����������µ�¼ʱ�ֻ�����������Կ,����˳�������������Կ, lh by 2006-02
-    // ������Կ
-    memset(g_NetIF->_key, 0, sizeof g_NetIF->_key);
-    g_NetIF->_key_len = 0;
-	g_NetIF->_comm_enc = 0;
-	g_NetIF->_enc = false;
 }
 
 void CS_OfflineMode()
@@ -98,6 +94,8 @@ void CS_BeginPlay(char cha_index)
 //------------------------
 void CS_EndPlay()
 {
+	//fix stall bugs with offline stalls @mothannakh
+	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->EndPlay();
 }
 
