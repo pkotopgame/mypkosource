@@ -7,7 +7,7 @@ LW_BEGIN
 
 LW_RESULT lwTexEncode::_Encode0(lwIBuffer* buf)
 {
-    const DWORD i = 38;
+    const DWORD i = 44;
     BYTE tmp[i];
 
     BYTE* p;
@@ -31,69 +31,60 @@ LW_RESULT lwTexEncode::_Decode0(lwIBuffer* buf)
 }
 LW_RESULT lwTexEncode::_Encode1(lwIBuffer* buf)
 {
-    constexpr auto key = 5;
     BYTE* p;
     DWORD s;
 
     lwDwordByte4* sp;
     lwDwordByte4 e;
-    e.b[0] = 'c';
-    e.b[1] = 'f';
-    e.b[2] = 'a';
-    e.b[3] = 'k';
-    e.b[4] = 'z';
+    e.b[0] = 'm';
+    e.b[1] = 'p';
+    e.b[2] = '.';
+    e.b[3] = 'x';
+
 
     p = buf->GetData();
     s = buf->GetSize();
 
-    sp = (lwDwordByte4*)&p[s - key];
+    sp = (lwDwordByte4*)&p[s - 4];
 
     if(sp->d == e.d)
         return LW_RET_OK;
 
     _Encode0(buf);
 
-    buf->Realloc(s + key);
+    buf->Realloc(s + 4);
 
     p = buf->GetData();
     s = buf->GetSize();
-    const auto maxlength = s - key;
-    for (DWORD i = 0; i < maxlength; i++) {
-        p[i] += 20;
-    }
-    memcpy(&p[s - key], &e, sizeof(e));
+
+    memcpy(&p[s - 4], &e, sizeof(e));
 
     return LW_RET_OK;
 }
 LW_RESULT lwTexEncode::_Decode1(lwIBuffer* buf)
 {
-    constexpr auto key = 5;
     BYTE* p;
     DWORD s;
 
     lwDwordByte4* sp;
     lwDwordByte4 e;
-    e.b[0] = 'c';
-    e.b[1] = 'f';
-    e.b[2] = 'a';
-    e.b[3] = 'k';
-    e.b[4] = 'z';
+    e.b[0] = 'm';
+    e.b[1] = 'p';
+    e.b[2] = '.';
+    e.b[3] = 'x';
 
     p = buf->GetData();
     s = buf->GetSize();
 
-    sp = (lwDwordByte4*)&p[s - key];
+    sp = (lwDwordByte4*)&p[s - 4];
 
     if(sp->d != e.d)
         return LW_RET_OK;
 
-    buf->SetSizeArbitrary(s - key);
+    buf->SetSizeArbitrary(s - 4);
 
     _Decode0(buf);
-    const auto maxlength = s - key;
-    for (DWORD i = 0; i < maxlength; i++) {
-        p[i] -= 20;
-    }
+
 
     return LW_RET_OK;
 }
