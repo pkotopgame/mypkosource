@@ -1349,6 +1349,7 @@ Short CCharacter::Cmd_PickupItem(uLong ulID, Long lHandle)
 	Short	sPickupNum = pCItem->m_SGridContent.sNum;
 	Short sPushPos = defKITBAG_DEFPUSH_POS;
 
+	const auto IspickedBefore = pCItem->m_SGridContent.bIsLock ? 1 : 0;
 	Short sPushRet = pKitbagCha->KbPushItem(true, true, &pCItem->m_SGridContent, sPushPos);
 	if (sPushRet != enumKBACT_SUCCESS)
 	{
@@ -1435,6 +1436,9 @@ Short CCharacter::Cmd_PickupItem(uLong ulID, Long lHandle)
 	pKitbagCha->SynKitbagNew(enumSYN_KITBAG_PICK);
 
 	pKitbagCha->LogAssets(enumLASSETS_PICKUP);
+	// pick item track by mothannakh 27/8/2019//
+	pCItem->m_SGridContent.bIsLock = true;
+	g_CParser.DoString("ItemPickTrack", enumSCRIPT_RETURN_NONE, 0, enumSCRIPT_PARAM_LIGHTUSERDATA, 1, pCCtrlCha, enumSCRIPT_PARAM_NUMBER, 1, pCItem->m_SGridContent.sID, enumSCRIPT_PARAM_NUMBER, 1, sPickupNum, enumSCRIPT_PARAM_NUMBER, 1, IspickedBefore, DOSTRING_PARAM_END);
 
 	return enumITEMOPT_SUCCESS;
 T_E}
