@@ -70,7 +70,7 @@ void MPEditor::Init(int nMapID)
     }
     */
     
-	_dwColor	    =  0xffff0000;
+	_dwColor	    =  0xffffff00;
     // begin by lsh
     // call 13
     _dwColor = D3DCOLOR_XRGB(89, 168, 158);

@@ -79,22 +79,22 @@ BOOL SC_UpdateGuildGold(LPRPACKET pk){
 	return true;
 }
 
-BOOL SC_ShowStallSearch(LPRPACKET pk){
-	uChar l_num		=pk.ReverseReadShort();
-	NetMC_LISTGUILD_BEGIN();
-	for(uChar i =0;i<l_num;++i)
+//rework to new form @mothannakh
+BOOL SC_ShowStallSearch(LPRPACKET pk) {
+	const auto l_num = pk.ReverseReadShort();
+	g_stUIStart.RestSearchStallList();
+	for (auto i = 0; i < l_num; ++i)
 	{
-		//char buf[8];
-		//sprintf(buf,"%03d>",i+1);
-		uLong	 l_id			=i+1;
-		cChar	*l_name			=pk.ReadString();//player name
-		cChar	*l_motto		=pk.ReadString();//stall name
-		cChar	*l_leadername	=pk.ReadString();//location
-		uShort	 l_memtotal		=pk.ReadLong(); //count remaining
-		__int64	 l_exp	=pk.ReadLong(); //cost each
-		NetMC_LISTGUILD(l_id,l_name,l_motto,l_leadername,l_memtotal,l_exp);
+		const uLong	 l_id = i + 1;
+		const auto playername = pk.ReadString();//player name
+		const auto stallname = pk.ReadString();//stall name
+		const auto location = pk.ReadString();//location
+		const auto qty = pk.ReadLong(); //qty
+		const auto  cost = pk.ReadLong(); //cost each
+		g_stUIStart.InitSearchStallForm(playername, stallname, location, qty, cost);
 	}
-	NetMC_LISTGUILD_END();
+	//all done show form 
+	g_stUIStart.ShowSearchStallForm();
 	return TRUE;
 }
 

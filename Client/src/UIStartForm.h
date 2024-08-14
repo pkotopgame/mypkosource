@@ -37,6 +37,10 @@ public:
 	void CleanDropListForm();
 	void SetMonsterInfo();
 	void FetchRates();
+	//search stall show form 
+	void ShowSearchStallForm() const { SearchStallForm->Show(); }
+	void RestSearchStallList() const;
+	void InitSearchStallForm(const char* PlayerName, const char* StallName, const char* location, unsigned long qty, unsigned long cost) const;
 
 	CForm* frmMonsterInfo;
 	CLabelEx* LabMobLevel;
@@ -157,7 +161,10 @@ private:
 	static CTextButton*	btnQQ;
 
 	//����Լ���Ѫ����sp�� exp������
-	
+		//search stall form 
+	CForm* SearchStallForm{ nullptr };
+	CListView* StallList{ nullptr };//search stall list view
+
 	CForm*			frmDetail;
 	CProgressBar*	proMainHP;
 	CProgressBar*	proMainSP;

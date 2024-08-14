@@ -659,6 +659,18 @@ bool CStartMgr::Init()
 	listPage = dynamic_cast<CPage*>(frmNpcShow->Find("pgeSkill"));
 	assert(listPage != NULL);
 	listPage->evtSelectPage = _evtPageIndexChange;
+	//-------------------------------------------//
+	//search stall form 
+	if (SearchStallForm = CFormMgr::s_Mgr.Find("SearchStallForm"); !SearchStallForm)
+		return Error(g_oLangRec.GetString(45), "SearchStallForm", "SearchStallForm");
+	//clear form list on closing
+	SearchStallForm->evtClose = [](CForm* pForm, bool& IsClose) {
+		g_stUIStart.RestSearchStallList();
+		};
+	//form list 
+	if (StallList = dynamic_cast<CListView*>(SearchStallForm->Find("StallList")); !StallList)
+		return Error(g_oLangRec.GetString(45), SearchStallForm->GetName(), "StallList");
+	//--------------------------------------------//
 	return true;
 }
 
@@ -2246,3 +2258,48 @@ void CStartMgr::_evtCheckLootFilter(CGuiData* pSender)
 }
 
 //end
+
+//stall search form 
+void CStartMgr::RestSearchStallList() const
+{
+	StallList->GetList()->GetItems()->Clear();
+}
+void CStartMgr::InitSearchStallForm(const char* PlayerName, const char* StallName, const char* location, const unsigned long qty, const unsigned long cost) const
+{
+	const auto PlayerNameItem = new CItem(PlayerName, COLOR_BLACK);
+	const auto StallNameItem = new CItem(StallName, COLOR_BLACK);
+	const auto QtyItem = new CItem(to_string(qty).c_str(), COLOR_BLACK);
+	const auto locationItem = new CItem(location, COLOR_BLACK);
+	//get list ready
+	const auto StallLis = StallList->GetList()->NewItem(); // create new list
+	//do some math to extra price if its item for item
+	const auto price = cost - 2000000000;
+	const auto quantity = price / 100000;
+	const auto itemID = price - quantity * 100000;
+	if (const CItemRecord* ItemInfo = GetItemRecordInfo(static_cast<int>(itemID)); ItemInfo) {
+		// stall qty
+		const auto PriceItem = new CItem(ItemInfo->szName, COLOR_BLACK);
+		StallLis->SetIndex(4, PriceItem); // item qty
+
+	}
+	else
+	{
+		std::string gold = std::format("{}G", cost);
+		//otherwise means cost is gold not item to item so format it correctly
+		if (cost >= 1000000000) {
+			gold = std::format("{}B", cost / 1000000000);
+		}
+		else if (cost >= 1000000) {
+			gold = std::format("{}M", cost / 1000000);
+		}
+		else if (cost >= 1000) {
+			gold = std::format("{}k", cost / 1000);
+		}
+		const auto PriceItem = new CItem(gold.c_str(), COLOR_BLACK);
+		StallLis->SetIndex(4, PriceItem); // item qty
+	}
+	StallLis->SetIndex(0, StallNameItem);   // stall name
+	StallLis->SetIndex(1, PlayerNameItem);        // player name going be
+	StallLis->SetIndex(2, locationItem);      // location
+	StallLis->SetIndex(3, QtyItem); // item qty
+}

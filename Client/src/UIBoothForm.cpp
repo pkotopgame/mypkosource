@@ -173,6 +173,7 @@ namespace GUI
 		
 		//send to server.
 		CS_StallSearch(pInfo->lID);
+		
 	}
 
 	
@@ -817,8 +818,8 @@ namespace GUI
 	//~ ------------------------------------------------------------------
 	bool CBoothMgr::PushToBoothSetup(CGoodsGrid& rkDrag, CGoodsGrid& rkSelf, int nGridID, CItemCommand& rkItemCmd)
 	{
-		// ����Ѿ��ڰ�̯״̬,���ܼ��������϶�
-		CCharacter *pMainCha = g_stUIBoat.GetHuman();
+		// 如果已经在摆摊状态,则不能继续进行拖动
+		CCharacter* pMainCha = g_stUIBoat.GetHuman();
 		if (pMainCha && pMainCha->IsShop())
 		{
 			return false;
@@ -830,67 +831,59 @@ namespace GUI
 		m_pkCurrSetupBooth->iEquipIndex = rkDrag.GetDragIndex();
 		m_pkCurrSetupBooth->pkEquipGrid = &rkDrag;
 		m_pkCurrSetupBooth->pkBoothGrid = &rkSelf;
-		
+
 		m_pkCurrSetupBooth->itemTotalNum = rkItemCmd.GetTotalNum();
 		m_pkCurrSetupBooth->itemGetIsPile = rkItemCmd.GetIsPile();
 
-		//�ж��϶���Item�Ƿ���ص�����������һ��
-		
+		//判断拖动的Item是否可重叠且数量大于一个
+
 		//selectedItem = rkItemCmd;
-		//g_stUIBox.ShowSelectBox(_PushItemCurrencyType,"Use gold as currency?");
-		if (g_stUIBooth.m_pkCurrSetupBooth->itemGetIsPile&& g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum > 1)
-			{
-				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_InquireSetupPushItemNumEvent, g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum, g_oLangRec.GetString(454), false);
-			}
-			else
-			{
-				g_stUIBooth.m_pkCurrSetupBooth->iNum = 1;	//����Ϊ1
-				g_stUIBooth.m_pkCurrSetupBooth->iTotal = 1;
-				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_InquireSetupPushItemPriceEvent, -1, g_oLangRec.GetString(450), false);
-			}
+		g_stUIBox.ShowSelectBox(_PushItemCurrencyType, "Use gold as currency?");
+
+
+
 		return true;
 	}
 
 	
-	void CBoothMgr::_PushItemCurrencyType(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey)
+	void CBoothMgr::_PushItemCurrencyType(CCompent* pSender, int nMsgType, int x, int y, DWORD dwKey)
 	{
-		if( true ) //nMsgType==CForm::mrYes
+		if (nMsgType == CForm::mrYes)
 		{
 			//normal stall item flow.
-			if (g_stUIBooth.m_pkCurrSetupBooth->itemGetIsPile&& g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum > 1)
+			if (g_stUIBooth.m_pkCurrSetupBooth->itemGetIsPile && g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum > 1)
 			{
 				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_InquireSetupPushItemNumEvent, g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum, g_oLangRec.GetString(454), false);
 			}
 			else
 			{
-				g_stUIBooth.m_pkCurrSetupBooth->iNum = 1;	//����Ϊ1
+				g_stUIBooth.m_pkCurrSetupBooth->iNum = 1;	//数量为1
 				g_stUIBooth.m_pkCurrSetupBooth->iTotal = 1;
 				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_InquireSetupPushItemPriceEvent, -1, g_oLangRec.GetString(450), false);
 			}
 			return;
-		}else{
-			/*
+		}
+		else {
 			//chad item stall flow.
-			if (g_stUIBooth.m_pkCurrSetupBooth->itemGetIsPile&& g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum > 1)
+			if (g_stUIBooth.m_pkCurrSetupBooth->itemGetIsPile && g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum > 1)
 			{
 				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeNumEvent, g_stUIBooth.m_pkCurrSetupBooth->itemTotalNum, g_oLangRec.GetString(454), false);
 			}
 			else
 			{
-				g_stUIBooth.m_pkCurrSetupBooth->iNum = 1;	//����Ϊ1
+				g_stUIBooth.m_pkCurrSetupBooth->iNum = 1;	//数量为1
 				g_stUIBooth.m_pkCurrSetupBooth->iTotal = 1;
 				g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeID, -1, "Enter Item Name", false);
 			}
 			return;
-			*/
 		}
 	}
 	
-	void CBoothMgr::_PushItemTradeNumEvent(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey)
+	void CBoothMgr::_PushItemTradeNumEvent(CCompent* pSender, int nMsgType, int x, int y, DWORD dwKey)
 	{
-		if( nMsgType!=CForm::mrYes ) 
+		if (nMsgType != CForm::mrYes)
 		{
-			SAFE_DELETE( g_stUIBooth.m_pkCurrSetupBooth );
+			SAFE_DELETE(g_stUIBooth.m_pkCurrSetupBooth);
 			return;
 		}
 
@@ -900,47 +893,47 @@ namespace GUI
 		stNumBox* kItemNumBox = (stNumBox*)pSender->GetForm()->GetPointer();
 		if (!kItemNumBox) return;
 
-		if( kItemNumBox->GetNumber()<=0 ) 
+		if (kItemNumBox->GetNumber() <= 0)
 		{
-			g_pGameApp->MsgBox( g_oLangRec.GetString(449) );
+			g_pGameApp->MsgBox(g_oLangRec.GetString(449));
 			return;
 		}
 
-		g_stUIBooth.m_pkCurrSetupBooth->iNum = kItemNumBox->GetNumber();	// ������������
+		g_stUIBooth.m_pkCurrSetupBooth->iNum = kItemNumBox->GetNumber();	// 玩家输入的数量
 		g_stUIBooth.m_pkCurrSetupBooth->iTotal = kItemNumBox->GetNumber();
-		
 
-		//ѯ�ʼ۸�
-		g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeID, -1,  "Enter Item Name", false);
+
+		//询问价格
+		g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeID, -1, "Enter Item Name", false);
 
 	}
 	
 	
-	void CBoothMgr::_PushItemTradeQuantity(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey){
-		if( nMsgType!=CForm::mrYes ) 
+	void CBoothMgr::_PushItemTradeQuantity(CCompent* pSender, int nMsgType, int x, int y, DWORD dwKey) {
+		if (nMsgType != CForm::mrYes)
 		{
-			SAFE_DELETE( g_stUIBooth.m_pkCurrSetupBooth );
+			SAFE_DELETE(g_stUIBooth.m_pkCurrSetupBooth);
 			return;
 		}
-		
+
 		if (!g_stUIBooth.m_pkCurrSetupBooth)
 			return;
-		
+
 		stNumBox* kItemPriceBox = (stNumBox*)pSender->GetForm()->GetPointer();
 		if (!kItemPriceBox) return;
 
 		int quantity = kItemPriceBox->GetNumber();
 		g_stUIBooth.m_pkCurrSetupBooth->iPrice += quantity * 100000;
-		
+
 		g_stUIBooth.AddBoothItem(g_stUIBooth.m_pkCurrSetupBooth);
 		g_stUIBooth.m_pkCurrSetupBooth = 0;
 	}
 	
-	void CBoothMgr::_PushItemTradeID(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey)
+	void CBoothMgr::_PushItemTradeID(CCompent* pSender, int nMsgType, int x, int y, DWORD dwKey)
 	{
-		if( nMsgType!=CForm::mrYes ) 
+		if (nMsgType != CForm::mrYes)
 		{
-			SAFE_DELETE( g_stUIBooth.m_pkCurrSetupBooth );
+			SAFE_DELETE(g_stUIBooth.m_pkCurrSetupBooth);
 			return;
 		}
 
@@ -951,22 +944,22 @@ namespace GUI
 		if (!kItemPriceBox) return;
 
 		int itemID = kItemPriceBox->GetNumber();
-		
+
 		std::string  strName;
-		
+
 		kItemPriceBox->GetString(strName);
 
-		CItemRecord* pInfo= GetItemRecordInfo( strName.c_str() );
+		CItemRecord* pInfo = GetItemRecordInfo(strName.c_str());
 
-		
-		if (!pInfo || pInfo->sType == 43 || !pInfo->chIsTrade){
-			g_pGameApp->MsgBox( "Invalid Item");
+
+		if (!pInfo || pInfo->sType == 43 || !pInfo->chIsTrade) {
+			g_pGameApp->MsgBox("Invalid Item");
 			return;
 		}
-		
+
 		g_stUIBooth.m_pkCurrSetupBooth->iPrice = 2000000000 + pInfo->lID;
-		g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeQuantity, pInfo->nPileMax, "Enter Required Item Quantity", false);
-		
+		g_stUIBooth.m_NumBox = g_stUIBox.ShowNumberBox(_PushItemTradeQuantity, pInfo->nPileMax, "Enter Trade Item Qty", false);
+
 	}
 	
 	//~ ------------------------------------------------------------------

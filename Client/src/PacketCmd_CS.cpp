@@ -76,6 +76,8 @@ void CS_Logout()
 
 void CS_OfflineMode()
 {
+	//fix stall bugs with offline stalls @mothannakh
+	//g_stUIBooth.PullBoothSuccess();
 	WPacket pk = g_NetIF->GetWPacket();
 	pk.WriteCmd(CMD_CM_OFFLINE_MODE);
 	g_NetIF->SendPacketMessage(pk);
@@ -131,7 +133,13 @@ void CS_DelCha(uint8_t cha_index, const char szPassword2[])
 void CS_Say(const char *content){
 	g_NetIF->m_pCProCir->Say(content);
 }
-
+void CS_InvSort(int type, int dir) {
+	WPacket pk = g_NetIF->GetWPacket();
+	pk.WriteCmd(CMD_CM_INVSORT);
+	pk.WriteChar(type);
+	pk.WriteChar(dir);
+	g_NetIF->SendPacketMessage(pk);
+}
 void CS_GuildBankOper(stNetBank * pNetBank){
 	if (g_pGameApp->GetCurScene()->GetMainCha()->IsBoat()) {
 		g_pGameApp->MsgBox("Not available at sea");

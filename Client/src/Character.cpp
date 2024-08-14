@@ -1315,7 +1315,7 @@ void CCharacter::setSideID( long v )
 void CCharacter::setGuildID( int nGuildID )			
 { 
 	_nGuildID = nGuildID;	
-	_dwGuildColor=0xffF70000;
+	_dwGuildColor= 0xffFFFF00;
 }
 
 void CCharacter::ActionKeyFrame( DWORD key_id )
