@@ -76,11 +76,12 @@ void CS_Logout()
 
 void CS_OfflineMode()
 {
-	//fix stall bugs with offline stalls @mothannakh
-	//g_stUIBooth.PullBoothSuccess();
+	
 	WPacket pk = g_NetIF->GetWPacket();
 	pk.WriteCmd(CMD_CM_OFFLINE_MODE);
 	g_NetIF->SendPacketMessage(pk);
+	//fix stall bugs with offline stalls @mothannakh
+	g_stUIBooth.PullBoothSuccess();
 }
 
 void CS_CancelExit()
@@ -108,6 +109,7 @@ void CS_EndPlay()
 	//fix stall bugs with offline stalls @mothannakh
 	g_stUIBooth.PullBoothSuccess();
 	g_NetIF->m_pCProCir->EndPlay();
+	
 }
 
 //------------------------

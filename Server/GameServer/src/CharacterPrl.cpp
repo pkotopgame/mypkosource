@@ -60,9 +60,13 @@ void CCharacter::ProcessPacket(unsigned short usCmd, RPACKET pk)
 		}
 		else if (!IsInArea(2)){
 			SystemNotice("Must be in safe zone to use the guild bank.");
-		}else{
+		}
+		else if (const auto COOLDOWN = GetTickCount(); GetPlyMainCha()->GuildCD > COOLDOWN) { //add guild bank cool down
+			BickerNotice("Please Calm Down. Don't Spam! %ds Left!", (GetPlyMainCha()->GuildCD - COOLDOWN) / 1000);
+		}
+		else{
+			GetPlyMainCha()->GuildCD = COOLDOWN + 5000; //add guild bank cool down for 5 seconds
 			switch (bankType){
-
 				case 0:{ //bankoper
 					Char	chSrcType = READ_CHAR(pk);
 					Short	sSrcGrid = READ_SHORT(pk);
@@ -118,7 +122,8 @@ void CCharacter::ProcessPacket(unsigned short usCmd, RPACKET pk)
 					
 					int canTake = (emGldPermTakeBank&guildPermission);
 					int canGive = (emGldPermDepoBank&guildPermission);
-
+					// double check for guild view @mothannakh avoid dupe and such
+					int canview = (emGldPermViewBank & guildPermission);
 					CTableGuild::BankLog l;
 					
 					if (action == 0 && canTake == emGldPermTakeBank){ //withdraw
