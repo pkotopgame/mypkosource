@@ -33,9 +33,10 @@
 #include "UIEdit.h"
 #include "UIBoxForm.h"
 #include "StringLib.h"
+#include <unordered_set>
 
 using namespace std;
-
+std::unordered_set<DWORD> visitedStalls;
 //#define SAFE_DELETE(x) if ( (x) ) delete (x), (x) = 0;
 int stallGridID = 0;
 //CItemCommand selectedItem = NULL;
@@ -251,7 +252,11 @@ namespace GUI
 		lblOwnerName->SetCaption(pCha->getHumanName());
 		edtBoothName->SetCaption(szBoothName);
 		edtBoothName->SetIsEnabled(false);
-
+		// mothannakh check if stall opened
+		if (!visitedStalls.contains(dwOwnerId)) {
+			visitedStalls.insert(dwOwnerId);
+		}
+		//Open the trading stall interface and the player's inventory
 		//�򿪽��װ�̯�������ҵ���Ʒ��
 		OpenBoothUI();
 	}

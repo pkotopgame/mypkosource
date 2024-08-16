@@ -718,13 +718,13 @@ namespace GUI
 					nCoinCount += ERNIE_COIN_COUNT;
 			}
 
-			if(nCoinCount > g_stUIEquip.GetItemCount(855))	// 是否有足够的精灵硬币
+			if(nCoinCount > g_stUIEquip.GetItemCount(9958))	// 是否有足够的精灵硬币
 			{
 				g_stUISpirit.chkSetmoney[0]->SetIsChecked(false);
 				g_stUISpirit.chkSetmoney[1]->SetIsChecked(false);
 				g_stUISpirit.chkSetmoney[2]->SetIsChecked(false);
 
-				g_pGameApp->MsgBox(g_oLangRec.GetString(881));
+				g_pGameApp->MsgBox(g_oLangRec.GetString(964));
 				return;
 			}
 

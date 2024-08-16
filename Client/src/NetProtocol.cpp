@@ -2103,7 +2103,7 @@ void NetFace(DWORD dwCharID, stNetFace& netface, char chType)
 			if( st )			
 			{
 				st->ServerEnd( 0 );
-				if(pCha->GetIsMountEquipped() && !pCha->GetIsOnMount() && g_stUISystem.m_sysProp.m_gameOption.bShowMounts ){
+				if (pCha->GetIsMountEquipped() && !pCha->GetIsOnMount() && g_stUISystem.m_sysProp.m_gameOption.bShowMounts && !pCha->GetIsPK()) {
 					pCha->RespawnMount();
 				}
 			}

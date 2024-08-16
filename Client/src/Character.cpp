@@ -15,7 +15,7 @@
 #include "SkillRecord.h"
 #include "worldscene.h"
 #include "ItemRecord.h"
-#include "EffectObj.h"
+//#include "EffectObj.h"
 #include "terrainattrib.h"
 #include "GameApp.h"
 #include "MusicSet.h"
@@ -60,7 +60,8 @@ void RespawnAllPlayerMounts()
 {
 	for (auto& cha : std::span{ g_pGameApp->GetCurScene()->_pChaArray, g_pGameApp->GetCurScene()->_nChaCnt })
 	{
-		if (cha.IsPlayer() && cha.GetIsMountEquipped())
+		//if (cha.IsPlayer() && cha.GetIsMountEquipped())
+		if (cha.IsPlayer() && cha.GetIsMountEquipped() && !cha.GetIsPK() && !cha.IsBoat())
 		{
 			cha.RespawnMount();
 			cha.RefreshItem(true);
@@ -1415,7 +1416,8 @@ bool CCharacter::PlayPose( DWORD pose, DWORD type, int time, int fps, bool isBle
 		if(pose == POSE_SHOW)  pose = POSE_FLY_SHOW;	// �ڿ�->���аڿ�
 		if(pose == POSE_SEAT)  pose = POSE_FLY_SEAT;	// ����->���������� 
 	}
-	else if (GetIsOnMount() && GetMount())
+	//else if (GetIsOnMount() && GetMount() && !GetIsPK())
+	else if (!GetIsPK()&& GetIsOnMount() && GetMount())
 	{
 		int mountID = this->GetPart().SLink[enumEQUIP_MOUNT].sID;
 		CItemRecord* itemRec = GetItemRecordInfo(mountID);
@@ -1438,6 +1440,7 @@ bool CCharacter::PlayPose( DWORD pose, DWORD type, int time, int fps, bool isBle
 		else
 		{
 			GetMount()->SetHide(true);
+			FightSwitch(true); //if didn't work withou this uncomment this
 		}
 
 		GetScene()->HandleSceneMsg(SCENEMSG_CHA_BEGINMOVE, getTypeID(), getID());
@@ -1731,7 +1734,8 @@ bool CCharacter::SpawnMount(int mountID) {
 }
 
 bool CCharacter::RespawnMount() {
-    if (!GetIsMountEquipped()) {
+    //if (!GetIsMountEquipped())
+		if (!GetIsMountEquipped() || GetIsPK()){
         return false;
     }
     UpdataItem(GetPart().SLink[enumEQUIP_MOUNT].sID, enumEQUIP_MOUNT);
@@ -1745,10 +1749,13 @@ bool CCharacter::DespawnMount() {
         chaMount->SetValid(FALSE);
         chaMount = NULL;
 
-        PlayPose(GetPose(POSE_WAITING), PLAY_LOOP_SMOOTH);
+       // PlayPose(GetPose(POSE_WAITING), PLAY_LOOP_SMOOTH);
         setPoseHeightOff(ERROR_POSE_HEIGHT);
         _UpdateHeight();
         SetIsOnMount(false);
+		if (GetIsPK())
+			FightSwitch(true);
+		PlayPose(GetPose(POSE_WAITING), PLAY_LOOP_SMOOTH);
         return true;
     }
     return false;
@@ -1764,15 +1771,16 @@ bool CCharacter::UpdataItem( int nItem, DWORD nLink )
 		const auto ShowMounts = g_stUISystem.m_sysProp.m_gameOption.bShowMounts;
 
 		int ID = GetPart().SLink[nLink].sID;
-		if (ShowMounts && GetIsOnMount() && ID != GetIsMountEquipped() && IsPlayer()) {
+		if (ShowMounts && GetIsOnMount() && (ID != GetIsMountEquipped() || GetIsPK()) && IsPlayer()) {
 			DespawnMount();
 			SetIsMountEquipped(0);
 		}
-		if (ShowMounts && nItem > 0 && IsPlayer() && !GetIsOnMount()) {
+		if (ShowMounts && !GetIsPK() && nItem > 0 && IsPlayer() && !GetIsOnMount()) {
 			SpawnMount(ID);
 			SetIsMountEquipped(ID);
-		}else{
-			if(GetMount() && IsPlayer() && !ID){
+		}
+		else {
+			if (GetMount() && IsPlayer() && (!ID || GetIsPK())) {
 				DespawnMount();
 				SetIsMountEquipped(0);
 			}
@@ -2324,30 +2332,21 @@ void CCharacter::LoadingCall()
     RefreshItem( true );
 }
 
-void CCharacter::RefreshItem(bool isFirst)
-{
-    if( isFirst )  
-    {
-        CheckIsFightArea();
-
-        PlayPose( GetPose( GetCurPoseType() ), PLAY_LOOP_SMOOTH );
-
-		if(GetMount() && !GetMount()->IsHide())
-		{
-			_InFight = false;
-		}
-		
-		_FightSwitch(_InFight);
+void CCharacter::RefreshItem(const bool isFirst) {
+	// hide weapons if player on pvp area using mounts as it ruin phyil sit
+	if (GetMount() && !GetMount()->IsHide() && !GetIsPK()) {
+		_InFight = false;
 	}
-    else
-    {
-		if (GetMount() && !GetMount()->IsHide())
-		{
-			_InFight = false;
-		}
 
-		if (_InFight != _IsFightPose)
-		{
+	if (isFirst) {
+		CheckIsFightArea();
+
+		_FightSwitch(_InFight);
+
+		PlayPose(GetPose(GetCurPoseType()), PLAY_LOOP_SMOOTH);
+	}
+	else {
+		if (_InFight != _IsFightPose) {
 			_FightSwitch(_InFight);
 		}
 	}
@@ -2645,7 +2644,7 @@ bool CCharacter::GetIsFly(){
 
 void CCharacter::_computeLinkedMatrix()
 {
-	if (this->GetIsOnMount() && this->GetIsMountEquipped() && !this->GetIsForUI())
+	if (this->GetIsOnMount() && !GetIsPK() && this->GetIsMountEquipped() && !this->GetIsForUI())
 	{
 		CCharacter *mountCha = GetMount();
 		CMountInfo *pMount = GetMountInfo(GetItemRecordInfo(this->GetIsMountEquipped())->szDataName);

@@ -266,14 +266,20 @@ void CWorldScene::_FrameMove( DWORD dwTimeParam )
             bool isFight = !(_pTerrain->GetTile(GetMainCha()->GetCurX()/100, GetMainCha()->GetCurY()/100)->sRegion & enumAREA_TYPE_NOT_FIGHT);
             if( isOldFight!=isFight )
             {
-                if( isFight )
-                {
-                    g_pGameApp->SysInfo( g_oLangRec.GetString(788) );
-                }
-                else
-                {
-                    g_pGameApp->SysInfo( g_oLangRec.GetString(789) );
-                }
+				if (isFight)
+				{
+
+					if (GetMainCha()->GetIsPK() && GetMainCha()->GetMount())
+					{
+						GetMainCha()->DespawnMount();
+						GetMainCha()->FightSwitch(true);
+					}
+					g_pGameApp->SysInfo(g_oLangRec.GetString(788));
+				}
+				else
+				{
+					g_pGameApp->SysInfo(g_oLangRec.GetString(789));
+				}
             }
 
             isOldFight = !(_pTerrain->GetTile(GetMainCha()->GetCurX()/100, GetMainCha()->GetCurY()/100)->sRegion & enumAREA_TYPE_NOT_FIGHT);
@@ -1439,7 +1445,7 @@ void CWorldScene::SetMainCha(int nChaID)
 		{
 			if (cha->GetIsMountEquipped())
 			{
-				pCha->IsBoat() ? cha->DespawnMount()
+				pCha->IsBoat() || pCha->GetIsPK() ? cha->DespawnMount()
 					: cha->RespawnMount();
 			}
 		}

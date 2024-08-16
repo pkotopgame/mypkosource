@@ -16,9 +16,12 @@
 #include "uiMiniMapForm.h"
 #include "UIProgressBar.h"
 #include "uistartForm.h"
+#include <unordered_set>
 
 using namespace std;
 using namespace GUI;
+//visit stall system @mothannakh 
+extern std::unordered_set<DWORD> visitedStalls;
 
 bool g_IsShowModel = true;
 bool g_IsShowShop = true;
@@ -789,7 +792,8 @@ void CHeadSay::_RenderShop( const char* szShopName, int x, int y )
 
 	static int nFontWidth = 0;
 	nFontWidth = CGuiFont::s_Font.GetWidth( szShopName );	
-	const DWORD dwImgColor = 0xffffffff;
+	const auto IsVisited = visitedStalls.contains(_pOwn->getAttachID());
+	const DWORD dwImgColor = IsVisited ? COLOR_GREEN : 0xffffffff;
 
 
 
@@ -817,6 +821,14 @@ void CHeadSay::_RenderShop( const char* szShopName, int x, int y )
 		_ImgShop[1].Render( x, y, dwImgColor );
 		//CGuiFont::s_Font.BRender( szShopName, x + (nFontWidth - nFontTrueWidth) / 2, y+_nShopFontYOff, COLOR_BLACK, COLOR_WHITE );
 		CGuiFont::s_Font.Render( szShopName, x + (nFontWidth - nFontTrueWidth) / 2, y+_nShopFontYOff, COLOR_BLACK );
+		if (IsVisited) //render red icon if seen stall @mothannakh
+		{
+			CGuiPic seenicon;
+			//or checkSTALL.png
+			seenicon.LoadImage("texture/icon/check.png", 32, 32, 0, 0, 0, 0, 0);
+			//seenicon.TintColour(209, 22, 13);	//color the image to red 
+			seenicon.Render(x - 25, y - _nShopFontYOff - 2);	//render ingame 
+		}
 	}
 	else
 	{
@@ -836,6 +848,13 @@ void CHeadSay::_RenderShop( const char* szShopName, int x, int y )
 		_ImgShop[1].Render( x, y, dwImgColor );
 		//CGuiFont::s_Font.BRender( szShopName, x, y+_nShopFontYOff, COLOR_BLACK, COLOR_WHITE );
 		CGuiFont::s_Font.Render( szShopName, x, y+_nShopFontYOff, COLOR_BLACK );
+		if (IsVisited) //render red icon if seen stall @mothannakh
+		{
+			CGuiPic seenicon;
+			seenicon.LoadImage("texture/icon/check.png", 32, 32, 0, 0, 0, 0, 0);
+			//seenicon.TintColour(209, 22, 13);	//color the image to red 
+			seenicon.Render(x - 25, y - _nShopFontYOff - 2); //render ingame 
+		}
 	}
 }
 

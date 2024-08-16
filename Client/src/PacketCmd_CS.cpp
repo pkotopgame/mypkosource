@@ -11,6 +11,7 @@
 _DBC_USING
 #include "blake2.h"
 #include "hex.h"
+#include <unordered_set>
 //------------------------
 // Э��C->S : ����
 //------------------------
@@ -60,7 +61,7 @@ void CS_Login(const char *accounts,const char *password, const char* passport)
 	// clear maze portals
 	g_stUIPortalTime.ClearList();
 }
-
+extern std::unordered_set<DWORD> visitedStalls;
 //------------------------
 // Э��C->S : ���͵ǳ�����
 //------------------------
@@ -71,6 +72,8 @@ void CS_Logout()
 	g_NetIF->m_pCProCir->Logout();
 	// clear maze portals
 	g_stUIPortalTime.ClearList();
+	//clear vister stalls on logout 
+	visitedStalls.clear();
 	return;
 }
 
@@ -82,6 +85,8 @@ void CS_OfflineMode()
 	g_NetIF->SendPacketMessage(pk);
 	//fix stall bugs with offline stalls @mothannakh
 	g_stUIBooth.PullBoothSuccess();
+	//clear vister stalls on logout 
+	visitedStalls.clear();
 }
 
 void CS_CancelExit()

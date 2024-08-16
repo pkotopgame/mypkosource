@@ -376,6 +376,7 @@ T_B
 	if(strParam.find("clu_bin")!= std::string::npos){
 		// CLU/LUA obfuscation
 		CLU_LoadScript("scripts/lua/CameraConf.clu", 1);
+		CLU_LoadScript("scripts/lua/CameraConf1024.clu", 1);
 		CLU_LoadScript("scripts/lua/scene.clu",1);
 		CLU_LoadScript("scripts/lua/scene/face.clu",1);
 		CLU_LoadScript("scripts/lua/CharacterConf.clu",1);
