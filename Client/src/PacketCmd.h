@@ -7,7 +7,7 @@
 #include <time.h>
 #include "discord_rpc.h"
 
-static const char* APPLICATION_ID = "697483146098245673";
+static const char* APPLICATION_ID = "1274422087708180540";
 static int SendPresence = 1;
 static int64_t StartTime = time(0);
 
@@ -20,7 +20,7 @@ static void updateDiscordPresence(const char *details, const char *state)
         discordPresence.details = details;
         discordPresence.startTimestamp = StartTime;
         discordPresence.largeImageKey = "top";
-		discordPresence.largeImageText = "Tales of Pirates - The Frozen Relics";
+		discordPresence.largeImageText = "Phoenix Online";
         discordPresence.instance = 0;
         Discord_UpdatePresence(&discordPresence);
     }

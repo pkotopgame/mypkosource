@@ -214,7 +214,7 @@ void ToClient::OnConnected(DataSocket* datasock)
 		try
 		{
 			////if (datasock->IsServer()) return;
-			l_ply->srvPrivateKey.GenerateRandomWithKeySize(l_ply->rng, 1821);
+			l_ply->srvPrivateKey.GenerateRandomWithKeySize(l_ply->rng, 3412);
 			CryptoPP::RSA::PublicKey srvPublicKey(l_ply->srvPrivateKey);
 
 			l_ply->handshakeDone = false;
