@@ -119,7 +119,7 @@ bool CStateMgr::Init()
 
 	//here add custom new labels 
 	//RankArenaLabel
-	if (RankArenaLabel = dynamic_cast<CLabelEx*>(frmState->Find("RankArenaLabel")); !RankArenaLabel)
+	/*if (RankArenaLabel = dynamic_cast<CLabelEx*>(frmState->Find("RankArenaLabel")); !RankArenaLabel)
 		return Error(g_oLangRec.GetString(45), frmState->GetName(), "RankArenaLabel");
 	//ArenaBattle
 	if (ArenaBattle = dynamic_cast<CLabelEx*>(frmState->Find("ArenaBattle")); !ArenaBattle)
@@ -150,7 +150,7 @@ bool CStateMgr::Init()
 		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosKill");
 	//ChaosDeath
 	if (ChaosDeath = dynamic_cast<CLabelEx*>(frmState->Find("ChaosDeath")); !ChaosDeath)
-		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosDeath");
+		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosDeath");*/
 	//ChaosPoint
 	if (ChaosPoint = dynamic_cast<CLabelEx*>(frmState->Find("ChaosPoint")); !ChaosPoint)
 		return Error(g_oLangRec.GetString(45), frmState->GetName(), "ChaosPoint");
@@ -444,6 +444,62 @@ void CStateMgr::RefreshStateFrm()
 		RankArenaLabel->SetCaption((const char*)pszCha);
 	}
 
+	if (ArenaBattle)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_BATTLE));
+		ArenaBattle->SetCaption((const char*)pszCha);
+	}
+
+	if (ArenaVictory)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_VICTORY));
+		ArenaVictory->SetCaption((const char*)pszCha);
+	}
+	if (ArenaKill)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_KILL));
+		ArenaKill->SetCaption((const char*)pszCha);
+	}
+	if (ArenaDeath)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_DEATH));
+		ArenaDeath->SetCaption((const char*)pszCha);
+	}
+	if (ArenaPoint)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_ARENA_POINT));
+		ArenaPoint->SetCaption((const char*)pszCha);
+	}
+	if (ChaosRank)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_RANK));
+		ChaosRank->SetCaption((const char*)pszCha);
+	}
+	if (ChaosBattle)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_BATTLE));
+		ChaosBattle->SetCaption((const char*)pszCha);
+	}
+	if (ChaosVictory)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_VICTORY));
+		ChaosVictory->SetCaption((const char*)pszCha);
+	}
+	if (ChaosKill)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_KILL));
+		ChaosKill->SetCaption((const char*)pszCha);
+	}
+	if (ChaosDeath)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_DEATH));
+		ChaosDeath->SetCaption((const char*)pszCha);
+	}
+	if (ChaosPoint)
+	{
+		sprintf(pszCha, "%d", pCChaAttr->get(ATTR_CHAOS_POINT));
+		ChaosPoint->SetCaption((const char*)pszCha);
+	}
 	//end custom labels 
 }
 

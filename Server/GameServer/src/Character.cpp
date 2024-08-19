@@ -1246,7 +1246,7 @@ bool CCharacter::String2KitbagTmpData(std::string &strData)
 		m_pCKitbagTmp = 0;
 	}
 	m_pCKitbagTmp = new CKitbag;
-	m_pCKitbagTmp->Init(32);
+	m_pCKitbagTmp->Init(48);
 
 	if (::String2KitbagData(m_pCKitbagTmp, strData))
 	{
@@ -7544,7 +7544,7 @@ char*	ChaExtendAttr2String(CCharacter *pCCha, char *szAttrBuf, int nLen)
 						(int)pCCha->getAttr(ATTR_ARENA_RANK), (int)pCCha->getAttr(ATTR_ARENA_BATTLE), (int)pCCha->getAttr(ATTR_ARENA_VICTORY),
 						(int)pCCha->getAttr(ATTR_ARENA_KILL), (int)pCCha->getAttr(ATTR_ARENA_DEATH), (int)pCCha->getAttr(ATTR_ARENA_POINT),
 						(int)pCCha->getAttr(ATTR_CHAOS_RANK), (int)pCCha->getAttr(ATTR_CHAOS_BATTLE), (int)pCCha->getAttr(ATTR_CHAOS_VICTORY),
-						(int)pCCha->getAttr(ATTR_CHAOS_KILL), (int)pCCha->getAttr(ATTR_CHAOS_DEATH), (int)pCCha->getAttr(ATTR_CHAOS_DEATH));
+						(int)pCCha->getAttr(ATTR_CHAOS_KILL), (int)pCCha->getAttr(ATTR_CHAOS_DEATH), (int)pCCha->getAttr(ATTR_CHAOS_POINT));
 	return szAttrBuf;
 }
 
