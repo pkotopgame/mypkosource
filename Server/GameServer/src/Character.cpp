@@ -7233,7 +7233,7 @@ void CCharacter::InitCheatX() {
 DWORD CCharacter::GetCheatInterval(int state)
 {
 	#define RAND_IN_NUM(x) (rand() % ((x) + 1))
-	const int MS_IN_ONE_MINUTE = 60 * 1000;
+	/*const int MS_IN_ONE_MINUTE = 60 * 1000;
 	const int MS_IN_ONE_SECOND = 1000;
 
 	DWORD ret = 0;
@@ -7254,8 +7254,8 @@ DWORD CCharacter::GetCheatInterval(int state)
 		//by default 109700 is 1 min and half up to 3 mins 
 		ret = 20 * MS_IN_ONE_SECOND + 100 * RAND_IN_NUM(MS_IN_ONE_SECOND);
 		break;
-	}
-	return ret;
+	}*/
+	return 300000;
 }
 
 void CCharacter::CheatRun(DWORD dwCurTime)

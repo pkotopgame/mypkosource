@@ -760,8 +760,8 @@ void CCharacter::ProcessPacket(unsigned short usCmd, RPACKET pk)
 			
 			if (sSkillID == 241 && chSkillLv == 2) {
 				
-				if (pMainCha->HasItem(19674,1)) {
-					if (!pMainCha->TakeItem(19674, 1, "ds"))
+				if (pMainCha->HasItem(9973,1)) {
+					if (!pMainCha->TakeItem(9973, 1, "ds"))
 						break;
 				}
 				else {
@@ -1991,11 +1991,12 @@ void CCharacter::ProcessPacket(unsigned short usCmd, RPACKET pk)
 		break;
 	case CMD_CM_CHEAT_CHECK:
 		{
-			//防外挂暂时不上
-			/*CCharacter *pMainCha = GetPlyMainCha();
+			CCharacter *pMainCha = GetPlyMainCha();
+			if (!pMainCha)
+				break;
 
 			cChar *answer = READ_STRING(pk);
-			pMainCha->CheatCheck(answer);*/
+			pMainCha->CheatCheck(answer);
 		}
 		break;
 	case CMD_CM_BIDUP:
