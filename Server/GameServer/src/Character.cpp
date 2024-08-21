@@ -7645,6 +7645,7 @@ float CCharacter::GetDropRate() {
 	float partyBonus = 1.0;
 	float ampBonus = 1.0;
 	float fairyBonus = 1.0;
+	float vipBonus = 1.0;
 	float globalRate = g_pGameApp->GetGlobalDropRate();
 
 	if (!globalRate) {
@@ -7654,12 +7655,15 @@ float CCharacter::GetDropRate() {
 	if (cPly && cPly->HasTeam()) {
 		partyBonus += 0.025 * (cPly->GetTeamMemberCnt()-1);
 	}
+	if (cPly && cPly->IsPlayerNitroVip()) {
+		vipBonus = 1.5;
+	}
 
 	// Fortune Lot, Charmed Berry, Amplifier of Luck, Loveless Tear
 	// Special Lucky Fruit
 	// Super Lucky Fruit and Hi-Amplifier of Luck
-	if (m_CSkillState.GetSStateByID(48)) {
-		switch (m_CSkillState.GetSStateByID(48)->GetStateLv()) {
+	if (m_CSkillState.GetSStateByID(49)) {
+		switch (m_CSkillState.GetSStateByID(49)->GetStateLv()) {
 			case 1:
 				ampBonus = 2.0;
 				break;
@@ -7668,6 +7672,8 @@ float CCharacter::GetDropRate() {
 				break;
 			case 3:
 				ampBonus = 3.25;
+				break;
+				vipBonus = 1.5;
 				break;
 			default:
 				ampBonus = 1.0;
@@ -7694,12 +7700,12 @@ float CCharacter::GetDropRate() {
 		case 681:
 			fairyBonus += fairyLv * 0.02;
 			break;
-		//case 7126:
-		//	fairyBonus += 1.5;
-		//	break;
+		case 7126:
+			fairyBonus += 1.5;
+			break;
 		}
 	}
-	return partyBonus * ampBonus * fairyBonus * globalRate;
+	return partyBonus * ampBonus * fairyBonus * vipBonus * globalRate;
 }
 
 float CCharacter::GetExpRate() {
@@ -7799,9 +7805,9 @@ float CCharacter::GetExpRate() {
 		case 681:
 			fairyBonus += fairyLv * 0.02;
 			break;
-		//case 7126:
-		//	fairyBonus += 1.5;
-		//	break;
+		case 7126:
+			fairyBonus += 1.5;
+			break;
 		}
 	}
 	try {

@@ -367,7 +367,7 @@ inline void CMemo::RenderRowAsSelectedQuest(int row) {
 	if (_files[row - _nRowInfo[1][0]].pGraph && _str[row].length() > 0) {
 		_files[row - _nRowInfo[1][0]].pGraph->Render(nPosX, nPosY - 3);
 	}
-	CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY, 0xFFFF00FF);
+	CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY, 0xFFFF8C00);
 }
 
 inline void CMemo::RenderRowAsQuest(int row) {
@@ -386,7 +386,7 @@ inline void CMemo::RenderRowAsFunction(int row) {
 		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY, 0xFF0000FF);
 	}
 	else {
-		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY + 1, 0xFF800080);
+		CGuiFont::s_Font.Render((char*)_str[row].c_str(), nPosX + 24, nPosY + 1, 0xFFFF8C00);
 	}
 }
 
@@ -873,21 +873,6 @@ void CMemoEx::Render()
 	GetRender().Reset();
 	if( _pScroll->GetIsShow() ) _pScroll->Render();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 std::vector<std::string> stringQuebrada(std::string original) {
 	std::string temp = "";

@@ -81,11 +81,6 @@ void CProCirculateCS::BeginAction( CCharacter* pCha, DWORD type, void* param, CA
 					updateDiscordPresence(buffer, buf );
 				}
 				
-				
-
-
-
-
 				LG(szLogName, "###Send(Move):\tTick:[%d]\n", GetTickCount());
 				LG(szLogName, "Ping:\t%3d\n", pMove->dwAveragePing);
 				LG(szLogName, "Point:\t%3d\n", pMove->pos_num);
