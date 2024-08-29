@@ -754,7 +754,7 @@ void CLoginScene::_evtLoginFrm(CCompent *pSender, int state, int x, int y, DWORD
 	else if(strName == "btnKeyboard" /*|| strName == "btnRegNo"*/)
 	{
 
-		string strURL = "https://corsairs.online/index.php?act=register";
+		string strURL = "https://phoenix-pko.com/";
 		ShellExecute(0, "open", strURL.c_str(), NULL, NULL, SW_SHOW);
 		/*
 		bool bShow = frmRegister->GetIsShow();
