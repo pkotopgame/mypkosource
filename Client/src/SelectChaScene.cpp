@@ -829,6 +829,7 @@ void CSelectChaScene::_SelChaFrmMouseEvent(CCompent* pSender, int nMsgType,
 	//	}
 	//}
 
+
 	return;
 }
 
@@ -1132,10 +1133,10 @@ void CSelectChaScene::SetChaDark(CCharacter* pCha)
 void CSelectChaScene::UpdateButton()
 {
 	UpdatePageLabel();
-	btnCreate->SetIsEnabled(m_CharactorPtrs.size() < m_MaxCharacters);
+	btnCreate->SetIsEnabled(GetChaCount() < 3);
 
 	{
-		const auto v = m_nCurChaIndex < m_CharactorPtrs.size();
+		const auto v = m_nCurChaIndex < GetChaCount();
 		btnDel->SetIsEnabled(v);
 		btnYes->SetIsEnabled(v);
 	}
