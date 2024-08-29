@@ -1841,6 +1841,9 @@ void CEquipMgr::_evtSpyFormShow(CGuiData *pSender){
 
 void CEquipMgr::_evtEquipFormShow(CGuiData *pSender){
 	CCharacter* pCha = g_stUIBoat.GetHuman();
+	if (!pCha) {
+		return;
+	}
 	int typeID = pCha->getTypeID();
 	g_stUIEquip.chaModel = CGameApp::GetCurScene()->AddCharacter(typeID);
 

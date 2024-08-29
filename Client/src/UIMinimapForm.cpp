@@ -249,15 +249,18 @@ void CMiniMapMgr::RefreshMapName( const char*name )
 
 void CMiniMapMgr::SetClockStringClientSide()
 {
+	// Get the current time
 	std::time_t rawtime = std::time(nullptr);
-	struct std::tm* ptm;
-	ptm = gmtime(&rawtime);
-	static char buf[26];
-	const int UTC = (+8);
-	ptm->tm_hour = (ptm->tm_hour + UTC) % 24;
-	std::strftime(buf, sizeof(buf), "%T", ptm);
-	labClock->SetCaption(buf);
-	tServerTime = mktime(ptm);
+
+	// Convert to UTC time
+	std::tm* ptm = std::gmtime(&rawtime);
+
+	// Format the time in UTC
+	char date[32];
+	std::strftime(date, sizeof(date), "%H:%M:%S", ptm);
+
+	// Update the clock caption
+	labClock->SetCaption(date);
 }
 
 void CMiniMapMgr::_MiniFormMouseEvent(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey)
