@@ -3703,11 +3703,11 @@ BOOL CCharacter::TakeItem( USHORT sItemID, USHORT sCount, const char szName[] )
 {T_B
 	int nNum = 0, nCount = 0;
 	//char szItem[32] = "δ֪";
-	char szItem[43];	
+	char szItem[128];	
 	//char szItem[100] = { 0 };
 	//strncpy(szItem, RES_STRING(GM_CHARACTER_CPP_00031), 46 - 1);
-	strncpy( szItem, RES_STRING(GM_CHARACTER_CPP_00031), 43 - 1 );
-	if (_countof(szItem) > 43)
+	strncpy( szItem, RES_STRING(GM_CHARACTER_CPP_00031), 128 - 1 );
+	if (_countof(szItem) > 128)
 	{
 		SystemNotice("Item Name too Long Pm GM !!");
 		return false;
@@ -3723,7 +3723,7 @@ BOOL CCharacter::TakeItem( USHORT sItemID, USHORT sCount, const char szName[] )
 		return FALSE;
 	}
 	///mothannakh fix// item name long string return false  ///
-	if (strlen(pItem->szName) > 43)
+	if (strlen(pItem->szName) > 128)
 	{
 		SystemNotice("Item Name too Long Pm GM !");
 		return false;
