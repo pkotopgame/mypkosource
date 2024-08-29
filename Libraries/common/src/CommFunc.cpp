@@ -36,7 +36,7 @@ const char	*g_szJobName[MAX_JOB_TYPE] =
 
 const char	*g_szCityName[defMAX_CITY_NUM] =
 {\
-"Argent city",\
+"Argent City",\
 "Thundoria Castle",\
 "Shaitan City",\
 "Icicle",\

@@ -2839,27 +2839,20 @@ void stNetTeamFightAsk::Exec()
 	CGameScene* pScene = CGameApp::GetCurScene();
 	if( pMain && pScene )
 	{
-		//MPTerrain* pTerrain = pScene->GetTerrain();
-		//if( pTerrain )
-		//{
-		//	int x = pMain->GetCurX() / 100;
-		//	int y = pMain->GetCurY() / 100;
-		//	short mask = pTerrain->GetTile(x, y)->sRegion;
-		//	if( !(mask & enumAREA_TYPE_FIGHT_ASK) )
-		//	{
-		//		// ��Ҳ���PK��
-		//		return;
-		//	}
-		//}
-
-		CMapInfo* pInfo = pScene->GetCurMapInfo();
-		if( pInfo && (stricmp( pInfo->szDataName, "garner" )==0) )
+		MPTerrain* pTerrain = pScene->GetTerrain();
+		if( pTerrain )
 		{
 			int x = pMain->GetCurX() / 100;
 			int y = pMain->GetCurY() / 100;
-			if( x<2194 || x>2239 || y<2872 || y>2902 )
+			short mask = pTerrain->GetTile(x, y)->sRegion;
+			if( !(mask & enumAREA_TYPE_FIGHT_ASK) )
+			{
+		//		// ��Ҳ���PK��
 				return;
+			}
 		}
+
+		
 	}
 
 	g_stUIPKDialog.SetStartDialogContent(*this);
