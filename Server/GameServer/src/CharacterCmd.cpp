@@ -1065,12 +1065,12 @@ T_E}
 Short CCharacter::Cmd_UnfixItem(Char chLinkID, Short *psItemNum, Char chDir, Long lParam1, Long lParam2, bool bPriority, bool bRefresh, bool bForcible)
 {T_B
 	//mothannakh cooldown	//this cooldown needed since the spam of this packet crash all players clients 
-	//DWORD dwLastTime = GetTickCount();	//static 
-	//if (GetPlyMainCha()->SwitchItemColD > dwLastTime)
-	//{
-	//	BickerNotice("Please Calm Down Don't Spam! ");
-	//	return enumITEMOPT_ERROR_PROTECT;	//return false 
-	//}
+	DWORD dwLastTime = GetTickCount();	//static 
+	if (GetPlyMainCha()->SwitchItemColD > dwLastTime)
+	{
+		BickerNotice("Please Calm Down Don't Spam! ");
+		return enumITEMOPT_ERROR_PROTECT;	//return false 
+	}
 	//cooldown end end
 	//fix if invnetory full delete the switch item @mothannakh
 	if (GetPlyMainCha()->m_CKitbag.IsFull())
@@ -1246,7 +1246,7 @@ Short CCharacter::Cmd_UnfixItem(Char chLinkID, Short *psItemNum, Char chDir, Lon
 			SynKitbagNew(enumSYN_KITBAG_UNFIX);
 	}
 	//if all went fine add our cooldown
-		//GetPlyMainCha()->SwitchItemColD = dwLastTime + 100;
+		GetPlyMainCha()->SwitchItemColD = dwLastTime + 100;
 		game_db.SavePlayer(GetPlayer(), enumSAVE_TYPE_TIMER);
 	//cooldown end 
 	return enumITEMOPT_SUCCESS;

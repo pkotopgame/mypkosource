@@ -189,32 +189,6 @@ int UI_SetFormTempleteMax( int max )
 	return R_FAIL;
 }
 
-void CryptImage(bool encrypt, std::string filename, char* sinkbuffer) {
-	const unsigned char imgTableKey[] = { 0x48, 0x73, 0x29, 0xCA, 0xBB, 0x54, 0xCF, 0xB0, 0xF4, 0xBF, 0x70, 0xA0, 0xAA, 0x4B, 0x12, 0xF5 };
-	const unsigned char imgTableIV[] = { 0x43, 0x2a, 0x46, 0x29, 0x4a, 0x40, 0x4e, 0x63, 0x52, 0x66, 0x55, 0x6a, 0x58, 0x6e, 0x32, 0x72 };
-	try {
-		if (encrypt) {
-			std::string encFilename = filename;
-			encFilename.replace(encFilename.length() - 3, 3, "wsd");
-			CryptoPP::GCM<CryptoPP::AES>::Encryption e;
-			e.SetKeyWithIV(imgTableKey, 16, imgTableIV, 16);
-			CryptoPP::FileSource(filename.c_str(), true, new CryptoPP::AuthenticatedEncryptionFilter(e, new CryptoPP::FileSink(encFilename.c_str())));
-			return;
-		}
-		else {
-			CryptoPP::GCM<CryptoPP::AES>::Decryption d;
-			d.SetKeyWithIV(imgTableKey, 16, imgTableIV, 16);
-			std::string buffer;
-			CryptoPP::FileSource(filename.c_str(), true, new CryptoPP::AuthenticatedDecryptionFilter(d, new CryptoPP::StringSink(buffer)));
-			memcpy(sinkbuffer, buffer.data(), buffer.size());
-			return;
-		}
-	}
-	catch (...) {}
-
-
-
-}
 int UI_AddAllFormTemplete( int form_id )
 {
 	CForm* p = dynamic_cast<CForm*>(CGuiData::GetGui( form_id ));
@@ -303,61 +277,15 @@ int UI_SetIsDrag( int id, int isDrag )
 	return R_OK;
 }
 
-int UI_LoadFormImage( int id, char* client, int cw, int ch, int tx, int ty, char * file, int w, int h )
+int UI_LoadFormImage(int id, const char* client, int cw, int ch, int tx, int ty, const char* file, int w, int h)
 {
-	
-	std::string s(client);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, client, NULL);
-	}
-	strcpy(client, s.c_str());
-	// Change file extension and send to UIRender for loading.
+	CGuiData* p = CGuiData::GetGui(id);
+	if (!p) return R_FAIL;
 
-	
-	if (strcmp(client, file)) {
-		if (strlen(file) > 4) {
-			std::string s2(file);
-			// Check the type of file
-			if (s2.find(".png") != std::string::npos || s2.find(".tga") != std::string::npos || s2.find(".bmp") != std::string::npos ||
-				s2.find(".dds") != std::string::npos) {
-				s2.replace(s2.length() - 3, 3, "wsd");
-			}
-			// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-			struct stat buffer2;
-			if (stat(s2.c_str(), &buffer2) != 0) {
-				CryptImage(true, file, NULL);
-			}
-			strcpy(file, s2.c_str());
-			// Change file extension and send to UIRender for loading.
-			size_t len2 = strlen(file);
-			file[len2 - 1] = 'd';
-			file[len2 - 2] = 's';
-			file[len2 - 3] = 'w';
-		}
+	CForm* f = dynamic_cast<CForm*>(p);
+	if (!f) return R_FAIL;
 
-	}
-	else {
-		size_t len3 = strlen(file);
-		file[len3 - 1] = 'd';
-		file[len3 - 2] = 's';
-		file[len3 - 3] = 'w';
-	}
-
-
-	CGuiData* p = CGuiData::GetGui( id );
-	if( !p ) return R_FAIL;
-
-	CForm *f = dynamic_cast<CForm*>(p);
-	if( !f ) return R_FAIL;
-
-	f->GetFrameImage()->LoadImage( client, cw, ch, tx, ty, file, w, h );
+	f->GetFrameImage()->LoadImage(client, cw, ch, tx, ty, file, w, h);
 	return R_OK;
 }
 
@@ -609,29 +537,15 @@ int UI_ComboSetTextColor( int id, int color )
 	return R_OK;
 }
 
-int UI_LoadButtonImage( int id, char* file, int w, int h, int sx, int sy, int isHorizontal )
+int UI_LoadButtonImage(int id, const char* file, int w, int h, int sx, int sy, int isHorizontal)
 {
-	std::string s(file);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, file, NULL);
-	}
-	strcpy(file, s.c_str());
-	// Change file extension and send to UIRender for loading.
+	CGuiData* p = CGuiData::GetGui(id);
+	if (!p) return R_FAIL;
 
-	CGuiData* p = CGuiData::GetGui( id );
-	if( !p ) return R_FAIL;
+	CTextButton* b = dynamic_cast<CTextButton*>(p);
+	if (!b) return R_FAIL;
 
-	CTextButton * b = dynamic_cast<CTextButton*>(p);
-	if( !b ) return R_FAIL;
-
-	b->LoadImage( file, w, h, sx, sy, isHorizontal!=0 ? true: false );
+	b->LoadImage(file, w, h, sx, sy, isHorizontal != 0 ? true : false);
 	//b->GetImage()->TintColour( 131, 188, 225 );
 	return R_OK;
 }
@@ -652,70 +566,33 @@ int UI_LoadImageUnencrypted(int id, char* file, int frame, int w, int h, int tx,
 }
 
 
-int UI_LoadImage( int id, char * file, int frame, int w, int h, int tx, int ty )
+int UI_LoadImage(int id, char* file, int frame, int w, int h, int tx, int ty)
 {
-	std::string s(file);
+	CGuiData* p = CGuiData::GetGui(id);
+	if (!p) return R_FAIL;
 
-	if (s.empty())
-	{
-		return R_FAIL;
+	CGuiPic* img = p->GetImage();
+	if (!img) return R_FAIL;
+
+	if (img->LoadImage(file, w, h, frame, tx, ty)) {
+		//img->TintColour( 131, 188, 225 );
+		return R_OK;
 	}
-
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-			s.replace(s.length() - 3, 3, "wsd");
-		}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-		struct stat buffer;
-		if (stat(s.c_str(), &buffer) != 0) {
-			CryptImage(true, file, NULL);
-		}
-		strcpy(file, s.c_str());
-	// Change file extension and send to UIRender for loading.
-		size_t len = strlen(file);
-		file[len - 1] = 'd';
-		file[len - 2] = 's';
-		file[len - 3] = 'w';
-		CGuiData* p = CGuiData::GetGui(id);
-		if (!p) return R_FAIL;
-
-		CGuiPic* img = p->GetImage();
-		if (!img) return R_FAIL;
-
-		if (img->LoadImage(file, w, h, frame, tx, ty)) {
-			//img->TintColour( 131, 188, 225 );
-			return R_OK;
-		}
-		return R_FAIL;
-	
-	
+	return R_FAIL;
 }
 
 // װ�ش�������ͼ��
-int UI_LoadScaleImage( int id, char * file, int frame, int w, int h, int tx, int ty, float scalex, float scaley )
+int UI_LoadScaleImage(int id, char* file, int frame, int w, int h, int tx, int ty, float scalex, float scaley)
 {
-	std::string s(file);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, file, NULL);
-	}
-	strcpy(file, s.c_str());
-	// Change file extension and send to UIRender for loading.
-	CGuiData* p = CGuiData::GetGui( id );
-	if( !p ) return R_FAIL;
-	
-	CGuiPic* img = p->GetImage();
-	if( !img ) return R_FAIL;
 
-	
-	if( img->LoadImage( file, w, h, frame, tx, ty, scalex, scaley ) ) return R_OK;
+	CGuiData* p = CGuiData::GetGui(id);
+	if (!p) return R_FAIL;
+
+	CGuiPic* img = p->GetImage();
+	if (!img) return R_FAIL;
+
+
+	if (img->LoadImage(file, w, h, frame, tx, ty, scalex, scaley)) return R_OK;
 
 	return R_FAIL;
 }
@@ -1260,45 +1137,28 @@ int UI_FixListSetText( int id, int index, const char* text )
 
 enum eTreeImage
 {
-	enumTreeAddImage=0,
+	enumTreeAddImage = 0,
 	enumTreeSubImage,
 	enumTreeNodeImage,
 };
-int UI_TreeLoadImage( int nTreeID, int nType, char* imagefile, int w, int h, int sx, int sy, int itemw, int itemh )
+int UI_TreeLoadImage(int nTreeID, int nType, const char* imagefile, int w, int h, int sx, int sy, int itemw, int itemh)
 {
-	CTreeView *f = dynamic_cast<CTreeView*>(CGuiData::GetGui( nTreeID ));
-	if( !f ) return R_FAIL;
+	CTreeView* f = dynamic_cast<CTreeView*>(CGuiData::GetGui(nTreeID));
+	if (!f) return R_FAIL;
 
-	auto pic = [&]() -> CGuiPic* {
-		switch (nType)
-		{
-		case enumTreeAddImage: return f->GetAddImage();
-		case enumTreeSubImage: return f->GetSubImage();
-		case enumTreeNodeImage: return f->GetNodeImage();
-		default: return nullptr;
-		}
-	}();
-
+	CGuiPic* pic = NULL;
+	switch (nType)
+	{
+	case enumTreeAddImage: pic = f->GetAddImage(); 	break;
+	case enumTreeSubImage: pic = f->GetSubImage(); 	break;
+	case enumTreeNodeImage: pic = f->GetNodeImage(); break;
+	}
 	if (pic)
 	{
-		std::string s(imagefile);
-		// Check the type of file
-		if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-			s.find(".dds") != std::string::npos) {
-			s.replace(s.length() - 3, 3, "wsd");
-		}
-		// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-		struct stat buffer;
-		if (stat(s.c_str(), &buffer) != 0) {
-			CryptImage(true, imagefile, NULL);
-		}
-		strcpy(imagefile, s.c_str());
-		// Change file extension and send to UIRender for loading.
 		pic->LoadImage(imagefile, w, h, 0, sx, sy);
 		pic->SetScale(itemw, itemh);
 		return R_OK;
 	}
-
 	return R_FAIL;
 }
 
@@ -1339,29 +1199,15 @@ int UI_CreateGraphItemTex( int tx, int ty, int tw, int th, float scale_x, float 
 	return g_ItemScript.AddObj( item );
 }
 
-int UI_CreateNoteGraphItem( char* file, int w, int h, int sx, int sy, int frame, const char* text, int TextX, int TextY )
+int UI_CreateNoteGraphItem(char* file, int w, int h, int sx, int sy, int frame, const char* text, int TextX, int TextY)
 {
-	CNoteGraph * item =  new CNoteGraph( frame );
-	std::string s(file);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, file, NULL);
-	}
-	strcpy(file, s.c_str());
-	// Change file extension and send to UIRender for loading.
-
-	item->GetImage()->LoadAllImage( file, w, h, sx, sy );
-	item->GetImage()->SetScale( w, h );
-	item->SetString( text );
-	item->SetTextX( TextX );
-	item->SetTextY( TextY );
-	return g_ItemScript.AddObj( item );
+	CNoteGraph* item = new CNoteGraph(frame);
+	item->GetImage()->LoadAllImage(file, w, h, sx, sy);
+	item->GetImage()->SetScale(w, h);
+	item->SetString(text);
+	item->SetTextX(TextX);
+	item->SetTextY(TextY);
+	return g_ItemScript.AddObj(item);
 }
 
 int UI_CreateSingleNode( int treeid, int itemid, int nodeid_parent )
@@ -1785,82 +1631,23 @@ int UI_SetFormStyleEx(int id ,int index, int offWidth, int offHeight)
 }
 
 // �˵�
-int UI_MenuLoadSelect( int id, char* imagefile, int w, int h, int sx, int sy )
+int UI_MenuLoadSelect( int id, const char* imagefile, int w, int h, int sx, int sy )
 {
-	std::string s(imagefile);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, imagefile, NULL);
-	}
-	strcpy(imagefile, s.c_str());
-	// Change file extension and send to UIRender for loading.
-
 	CMenu *f = dynamic_cast<CMenu*>(CGuiData::GetGui( id ));
 	if( !f ) return R_FAIL;
 
 	f->GetSelectImage()->LoadImage(imagefile, w, h, 0, sx, sy);
 	return R_OK;
 }
-
-int UI_MenuLoadImage( int id, int IsShowFrame, int IsTitle, char* clientfile, int cw, int ch, int tx, int ty, char* framefile, int w, int h )
+int UI_MenuLoadImage(int id, int IsShowFrame, int IsTitle, const char* clientfile, int cw, int ch, int tx, int ty, const char* framefile, int w, int h)
 {
-	CMenu *f = dynamic_cast<CMenu*>(CGuiData::GetGui( id ));
-	if( !f ) return R_FAIL;
-
-	std::string s(clientfile);
-	// Check the type of file
-	if (s.find(".png") != std::string::npos || s.find(".tga") != std::string::npos || s.find(".bmp") != std::string::npos ||
-		s.find(".dds") != std::string::npos) {
-		s.replace(s.length() - 3, 3, "wsd");
-	}
-	// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-	struct stat buffer;
-	if (stat(s.c_str(), &buffer) != 0) {
-		CryptImage(true, clientfile, NULL);
-	}
-	strcpy(clientfile, s.c_str());
-	// Change file extension and send to UIRender for loading.
-
-	if (strcmp(clientfile, framefile)) {
-		if (strlen(framefile) > 4) {
-			std::string s2(framefile);
-			// Check the type of file
-			if (s2.find(".png") != std::string::npos || s2.find(".tga") != std::string::npos || s2.find(".bmp") != std::string::npos ||
-				s2.find(".dds") != std::string::npos) {
-				s2.replace(s2.length() - 3, 3, "wsd");
-			}
-			// Quickest way to check if file exists. If it doesn't, encrypt the original file.
-			struct stat buffer2;
-			if (stat(s2.c_str(), &buffer2) != 0) {
-				CryptImage(true, framefile, NULL);
-			}
-			strcpy(framefile, s2.c_str());
-			// Change file extension and send to UIRender for loading.
-			size_t len2 = strlen(framefile);
-			framefile[len2 - 1] = 'd';
-			framefile[len2 - 2] = 's';
-			framefile[len2 - 3] = 'w';
-		}
-
-	}
-	else {
-		size_t len3 = strlen(framefile);
-		framefile[len3 - 1] = 'd';
-		framefile[len3 - 2] = 's';
-		framefile[len3 - 3] = 'w';
-	}
-
+	CMenu* f = dynamic_cast<CMenu*>(CGuiData::GetGui(id));
+	if (!f) return R_FAIL;
 
 	CFramePic* frame = f->GetBkgImage();
-	frame->SetIsTitle( IsTitle ? true : false );
-	frame->SetIsShowFrame( IsShowFrame ? true : false );
-	frame->LoadImage( clientfile, cw, ch, tx, ty, framefile, w, h );
+	frame->SetIsTitle(IsTitle ? true : false);
+	frame->SetIsShowFrame(IsShowFrame ? true : false);
+	frame->LoadImage(clientfile, cw, ch, tx, ty, framefile, w, h);
 	return R_OK;
 }
 

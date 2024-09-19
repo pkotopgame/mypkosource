@@ -184,6 +184,7 @@ void CCharacter::Initially()
 	//showrank cooldown @mothannakh
 	ShowRankColD = 0;
 	GuildCD = 0;
+	SwitchItemColD = 0;
 	_dwStallTick = 0;
 
 

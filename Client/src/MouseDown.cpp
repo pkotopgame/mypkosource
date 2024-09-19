@@ -403,7 +403,10 @@ bool CMouseDown::ActAttackCha( CCharacter* pCha, CSkillRecord* pSkill, CCharacte
 	static CSkillRecord* pLastSkill = NULL;
 	static DWORD dwLastTime = 0;
 
-	g_stUIStart.SetTargetInfo(pTarget);
+	if (!pTarget->IsMainCha())
+	{
+		g_stUIStart.SetTargetInfo(pTarget);
+	}
 	
 	if( CGameApp::GetCurTick()<=dwLastTime 
 		&& pLastCha==pCha && pLastTarget==pTarget
@@ -411,10 +414,6 @@ bool CMouseDown::ActAttackCha( CCharacter* pCha, CSkillRecord* pSkill, CCharacte
 	{
 		return true;
 	}
-	
-	
-	
-
 	LG( "mousedown", "actattackcha: self:%s, target:%s, pos[%d, %d], skill:%s\ttick:%u\n", pCha->getName(), pTarget->getName(), pTarget->GetCurX(), pTarget->GetCurY(), pSkill->szName, CGameApp::GetCurTick() );
 	
 	dwLastTime = CGameApp::GetCurTick() + DELAY_TIME;

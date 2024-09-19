@@ -767,6 +767,7 @@ public:
 	//cooldown for ranking
 	DWORD				ShowRankColD;	
 	DWORD				GuildCD;
+	DWORD				SwitchItemColD;
 	int					m_nPetNum;
 	
 	stNetChangeChaPart	m_SChaPart;

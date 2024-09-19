@@ -127,7 +127,7 @@ BOOL MPGameApp::Init(HINSTANCE hInst,const char *pszClassName, int nScrWidth, in
         return FALSE;
     }
 
-	MPTexSet *pTextureSet = new MPTexSet(0, 8192);
+	MPTexSet *pTextureSet = new MPTexSet(0, 2048);
 	
 	_nLogoTexID = GetTextureID("texture/logo.BMP");
 

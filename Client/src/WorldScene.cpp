@@ -704,15 +704,29 @@ void CWorldScene::_SceneCursor()
 		g_stUIStart.SetTargetInfo(hoverCha);
 	}
 	
-	if( g_pGameApp->IsMouseButtonPress(1) ) // g_pGameApp->GetMainCam()->IsRotating()
+	/*if (g_pGameApp->IsMouseButtonPress(1)) // g_pGameApp->GetMainCam()->IsRotating()
 	{
 		g_pGameApp->GetCursor()->SetCursor( csNormalCursor );
 		CGameScene::Set3DMouseState( enumClick );
 
 		CCursor::I()->SetFrame( CCursor::stCamera );
 		return;
-	}
+	}*/
+	if (g_pGameApp->IsMouseButtonPress(1)) // g_pGameApp->GetMainCam()->IsRotating()
+	{
+		g_pGameApp->GetCursor()->SetCursor(csNormalCursor);
+		Set3DMouseState(e3DMouseState::enumClick);
 
+		CCursor::I()->SetFrame(CCursor::stCamera);
+		//@mothannakh moved target panel to right click
+		//&& hoverCha->getChaCtrlType() !=8 this to not render pet/mounts
+		if (CCharacter* hoverCha = HitSelectCharacter(nMouseX, nMouseY); hoverCha && !hoverCha->IsNPC() && hoverCha != pMain && !hoverCha->GetIsOnMount() && !g_stUIMap.IsPKSilver()) {
+
+			g_stUIStart.SetTargetInfo(hoverCha);
+		}
+		// target panel end
+		return;
+	}
 	pMain=GetMainCha();
 	if( !pMain || GetUseLevel().IsFalse(LEVEL_CHA_RUN) || CGameApp::IsMouseContinue(0) ) 
 	{
