@@ -459,6 +459,11 @@ namespace GUI
 
 	void CBoothMgr::OpenBoothUI()
 	{
+		//if (g_stUIForge.IsForgeFormActive())
+		//{
+		//g_pGameApp->SysInfo(("Inventory is locked. Close all forge forms before open a new stall");
+		//	return;
+	//	}
 		frmBooth->SetPos(150, 150);
 		frmBooth->Reset();
 		frmBooth->Refresh();

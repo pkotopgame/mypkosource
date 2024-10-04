@@ -768,6 +768,7 @@ public:
 	DWORD				ShowRankColD;	
 	DWORD				GuildCD;
 	DWORD				SwitchItemColD;
+	DWORD				PickItemColD;
 	int					m_nPetNum;
 	
 	stNetChangeChaPart	m_SChaPart;

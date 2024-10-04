@@ -54,7 +54,6 @@ void CCharacter::ProcessPacket(unsigned short usCmd, RPACKET pk)
 	}
 	case CMD_PM_GUILDBANK:{
 		Char bankType = READ_CHAR(pk);
-
 		if (!IsLiveing()){
 			SystemNotice("Dead pirates are unable to trade.");
 		}

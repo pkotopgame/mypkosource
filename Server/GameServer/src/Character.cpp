@@ -185,6 +185,7 @@ void CCharacter::Initially()
 	ShowRankColD = 0;
 	GuildCD = 0;
 	SwitchItemColD = 0;
+	PickItemColD = 0;
 	_dwStallTick = 0;
 
 

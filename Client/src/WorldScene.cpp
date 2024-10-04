@@ -1271,9 +1271,7 @@ void CWorldScene::_KeyDownEvent( int key )
 	}
 
 	if( !GetMainCha() ) return;
-
-	if( g_pGameApp->IsCtrlPress() )
-	{
+	if (g_pGameApp->IsCtrlPress()) {
 		if ((key == 'h' || key == 'H')) {
 			_IsThrowItemHint = !_IsThrowItemHint;
 			g_pGameApp->SysInfo(_IsThrowItemHint ?
@@ -1282,28 +1280,37 @@ void CWorldScene::_KeyDownEvent( int key )
 			);
 		}
 
-		if( (key=='s' || key=='S') )
+		if ((key == 's' || key == 'S')) {
 			_IsShowSideLife = !_IsShowSideLife;
+		}
 
-		if( key=='a' || key=='A' )
-		{
-			_cMouseDown.PickItem( GetMainCha() );
-			if( g_pGameApp->IsShiftPress() )
-			{
-				_IsAutoPick = !_IsAutoPick;
-				g_pGameApp->SysInfo( _IsAutoPick ? g_oLangRec.GetString(792) : g_oLangRec.GetString(793) );
+		if (key == 'a' || key == 'A') {
+			static time_t lastPickTime = 0; // Static variable for cooldown tracking
+			time_t currentTime = time(nullptr);
+
+			// Check if cooldown period has passed (3 seconds)
+			if (difftime(currentTime, lastPickTime) < 3) {
+				int remainingCooldown = 3 - static_cast<int>(difftime(currentTime, lastPickTime));
+			}
+			else {
+				_cMouseDown.PickItem(GetMainCha());
+				lastPickTime = currentTime; // Update lastPickTime after a successful pick
+
+				if (g_pGameApp->IsShiftPress()) {
+					_IsAutoPick = !_IsAutoPick;
+					g_pGameApp->SysInfo(_IsAutoPick ? g_oLangRec.GetString(792) : g_oLangRec.GetString(793));
+				}
 			}
 		}
 
-		if( g_pGameApp->IsAltPress() && (key=='c' || key=='C') )	// ��ӡ�����
-			_IsShowCameraInfo = !_IsShowCameraInfo;			
+		if (g_pGameApp->IsAltPress() && (key == 'c' || key == 'C')) // Show camera info
+			_IsShowCameraInfo = !_IsShowCameraInfo;
 
-		if( g_pGameApp->IsAltPress() && (key=='k' || key=='K') )
-			_IsShowPing = !_IsShowPing;			
+		if (g_pGameApp->IsAltPress() && (key == 'k' || key == 'K'))
+			_IsShowPing = !_IsShowPing;
 
-		if( g_pGameApp->IsAltPress() && (key=='m' || key=='M') )
-		{
-			g_Config.SetMoveClient( !g_Config.m_IsMoveClient );
+		if (g_pGameApp->IsAltPress() && (key == 'm' || key == 'M')) {
+			g_Config.SetMoveClient(!g_Config.m_IsMoveClient);
 		}
 
 #ifdef _DEBUG	// ������

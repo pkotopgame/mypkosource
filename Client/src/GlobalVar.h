@@ -22,7 +22,7 @@ extern MPEditor g_Editor;
 #define FULL_LARGE_RES_X 1920
 #define FULL_LARGE_RES_Y 1080
 
-#define CLIENT_NAME "Tales Of Pirates"
+#define CLIENT_NAME "Phoenix Online"
 #define VERSION_NAME "The Frozen Relics"
 #define VERSION_NUM "v2.00"
 
