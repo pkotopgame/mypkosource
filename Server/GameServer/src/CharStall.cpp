@@ -443,6 +443,11 @@ return;
 			character.SystemNotice(RES_STRING(GM_CHARSTALL_CPP_00030));
 			return;
 		}
+		//double check of maincharacter if forge in process stop all trades 
+		if (const auto GetPlayer = character.GetPlayer(); !GetPlayer || character.GetPlyMainCha()->GetTradeData() || GetPlayer->IsInForge() || GetPlayer->IsInLifeSkill() || GetPlayer->IsInRepair()) {
+			character.SystemNotice("Bag is currently locked.");
+			return;
+		}
 
 		DWORD dwCharID = packet.ReadLong();
 		CCharacter* pStaller = character.GetSubMap()->FindCharacter(dwCharID, character.GetShape().centre);

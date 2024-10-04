@@ -1066,11 +1066,11 @@ Short CCharacter::Cmd_UnfixItem(Char chLinkID, Short *psItemNum, Char chDir, Lon
 {T_B
 	//mothannakh cooldown	//this cooldown needed since the spam of this packet crash all players clients 
 	DWORD dwLastTime = GetTickCount();	//static 
-	if (GetPlyMainCha()->SwitchItemColD > dwLastTime)
-	{
-		BickerNotice("Please Calm Down Don't Spam! ");
-		return enumITEMOPT_ERROR_PROTECT;	//return false 
-	}
+	//if (GetPlyMainCha()->SwitchItemColD > dwLastTime)
+	//{
+	//	BickerNotice("Please Calm Down Don't Spam! ");
+	//	return enumITEMOPT_ERROR_PROTECT;	//return false 
+//	}
 	//cooldown end end
 	//fix if invnetory full delete the switch item @mothannakh
 	if (GetPlyMainCha()->m_CKitbag.IsFull())

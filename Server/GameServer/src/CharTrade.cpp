@@ -303,6 +303,7 @@ namespace mission
 			pMain->SystemNotice( RES_STRING(GM_CHARTRADE_CPP_00022) );
 			return FALSE;
 		}
+
 		if (!pChar->IsLiveing()){
 			pChar->SystemNotice("Dead pirates are unable to trade.");
 			return FALSE;
@@ -353,7 +354,7 @@ namespace mission
 			pChar->SystemNotice( RES_STRING(GM_CHARTRADE_CPP_00003) );
 			return FALSE;
 		}
-
+	
 		//add by ALLEN 2007-10-16
 				if( pChar->IsReadBook() )
 		{

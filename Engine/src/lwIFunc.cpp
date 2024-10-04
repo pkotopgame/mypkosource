@@ -329,12 +329,33 @@ LW_RESULT lwInitMeshLibSystem(lwISystem** ret_sys, lwISysGraphics** ret_sys_grap
 
         lwIResourceMgr* res_mgr = sys_graphics->GetResourceMgr();
         lwIStaticStreamMgr* ssm = res_mgr->GetStaticStreamMgr();
+        //ssm->CreateStreamEntitySeq(4096, 4096);
+        //ssm->CreateVertexBufferStream(0, 1024 * 1024);
+        //ssm->CreateVertexBufferStream(1, 1024 * 1024);
+        //ssm->CreateIndexBufferStream(0, 1024 * 1024);
+        //lwIDynamicStreamMgr* dsm = res_mgr->GetDynamicStreamMgr();
         ssm->CreateStreamEntitySeq(4096, 4096);
-        ssm->CreateVertexBufferStream(0, 1024 * 1024);
-        ssm->CreateVertexBufferStream(1, 1024 * 1024);
-        ssm->CreateIndexBufferStream(0, 1024 * 1024);
+
+        // Decrease vertex buffer sizes to 32 MB
+        ssm->CreateVertexBufferStream(0, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(1, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(2, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(3, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(4, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(5, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(6, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(7, 32 * 1024 * 1024);
+        ssm->CreateVertexBufferStream(8, 32 * 1024 * 1024);
+
+        // Decrease index buffer sizes to 32 MB
+        ssm->CreateIndexBufferStream(0, 32 * 1024 * 1024);
+
+        // Decrease dynamic stream manager size to 32 MB
         lwIDynamicStreamMgr* dsm = res_mgr->GetDynamicStreamMgr();
-        dsm->Create(512 * 1024, 1024 * 512);
+        dsm->Create(32 * 1024 * 1024, 1024 * 512);
+
+
+
 
         // begin set default active system
         lwSetActiveISystem(sys);
