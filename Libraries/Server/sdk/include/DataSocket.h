@@ -98,7 +98,12 @@ public:
 	volatile uLong		m_waringNum;				// 记录一秒钟内命令的个数，分析网络状况	
 
 	short				m_gsCheck;
-
+	//bit more rework for check socket connect if valid or invalid @mothannakh
+	volatile bool ValidSocketLogin{ false };//this will be marked as true as soon as player login
+	volatile uLong ValidSocketTime{ 5000 };  // time to wait before kick player 5 seconds {5000ms}
+	volatile bool GateServer{ false };	   // just to make sure this work for gateserver only 
+	void SetValidSocketLogin() { ValidSocketLogin = true; }
+	auto GetValidSocketLogin() const { return ValidSocketLogin; }
 public:
 	DWORD					m_pktn{};
 	char					m_pktn2{};

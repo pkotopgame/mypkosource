@@ -351,7 +351,16 @@ protected:
     BOOL  _bValid{ FALSE };
 };
 //---------------------------------------------------------------------------------------------------------------------------
-
+static std::string TrimStringLeftAndRight(const std::string& str) {
+    // Find the first non-whitespace character
+    const size_t first = str.find_first_not_of(" \t");
+    if (first == std::string::npos) // If the string is all whitespace
+        return "";
+    // Find the last non-whitespace character
+    const size_t last = str.find_last_not_of(" \t");
+    // Return the trimmed string
+    return str.substr(first, last - first + 1);
+}
 
 extern BOOL  g_bBinaryTable;
 #endif

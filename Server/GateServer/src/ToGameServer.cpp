@@ -204,9 +204,9 @@ void ToGameServer::OnProcessData(DataSocket* datasock, RPacket &recvbuf)
 	uShort l_cmd = recvbuf.ReadCmd();
 	//LG("ToGameServer", "-->l_cmd = %d\n", l_cmd);
 
-	printf("Incoming from GameServer Packet CMD ID: %d\n", l_cmd);
-	printf("Packet data size: %d bytes\n", recvbuf.GetDataLen());
-	printf("Packet total size: %d bytes\n",recvbuf.GetPktLen());
+	//printf("Incoming from GameServer Packet CMD ID: %d\n", l_cmd);
+	//printf("Packet data size: %d bytes\n", recvbuf.GetDataLen());
+	//printf("Packet total size: %d bytes\n",recvbuf.GetPktLen());
 
 	try
 	{

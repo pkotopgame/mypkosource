@@ -13,7 +13,7 @@ ToClient::ToClient(char const* fname, ThreadPool* proc, ThreadPool* comm)
 	IniSection& is = inf["ToClient"];
 	const std::string ip = is["IP"]; uShort port = std::stoi(is["Port"]);
 	_comm_enc = std::stoi(is["CommEncrypt"]);
-	printf("Current client version is %d\n", m_version);
+	printf_s("Current client version is %d\n", m_version);
 	// DDOS Protection begins
 	if (g_ddos)
 	{
@@ -32,6 +32,20 @@ ToClient::ToClient(char const* fname, ThreadPool* proc, ThreadPool* comm)
 
 		// DDOS Protection end
 	}
+	MaxIpLogin = Str2Int(is["MaxIpLogin"].c_str()); //max login numbers 
+	//handle if forgot to setup it to make default value as 25
+	if (MaxIpLogin <= 0) {
+		MaxIpLogin = 25;
+	}
+	std::cout << "Max Login Per ip:" << MaxIpLogin << std::endl;
+	IsFloodControl = static_cast<uShort>(Str2Int(is["FloodControl"].c_str())) == 1;
+	const auto notice = IsFloodControl ? "Floor Control is Active " : "Floor Control is InActive ";
+	std::cout << notice << std::endl;
+	LoadBlackListIPS = static_cast<uShort>(Str2Int(is["LoadBlackListIPS"].c_str())) == 1;
+	std::cout << "LoadBlackListIPS is"<< (LoadBlackListIPS? "Active":"Inactive") << std::endl;
+	if(LoadBlackListIPS)
+		LoadBlackListIPSFile();
+
 	SetPKParse(0, 2, 16 * 1024, 100); BeginWork(std::stoi(is["EnablePing"]),1);
 	if (OpenListenSocket(port, ip.c_str()) != 0)
 		THROW_EXCP(excp, "ToClient listen failed\n");
@@ -47,7 +61,34 @@ ToClient::~ToClient()
 	}
 	ShutDown(12 * 1000);
 }
+//load all black list ips 
+void ToClient::LoadBlackListIPSFile() {
 
+	std::ifstream file("BlackList.txt");
+	if (!file.is_open()) {
+		std::cout << "Warning: File BlackList.txt does not exist or cannot be opened. Creating an empty file.\n";
+		// Create an empty file if it doesn't exist
+		std::ofstream createFile("BlackList.txt", std::ios::app);
+		createFile.close(); // Close the file immediately after creating it
+		// Attempt to open the file again for reading
+		file.open("BlackList.txt");
+		if (!file.is_open()) {
+			std::cout << "Error: Unable to open file BlackList.txt for reading.\n";
+			return;
+		}
+	}
+	std::string line;
+	while (std::getline(file, line)) {
+		// Skip empty and comment lines 
+		if (line.empty() || line.starts_with("//") || line.starts_with("--") || line.starts_with("##"))
+			continue;
+		std::string ip = TrimStringLeftAndRight(line);
+		if (ip.empty())
+			continue;
+		blacklistedIP.insert(ip);
+	}
+	std::cout << "Total Black List IPs is :" << blacklistedIP.size() << std::endl;
+}
 
 void ToClient::SetCheckSpan(uShort checkSpan)
 {
@@ -116,7 +157,7 @@ bool ToClient::OnConnect(DataSocket* datasock)
 	if (g_ddos)
 	{
 
-		if (std::find(blacklistedIP.begin(), blacklistedIP.end(), datasock->GetPeerIP()) != blacklistedIP.end()) {
+		if (blacklistedIP.contains(datasock->GetPeerIP())) {
 			// Check for blacklisted IPs, then disconnect them. Not the ideal way, should get rid of them in PKQueue.
 			this->Disconnect(datasock, 0, -31);
 			return false;
@@ -134,7 +175,7 @@ bool ToClient::OnConnect(DataSocket* datasock)
 				this->Disconnect(datasock, 0, -31);
 				LogLine l_line(g_gatelog);
 				l_line << newln << "client: " << datasock->GetPeerIP() << "is suspect of DoS'ing, disconnected" << endln;
-				blacklistedIP.push_back(datasock->GetPeerIP());
+				blacklistedIP.insert(datasock->GetPeerIP());
 				
 			};
 			// If the counter is above 5, disconnect and add to the blacklist.
@@ -173,8 +214,45 @@ bool ToClient::OnConnect(DataSocket* datasock)
 	}
 	if(GetSockTotal()<=m_maxcon)
 	{
-		
-		datasock->SetRecvBuf(64 * 1024); datasock->SetSendBuf(64 * 1024);
+		//if connected ip from banned bot and flood control on, just close connection right away
+		if (GetFloodControl() && BlockedBotIPs.contains(datasock->GetPeerIP()))
+			return false;
+		// check max player login
+		// if has no user in current map add one
+		if (!MaxLoginPerIP.contains(datasock->GetPeerIP())) {
+			// MaxLoginPerIP[datasock->GetPeerIP()] = 1;
+			MaxLoginPerIP.insert_or_assign(datasock->GetPeerIP(), 1);
+		}
+		else {
+			// otherwise it has value in our table check the data of it
+			if (auto&& ipmap = MaxLoginPerIP.find(datasock->GetPeerIP()); ipmap != MaxLoginPerIP.end()) {
+				// if player reached max login per ip disconnect his ip
+				if (ipmap->second > MaxIpLogin) {
+					printf_s("[%s]..Reached Max Login\n", datasock->GetPeerIP());
+					return false;
+				}
+				// otherwise increase his login counter
+				ipmap->second++;
+			}
+		}
+		//if we have flood control active
+		if (GetFloodControl()) {
+			datasock->GateServer = true; // mark this as for gate connecting
+			//here we remove banned ips every 10mins from our map
+			const auto currentTicks = GetCurrentTick();
+			if (static unsigned long cooldown = 0; cooldown < currentTicks && !BlockedBotIPs.empty()) {
+				//update time so it don't call code twice
+				constexpr auto blockDurationMilliseconds = 60 * 60 * 1000; // 10 minutes in milliseconds
+				cooldown = currentTicks + blockDurationMilliseconds;
+				// Use std::erase_if to remove IPs with times less than the current time
+				std::erase_if(BlockedBotIPs, [&](const auto& pair) {
+					const auto& [ip, time] = pair;
+					return time < currentTicks;
+					});
+			}
+		}
+		datasock->SetRecvBuf(64 * 1024);
+		datasock->SetSendBuf(64 * 1024);
 		LogLine l_line(g_gatelog);
 		l_line<<newln<<"client: "<<datasock->GetPeerIP()<<"	come...Socket num: "<<GetSockTotal() + 1;
 		return true;
@@ -198,7 +276,7 @@ void ToClient::OnConnected(DataSocket* datasock)
 
 	if(!l_ply->InitReference(datasock))
 	{
-		printf( "warning: forbid %s repeat connect !", datasock->GetPeerIP() );
+		printf_s( "warning: forbid %s repeat connect !", datasock->GetPeerIP() );
 		l_ply->Free();
 		Disconnect(datasock);
 		return;
@@ -220,8 +298,17 @@ void ToClient::OnConnected(DataSocket* datasock)
 			l_ply->handshakeDone = false;
 			if (!l_ply->srvPrivateKey.Validate(l_ply->rng, 2) || !srvPublicKey.Validate(l_ply->rng, 2))
 			{
-				printf("The generated key is invalid!\n");
-				Disconnect(datasock, 65, -27);
+				printf_s("The generated key is invalid! IP:%s\n", datasock->GetPeerIP());
+				//here add to tcp flood as it ddos  so it block ip for 10mins 
+				if (GetFloodControl())
+				{
+					//added exploit max length packet to fake tcp as well as ddos PacketMaxLength 
+					//if its marked as bot ip add it to block ip list
+					constexpr auto blockDurationMilliseconds = 60 * 60 * 1000; // 60 minutes in milliseconds
+					const auto blocktime = GetCurrentTick() + blockDurationMilliseconds;
+					BlockedBotIPs.insert({ datasock->GetPeerIP(), blocktime });
+				}
+				Disconnect(datasock, 65, -39);
 				return;
 			}
 
@@ -250,13 +337,36 @@ void ToClient::OnConnected(DataSocket* datasock)
 }
 void ToClient::OnDisconnect(DataSocket* datasock, int reason)
 {
-	LogLine l_line(g_gatelog);
-	l_line << newln << "client: " << datasock->GetPeerIP() << " gone...Socket num: " << GetSockTotal() << " ,reason=" << GetDisconnectErrText(reason).c_str();
-	l_line << endln;
+    LogLine l_line(g_gatelog);
+    l_line << newln << "client: " << datasock->GetPeerIP() << " gone...Socket num: " << GetSockTotal() << " ,reason=" << GetDisconnectErrText(reason).c_str();
+    l_line << endln;
 
-	RPacket l_rpk = 0;
-	CM_LOGOUT(datasock,l_rpk);
+    // Decrease player IP login on each disconnect
+    if (auto&& ipmap = MaxLoginPerIP.find(datasock->GetPeerIP()); ipmap != MaxLoginPerIP.end()) {
+        // If player has last connection, remove their IP from the map
+        if (ipmap->second == 1) {
+            MaxLoginPerIP.erase(ipmap);
+        } else {
+            // Otherwise, decrease their login counter
+            ipmap->second--;
+        }
+    }
+
+    if (GetFloodControl() && (reason == -39 || reason == -5)) {
+        // Added exploit max length packet to fake TCP as well as DDoS PacketMaxLength
+        // If it's marked as bot IP, add it to block IP list
+        constexpr auto blockDurationMilliseconds = 60 * 60 * 1000; // 60 minutes in milliseconds
+        const auto blocktime = GetCurrentTick() + blockDurationMilliseconds;
+        BlockedBotIPs.insert({ datasock->GetPeerIP(), blocktime });
+        
+        LogLine logs(g_botsAttack);
+        logs << newln << " IP: " << datasock->GetPeerIP() << endln;
+    }
+
+    RPacket l_rpk = 0;
+    CM_LOGOUT(datasock, l_rpk);
 }
+
 
 std::string	ToClient::GetDisconnectErrText(int reason) const
 {
@@ -271,6 +381,7 @@ std::string	ToClient::GetDisconnectErrText(int reason) const
 		case -31:return RES_STRING(GS_TOCLIENT_CPP_00017);
 		case -32:return RES_STRING(GS_TOCLIENT_CPP_00019);
 		case -33:return RES_STRING(GS_TOCLIENT_CPP_00020);
+		case -39: return "Bot DDOS";
 		default:return TcpServerApp::GetDisconnectErrText(reason);
 	}
 }
@@ -360,13 +471,13 @@ void ToClient::OnProcessData(DataSocket* datasock, RPacket &recvbuf)
 					++datasock->m_cmdNum;
 
 					auto DisconnectDDOSer = [&] {
-						printf("[%s] ddos suspected... ", datasock->GetPeerIP());
+						//printf("[%s] ddos suspected... ", datasock->GetPeerIP());
 						dbc::WPacket l_wpk = GetWPacket();
 						l_wpk.WriteCmd(CMD_MC_LOGIN);
 						l_wpk.WriteShort(ERR_MC_NETEXCP);
 						SendData(datasock, l_wpk);
 
-						C_PRINT("disconnected!\n");
+						//C_PRINT("disconnected!\n");
 						this->Disconnect(datasock, 100, -31);
 					};
 
@@ -862,7 +973,11 @@ void ToClient::CM_LOGIN(DataSocket* datasock, RPacket& recvbuf)
 			LogLine l_line(g_gatelog);
 			//l_line<<newln<<"�ͻ���: "<<datasock->GetPeerIP()<<"	��½�ɹ���"<<endln;
 			l_line << newln << "client: " << datasock->GetPeerIP() << "	login ok." << endln;
-
+			//if player login sucessfully mark it as validate 
+			if (GetFloodControl()) {
+				datasock->SetValidSocketLogin();
+			}
+			// end
 			// ��ʼ����
 		}
 		else

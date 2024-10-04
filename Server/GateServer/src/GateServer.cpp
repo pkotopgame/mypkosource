@@ -14,6 +14,7 @@ dbc::LogStream g_gateerr("ErrServer");
 dbc::LogStream g_gatelog("GateServer");
 dbc::LogStream g_chkattack("AttackMonitor");
 dbc::LogStream g_gateconnect("Connect");
+dbc::LogStream g_botsAttack("BotsAttack");
 //LogStream g_gatepacket("PacketProc");
 
 dbc::InterLockedLong		g_exit	=0;
@@ -209,7 +210,57 @@ void GateServer::RunLoop()
 				std::cout<<RES_STRING(GS_GATESERVER_CPP_00010)<<l_maxcon<<std::endl;
 			}
 			g_gtsvr->cli_conn->SetMaxCon(l_maxcon);
-		}else	if(l_str	=="logbak")
+		}
+		else if (!strncmp(l_str.c_str(), "setfloodcontrol", 15)) {
+
+			if (const auto flood = static_cast<dbc::uShort>(Str2Int(l_str.c_str() + 15)); flood == 1) {
+				std::cout << "Flood Control is active" << std::endl;
+				g_gtsvr->cli_conn->SetFloodControl(true);
+			}
+			else {
+				std::cout << "Flood Control is Inactive" << std::endl;
+				g_gtsvr->cli_conn->SetFloodControl(false);
+				// remove current banned ips
+				g_gtsvr->cli_conn->ClearBlockedBotIPs();
+			}
+			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+			std::cout << std::endl;
+		}
+		else if (!strncmp(l_str.c_str(), "erasebotip", 10)) {
+			std::string ip = TrimStringLeftAndRight(l_str.c_str());
+			if (ip.empty())
+				continue;
+			std::cout << "Removed [" << l_str.c_str() << "] from banned list" << std::endl;
+			// remove current banned ips
+			g_gtsvr->cli_conn->EraseBlockedBotIP(l_str.c_str());
+			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+			std::cout << std::endl;
+		}
+		else if (!strncmp(l_str.c_str(), "eraseblacklisttip", 17)) {
+			std::string ip = TrimStringLeftAndRight(l_str.c_str());
+			if (ip.empty())
+				continue;
+			std::cout << "Removed [" << l_str.c_str() << "] from Black list" << std::endl;
+			// remove current banned ips
+			g_gtsvr->cli_conn->EraseBlackListIP(l_str.c_str());
+			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+			std::cout << std::endl;
+		}
+		else if (!strncmp(l_str.c_str(), "clearblacklist", 14)) {
+			std::cout << "Cleared Black list ips" << std::endl;
+			// remove current banned ips
+			g_gtsvr->cli_conn->ClearBlackListIPs();
+			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+			std::cout << std::endl;
+		}
+		else if (!strncmp(l_str.c_str(), "reloadblacklist", 16)) {
+			std::cout << "Reloading Black List IP File" << std::endl;
+			// remove current banned ips
+			g_gtsvr->cli_conn->LoadBlackListIPSFile();
+			std::cin.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+			std::cout << std::endl;
+		}
+		else	if(l_str	=="logbak")
 		{
 			dbc::LogStream::Backup();
 		}else	if(l_str	=="getqueparm")

@@ -378,7 +378,11 @@ void TcpCommApp::BeforeSel(selparm &p)
 		}
 		if(m_keepalive)
 		{
-			if (auto delta = l_tick - l_datasock->m_recvtime; delta > m_keepalive)
+			//check if socket connect valid one or just fake
+			if (l_datasock->GateServer && !l_datasock->GetValidSocketLogin() && l_tick - static_cast<uLong>(l_datasock->m_recvtime) > l_datasock->ValidSocketTime) {
+				Disconnect(l_datasock, 0, -39);
+			}
+			else if (auto delta = l_tick - l_datasock->m_recvtime; delta > m_keepalive)
 			{
 				Disconnect(l_datasock, 0, -9);
 			}
@@ -798,6 +802,7 @@ std::string TcpCommApp::GetDisconnectErrText(int reason) const {
 	case -7:
 		return "Data blocking on the socket is too severe.";
 	case -9:
+	case -39:return "KeepAlive failed,Fake tcp connect";
 		return "KeepAlive failed.";
 	case DS_DISCONN:
 		return "The program uses the default anti-link.";

@@ -27,6 +27,7 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include <unordered_set>
 
 // 关于 Client 连接部分＝＝＝＝＝＝＝＝＝＝
 class  ClientConnection;
@@ -64,7 +65,16 @@ public:
 	void	SetCheckSpan(dbc::uShort checkSpan);
 	void	SetCheckWaring(dbc::uShort checkWaring);
 	void	SetCheckError(dbc::uShort checkError);
-  
+	//helper for floodcontrol
+
+	void ClearBlockedBotIPs() { BlockedBotIPs.clear(); }
+	void EraseBlockedBotIP(const std::string& ip) { BlockedBotIPs.erase(ip); }
+	void SetFloodControl(const bool v) { IsFloodControl = v; }
+	bool GetFloodControl() const { return IsFloodControl; }
+	void LoadBlackListIPSFile();
+
+	void ClearBlackListIPs() { blacklistedIP.clear(); }
+	void EraseBlackListIP(const std::string& ip) { blacklistedIP.erase(ip); }
 private:
 	bool		 DoCommand(dbc::DataSocket* datasock, dbc::cChar* cmdline);
 	virtual bool OnConnect(dbc::DataSocket* datasock); // 返回值:true-允许连接,false-不允许连接
@@ -73,7 +83,7 @@ private:
 	virtual void OnProcessData(dbc::DataSocket* datasock, dbc::RPacket& recvbuf);
 	virtual dbc::WPacket OnServeCall(dbc::DataSocket* datasock, dbc::RPacket& in_para);
 	virtual bool OnSendBlock(dbc::DataSocket* datasock) { return false; }
-
+	 
 	// communication encryption
 	virtual bool OnEncrypt(dbc::DataSocket* datasock, char* ciphertext, dbc::uLong ciphertext_len, const char* text, dbc::uLong& len);
 	virtual bool OnDecrypt(dbc::DataSocket* datasock, char* ciphertext, dbc::uLong& len);
@@ -90,8 +100,13 @@ private:
 	volatile dbc::uLong		m_cmdNum;
 	volatile dbc::uLong		m_Warning;
 	volatile dbc::uLong     m_lastConnect;
-	std::vector<std::string>		blacklistedIP;
-
+	std::unordered_set<std::string>blacklistedIP{};
+	//map to store blocked bot ips from login we will make it clear the map every 10mins
+	std::unordered_map<std::string, unsigned long> BlockedBotIPs;
+	unsigned int MaxIpLogin{ 25 };
+	bool IsFloodControl{ true }; //new method to check if server got fake tcp connect or not to store bots ips
+	std::unordered_map<std::string, unsigned int> MaxLoginPerIP{}; /// max player login per ip
+	bool LoadBlackListIPS{ true };//load wide list of black list ips  @mothannakh
 	IMPLEMENT_CDELETE(ToClient)
 };
 
@@ -371,6 +386,8 @@ extern dbc::LogStream g_gateerr;
 extern dbc::LogStream g_gatelog;
 extern dbc::LogStream g_chkattack;
 extern dbc::LogStream g_gateconnect;
+extern dbc::LogStream g_botsAttack;
+
 //extern LogStream g_gatepacket;
 extern GateServerApp* g_app;
 extern BYTE g_wpe;
