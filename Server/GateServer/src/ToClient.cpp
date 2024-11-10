@@ -471,13 +471,13 @@ void ToClient::OnProcessData(DataSocket* datasock, RPacket &recvbuf)
 					++datasock->m_cmdNum;
 
 					auto DisconnectDDOSer = [&] {
-						//printf("[%s] ddos suspected... ", datasock->GetPeerIP());
+						printf("[%s] ddos suspected... ", datasock->GetPeerIP());
 						dbc::WPacket l_wpk = GetWPacket();
 						l_wpk.WriteCmd(CMD_MC_LOGIN);
 						l_wpk.WriteShort(ERR_MC_NETEXCP);
 						SendData(datasock, l_wpk);
 
-						//C_PRINT("disconnected!\n");
+						C_PRINT("disconnected!\n");
 						this->Disconnect(datasock, 100, -31);
 					};
 
