@@ -240,10 +240,10 @@ public:
 	bool			RespawnMount();
 	bool			DespawnMount();
 
-	int				GetIsMountEquipped()			{return IsMountEquip;}
+	int				GetIsMountEquipped() const { return IsMountEquip; }
 	void			SetIsMountEquipped(int x) { IsMountEquip = x;}
-	bool			GetIsOnMount()				{	return bIsOnMount; }
-	bool			GetCanPkOnMount();
+	bool			GetIsOnMount() const { return bIsOnMount; }
+
 	void			SetIsOnMount(bool x)		{  bIsOnMount = x;}
 	CCharacter*		GetMount();
 	int				GetApparelID(SItemGrid app);
@@ -504,7 +504,14 @@ protected:
     int             _nUIScale;		// ����Ϊ������ʾʱ, ���Ų���
 	CCharacter*		chaMount;
 	CCharacter*		mountOwner;
-
+	//extra helper for mounts 
+	int pMountID{ 0 }; //iteminfo id 
+	int pMountBone{ 0 };
+	DWORD MountPose{ 0 };
+	int MountHeight{ 0 }; //mount auto hegiht @mothannakh
+	float MountScale{ 0.0f };
+	int MountX{ 0 };
+	int MountY{ 0 };
 private:			// ��Ч
 	CBoolSet		_Special;		// ��Ч���ּ���
 	CBoolSet		_PK;			// PK����

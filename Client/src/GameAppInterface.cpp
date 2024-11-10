@@ -75,7 +75,7 @@
 #include "NPCHelper.h" 
 #include "helpinfoset.h"
 #include "MonsterSet.h"
-#include "MountRecord.h"
+#include "MountInfo.h"
 
 using namespace std;
 
@@ -1493,8 +1493,8 @@ void CGameApp::InitAllTable()
 	CMonsterSet* pMonsterSet = new CMonsterSet(0, 1000);
     pMonsterSet->LoadRawDataInfo("scripts/table/MonsterInfo", bBinary);
 
-	CMountSet* pMount = new CMountSet(0, 500);
-	pMount->LoadRawDataInfo("scripts/table/mountinfo", bBinary);
+	const auto MountHelperSet = new MountHelper(0, 500);
+	MountHelperSet->LoadRawDataInfo("scripts/table/MountInfo", bBinary);
 
 	//CHelpInfoSet* pHelpInfoSet = new CHelpInfoSet( 0, 20 );
 	//pHelpInfoSet->LoadRawDataInfo("scripts/table/helpinfoset", bBinary);

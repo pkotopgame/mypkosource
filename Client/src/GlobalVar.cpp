@@ -32,7 +32,7 @@
 #include "helpinfoset.h"
 #include "ResourceBundleManage.h"
 #include "pi_Alloc.h"
-#include "MountRecord.h"
+//#include "MountInfo.h"
 #include "LootFilter.h"
 
 #ifndef USE_DSOUND
@@ -70,7 +70,7 @@ CElfSkillSet*		CElfSkillSet::_Instance				= NULL;
 CMonsterSet*        CMonsterSet::_Instance    = NULL;//Add by sunny.sun 20080903
 CHelpInfoSet*		CHelpInfoSet::_Instance     = NULL;
 // Add by Mdr
-CMountSet*          CMountSet::_Instance      = NULL;
+
 
 
 MPEditor	        g_Editor;

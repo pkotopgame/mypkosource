@@ -149,6 +149,9 @@
     <Filter Include="maze timer">
       <UniqueIdentifier>{d32a5194-54b1-4e00-a31c-7ed6852915cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Mounts">
+      <UniqueIdentifier>{4d61f0b9-8c28-4b01-94cb-7a2167e2e9e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CameraCtrl.cpp">
@@ -734,6 +737,9 @@
     <ClCompile Include="..\src\LootFilter.cpp" />
     <ClCompile Include="..\src\UIPortalTime.cpp">
       <Filter>maze timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MountInfo.cpp">
+      <Filter>Mounts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1387,6 +1393,9 @@
     <ClInclude Include="..\src\LootFilter.h" />
     <ClInclude Include="..\src\UIPortalTime.h">
       <Filter>maze timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MountInfo.h">
+      <Filter>Mounts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

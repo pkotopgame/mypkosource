@@ -161,9 +161,6 @@
     <ClInclude Include="..\include\MonRefRecord.h">
       <Filter>Data Tables</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\MountRecord.h">
-      <Filter>Data Tables</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\NpcRecord.h">
       <Filter>Data Tables</Filter>
     </ClInclude>

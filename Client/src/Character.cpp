@@ -39,7 +39,7 @@
 #include "UIEquipForm.h"
 #include "UIItemCommand.h"
 #include "UIMiniMapForm.h"
-#include "MountRecord.h"
+#include "MountInfo.h"
 
 #include "PacketCmd.h"
 #include "GameConfig.h"
@@ -1419,19 +1419,13 @@ bool CCharacter::PlayPose( DWORD pose, DWORD type, int time, int fps, bool isBle
 	//else if (GetIsOnMount() && GetMount() && !GetIsPK())
 	else if (!GetIsPK()&& GetIsOnMount() && GetMount())
 	{
-		int mountID = this->GetPart().SLink[enumEQUIP_MOUNT].sID;
-		CItemRecord* itemRec = GetItemRecordInfo(mountID);
-		if(!itemRec){
-		return false;
-		}
-		CMountInfo *pMount = GetMountInfo(itemRec->szDataName);
 		if (DWORD mountPose = GetMountPose(pose))
 		{
 			GetMount()->SetHide(false);
 			GetMount()->PlayPose(mountPose, type, time, fps, isBlend, IsGlitched);
 		
-			pose = pMount->poseID[getTypeID()-1];
-
+			pose = MountPose;
+			//g_pGameApp->SysInfo("PlayPose poseid %d", pose);
 			if (_InFight || _IsFightPose)
 			{
 				FightSwitch(false);
@@ -1439,6 +1433,7 @@ bool CCharacter::PlayPose( DWORD pose, DWORD type, int time, int fps, bool isBle
 		}
 		else
 		{
+			//g_pGameApp->SysInfo("PlayPose HideMount ");
 			GetMount()->SetHide(true);
 			FightSwitch(true); //if didn't work withou this uncomment this
 		}
@@ -1716,10 +1711,37 @@ int CCharacter::GetApparelID(SItemGrid app) {
 }
 
 bool CCharacter::SpawnMount(int mountID) {
-    CItemRecord* pInfo = GetItemRecordInfo(mountID);
-    if (!chaMount && pInfo) {
-        chaMount = g_pGameApp->GetCurScene()->AddCharacter(pInfo->sItemEffect[0]);
+	const auto MountInfo = GetMountInfoFromItemID(mountID);
+	if (!MountInfo)
+	{
+		g_pGameApp->SysInfo("Missing Mount info report to admin , itemID %d",mountID);
+		return false;
+	}
+
+    if (!chaMount) {
+		if (const CChaRecord* MountInfoX = GetChaRecordInfo(MountInfo->CharID); !MountInfoX)
+		{
+			g_pGameApp->SysInfo("Missing model OR Character info record");
+			return false;
+		}
+        chaMount = g_pGameApp->GetCurScene()->AddCharacter(MountInfo->CharID);
         if (chaMount) {
+			const int chatype = getTypeID();
+			if (chatype > 4)
+			{
+				g_pGameApp->SysInfo("Character Type is wrong higher than 4", MountInfo->CharID, MountInfo->ItemID);
+				return false;
+			}
+			//g_pGameApp->SysInfo("Spawn mount id %d %d", MountInfo->CharID, MountInfo->ItemID);
+			pMountID = MountInfo->ItemID;
+			pMountBone = MountInfo->mountBone[chatype - 1];
+			MountPose = MountInfo->PoseID[chatype - 1];
+			MountHeight = MountInfo->MountHeight[chatype - 1];
+			MountScale = MountInfo->Mountscale[chatype - 1];
+			MountX = MountInfo->OffSetx[chatype - 1];
+			MountY = MountInfo->OffSety[chatype - 1];
+			chaMount->setMobID(MountInfo->CharID);
+			chaMount->setName("");
             chaMount->GetActor()->InitState();
             chaMount->SetMountOwner(this);
             chaMount->EnableAI(FALSE);
@@ -1748,7 +1770,13 @@ bool CCharacter::DespawnMount() {
         chaMount->SetMountOwner(NULL);
         chaMount->SetValid(FALSE);
         chaMount = NULL;
-
+		pMountID = 0;
+		pMountBone = 0;
+		MountPose = 0;
+		MountHeight = 0;
+		MountScale = 0.0f;
+		MountX = 0;
+		MountY = 0;
        // PlayPose(GetPose(POSE_WAITING), PLAY_LOOP_SMOOTH);
         setPoseHeightOff(ERROR_POSE_HEIGHT);
         _UpdateHeight();
@@ -1776,8 +1804,11 @@ bool CCharacter::UpdataItem( int nItem, DWORD nLink )
 			SetIsMountEquipped(0);
 		}
 		if (ShowMounts && !GetIsPK() && nItem > 0 && IsPlayer() && !GetIsOnMount()) {
-			SpawnMount(ID);
-			SetIsMountEquipped(ID);
+			
+			if(SpawnMount(ID))
+			{
+				SetIsMountEquipped(ID);
+			}
 		}
 		else {
 			if (GetMount() && IsPlayer() && (!ID || GetIsPK())) {
@@ -2646,10 +2677,9 @@ void CCharacter::_computeLinkedMatrix()
 {
 	if (this->GetIsOnMount() && !GetIsPK() && this->GetIsMountEquipped() && !this->GetIsForUI())
 	{
-		CCharacter *mountCha = GetMount();
-		CMountInfo *pMount = GetMountInfo(GetItemRecordInfo(this->GetIsMountEquipped())->szDataName);
+		const auto &mountCha = GetMount();
 
-		if (mountCha && pMount)
+		if (mountCha)
 		{
 			if (mountCha->IsHide())
 			{
@@ -2666,62 +2696,32 @@ void CCharacter::_computeLinkedMatrix()
 			playerPos.z = playerMat._43;
 
 			float angle = GetYaw();
-			float offsetX = pMount->offsetX / 100.0f;
-			float offsetY = pMount->offsetY / 100.0f;
+			float offsetX = MountX / 100.0f;
+			float offsetY = MountY / 100.0f;
 			float xRotated = (offsetX)*cos(angle) - (offsetY)*sin(angle);
 			float yRotated = (offsetX)*sin(angle) + (offsetY)*cos(angle);
 
-			chaMount->setPos((xRotated + playerPos.x) * 100, (yRotated + playerPos.y) * 100);
+			mountCha->setPos((xRotated + playerPos.x) * 100, (yRotated + playerPos.y) * 100);
 			mountCha->setYaw(getYaw());
 
 			MPMatrix44 mountMat;
-			mountCha->GetRunTimeMatrix(&mountMat, pMount->boneID);
+			mountCha->GetRunTimeMatrix(&mountMat, pMountBone);
 
-			const float boneZ = mountMat._43;
-			const int heightOffset = (boneZ + pMount->height[getTypeID()-1] / 100.0f) * 100.0f;
-			setPoseHeightOff(heightOffset);
+			//set main character pose 
+			setPoseHeightOff(static_cast<int>((mountMat._43 + MountHeight / 100.0f) * 100.0f));
+			D3DXVECTOR3 scale;
+			scale.x = MountScale;
+			scale.y = MountScale;
+			scale.z = MountScale;
+			mountCha->SetScale(scale);
 
 			if (_pNpcStateItem)
 			{
-				_pNpcStateItem->setHeightOff(static_cast<int>((GetDefaultChaInfo()->fHeight + boneZ + pMount->height[getTypeID() - 1] / 100.f - mountCha->GetPos().z) * 100.f));
+				_pNpcStateItem->setHeightOff(static_cast<int>((GetDefaultChaInfo()->fHeight + mountMat._43 + MountHeight / 100.f - mountCha->GetPos().z) * 100.f));
 			}
 		}
 	}
-	/*
-	if( mParentNode )		// This doesn't seem to be used at all currently.
-	{
-		MPMatrix44 mat;
-		mParentNode->GetRunTimeMatrix( &mat, mParentBoneID );
-
-		// extract translation information from parent bone.
-		D3DXVECTOR3 pos;
-		pos.x = mat._41;
-		pos.y = mat._42;
-		pos.z = mat._43;
-		
-		// extract scaling information from parent bone.
-		D3DXVECTOR3 scale;
-		scale.x = sqrt ( mat._11 * mat._11 + mat._21 * mat._21 + mat._31 * mat._31 );
-		scale.y = sqrt ( mat._12 * mat._12 + mat._22 * mat._22 + mat._32 * mat._32 );
-		scale.z = sqrt ( mat._13 * mat._13 + mat._23 * mat._23 + mat._33 * mat._33 );
-
-		// extract rotation information from parent bone.
-		float rotZ = D3DX_PI - atan2( mat._21, mat._11 );
-		float rotY = - asin( -mat._31 / scale.x );//
-		float rotX = - atan2( mat._32 / scale.y, mat._33 / scale.z );
-
-		float yaw = Radian2Angle( rotZ );
-		float pitch = Radian2Angle( rotY );
-		float roll = Radian2Angle( rotX );
-
-		//SetPos((float*)(&pos));
-		setPos( int( pos.x * 100.f ), int( pos.y * 100.f )); //Edit by Mdr.st
-		SetScale(scale);
-		setYaw(int(yaw));
-		setPitch(int(pitch));
-		setRoll(int(roll));
-	}
-	*/
+	
 }
 
 //add by ALLEN 2007-10-16
@@ -2732,167 +2732,6 @@ bool CCharacter::IsReadingBook()
 }
 
 
-/*
-MountData* CCharacter::GetMountData(){
-	// Default mount data
-	MountData* data = new MountData;
-	data->height =0;
-	data->yawAngle =0;
-	data->pose = POSE_SEAT2;
-	data->offsetX = 0;
-	data->offsetY = 0;
-	data->boneID = 0;
-	if(!GetIsOnMount() || !GetIsMountEquipped()) return NULL;
-
-	int mountID = GetIsMountEquipped();
-
-	CItemRecord*	pInfo = GetItemRecordInfo(mountID);
-	if(pInfo){
-	// Races ID: Lance =1, Carsise = 2, Phyllis = 3, Ami = 4
-	switch(mountID){
-	case 19676: 		// Baby Black Dragon Mount
-	data->boneID = 3;
-	switch(GetDefaultChaInfo()->lID){ 
-		case 1: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			break;
-		case 2:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			break;
-		case 3: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			break;
-		case 4:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			break;
-		}
-	break;
-	case 19677:			// Cuddly Lamb Mount
-	data->boneID = 1;
-	switch(GetDefaultChaInfo()->lID){ 
-		case 1: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 2:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 1000;
-			data->offsetY = 1000;
-			break;
-		case 3: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 4:
-			data->height = 0.4f;
-			data->pose = POSE_SEAT;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		}
-	case 19678:			// Yeti Mount
-	data->boneID = 1;
-	switch(GetDefaultChaInfo()->lID){ 
-		case 1: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 2:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 100;
-			data->offsetY = 100;
-			break;
-		case 3: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 4:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 100;
-			break;
-		}
-	break;
-	case 19683:			// Yeti Mount
-	data->boneID = 0;
-	switch(GetDefaultChaInfo()->lID){ 
-		case 1: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 2:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 80;
-			break;
-		case 3: 
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 0;
-			break;
-		case 4:
-			data->height = 0;
-			data->pose = POSE_SEAT2;
-			data->yawAngle = 0;
-			data->offsetX = 0;
-			data->offsetY = 100;
-			break;
-		}
-	break;
-	
-	}
-	}
-	return data;
-}
-*/
-
-/*
-void CCharacter::MoveTo(int nTargetX, int nTargetY){
-	CCharacter*	chaMount = this->GetMount();
-	if (chaMount){
-		chaMount->ForceMove(nTargetX, nTargetY);
-		 if( !_isArrive )  chaMount->FaceTo(chaMount->_GetTargetAngle(nTargetX, nTargetY));
-	}else {
-
-    ForceMove( nTargetX, nTargetY );
-    if( !_isArrive )  FaceTo(_GetTargetAngle(nTargetX, nTargetY));
-	}
-}
-*/
 
 CCharacter* CCharacter::GetMount(){
 	if(this->IsPlayer()){

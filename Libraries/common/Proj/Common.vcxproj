@@ -152,7 +152,6 @@
     <ClInclude Include="..\include\LifeLvRecord.h" />
     <ClInclude Include="..\include\LogFile.h" />
     <ClInclude Include="..\include\MonRefRecord.h" />
-    <ClInclude Include="..\include\MountRecord.h" />
     <ClInclude Include="..\include\NetCommand.h" />
     <ClInclude Include="..\include\NetRetCode.h" />
     <ClInclude Include="..\include\NpcRecord.h" />

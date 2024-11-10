@@ -78,8 +78,10 @@ public:
 	BOOL			LoadRawDataInfoEx(const char *pszFileName, BOOL bBinary = FALSE);
 	void			WriteBinFile(const char *pszFileName);
 	
-	BOOL			IsValidID(int nID);
-    int             GetLastID() const {return _nIDLast;}
+	BOOL			IsValidID(int nID) const;
+	virtual int             GetIDStart() const { return _nIDStart; }
+	virtual int             GetIDCnt() const { return _nIDCnt; }
+	int             GetLastID() const { return _nIDLast; }
 	
 	// 对于动态释放的参数设置
     void			SetReleaseInterval(DWORD dwInterval)	{ _dwReleaseInterval = dwInterval;	}
@@ -259,7 +261,7 @@ inline void* CRawDataSet::GetRawData(const char* pszDataName, int *pnID)
     return GetRawData(nID);
 }
 
-inline BOOL CRawDataSet::IsValidID(int nID)
+inline BOOL CRawDataSet::IsValidID(int nID)const
 {
 	if(nID < _nIDStart || nID >= (_nIDStart + _nIDCnt)) return FALSE;
 	return TRUE;

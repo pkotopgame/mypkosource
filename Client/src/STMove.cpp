@@ -13,7 +13,6 @@
 #include "CameraCtrl.h"
 #include "STAttack.h"
 #include "AreaRecord.h"
-#include "MountRecord.h"
 
 //---------------------------------------------------------------------------
 // class CWaitMoveState

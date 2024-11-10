@@ -325,6 +325,7 @@
     <ClCompile Include="..\src\LootFilter.cpp" />
     <ClCompile Include="..\src\lua_platform.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\MountInfo.cpp" />
     <ClCompile Include="..\src\MouseDown.cpp" />
     <ClCompile Include="..\src\MPEditor.cpp" />
     <ClCompile Include="..\src\MusicThread.cpp" />
@@ -549,6 +550,7 @@
     <ClInclude Include="..\src\Main.h" />
     <ClInclude Include="..\src\MapSet.h" />
     <ClInclude Include="..\src\MonsterSet.h" />
+    <ClInclude Include="..\src\MountInfo.h" />
     <ClInclude Include="..\src\MouseDown.h" />
     <ClInclude Include="..\src\MPEditor.h" />
     <ClInclude Include="..\src\MusicSet.h" />
