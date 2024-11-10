@@ -530,7 +530,6 @@ void MPGameApp::_ReadKeyboardInput()
 			}
 		}
 	}
-
 /*
 	// GetDeviceState version
 	memcpy ( _lastKeyState, _curKeyState, sizeof ( _lastKeyState ) );

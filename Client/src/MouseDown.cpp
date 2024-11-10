@@ -33,7 +33,8 @@ extern MPEditor g_Editor;
 static D3DXVECTOR3 vPos;
 static int nScrX, nScrY;
 
-const DWORD DELAY_TIME = 100;
+//const DWORD DELAY_TIME = 100;
+const DWORD DELAY_TIME = 0;
 int	  MOVE_LENGTH = -1;
 int   ATTACT_DIS = 200;
 
