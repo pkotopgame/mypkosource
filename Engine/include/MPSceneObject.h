@@ -58,6 +58,7 @@ public:
 
     lwIModel* GetObject() { return _model; }
     lwIHelperObject* GetHelperObject() { return _model->GetHelperObject(); }
+   // lwVector3 GetObjectSize();
 
     LW_RESULT SetItemLink( const lwSceneItemLinkInfo* info );
     LW_RESULT UnwieldItem( const MPSceneItem* obj );

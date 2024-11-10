@@ -210,6 +210,44 @@ DWORD MPSceneObject::GetObjState( DWORD state ) const
     return _model->GetObjState( state );
 	return 0;
 }
+/*lwVector3 MPSceneObject::GetObjectSize()
+{
+    if (_model)
+    {
+        lwVector3	vModelSizeMin(0.0f, 0.0f, 0.0f);
+        lwVector3	vModelSizeMax(0.0f, 0.0f, 0.0f);
+        for (DWORD i = 0; i < _model->GetPrimitiveNum(); i++)
+        {
+            lwVector3* _seq = _model->GetPrimitive(i)->GetMeshAgent()->GetMesh()->GetMeshInfo()->vertex_seq;
+            if (_seq->x < vModelSizeMin.x)
+            {
+                vModelSizeMin.x = _seq->x;
+            }
+            if (_seq->x > vModelSizeMax.x)
+            {
+                vModelSizeMax.x = _seq->x;
+            }
+            if (_seq->y < vModelSizeMin.y)
+            {
+                vModelSizeMin.y = _seq->y;
+            }
+            if (_seq->y > vModelSizeMax.y)
+            {
+                vModelSizeMax.y = _seq->y;
+            }
+            if (_seq->z < vModelSizeMin.z)
+            {
+                vModelSizeMin.z = _seq->z;
+            }
+            if (_seq->z > vModelSizeMax.z)
+            {
+                vModelSizeMax.z = _seq->z;
+            }
+        }
+        return lwVector3(vModelSizeMax.x - vModelSizeMin.x, vModelSizeMax.y - vModelSizeMin.y, vModelSizeMax.z - vModelSizeMin.z);
+    }
+    return lwVector3(0, 0, 0);
+}*/
 
 LW_RESULT MPSceneObject::SetItemLink( const lwSceneItemLinkInfo* info )
 {

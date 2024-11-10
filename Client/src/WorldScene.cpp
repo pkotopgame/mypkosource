@@ -720,7 +720,7 @@ void CWorldScene::_SceneCursor()
 		CCursor::I()->SetFrame(CCursor::stCamera);
 		//@mothannakh moved target panel to right click
 		//&& hoverCha->getChaCtrlType() !=8 this to not render pet/mounts
-		if (CCharacter* hoverCha = HitSelectCharacter(nMouseX, nMouseY); hoverCha && !hoverCha->IsNPC() && hoverCha != pMain && !hoverCha->GetIsOnMount() && !g_stUIMap.IsPKSilver()) {
+		if (CCharacter* hoverCha = HitSelectCharacter(nMouseX, nMouseY); hoverCha && !hoverCha->IsNPC() && hoverCha != pMain && !hoverCha->GetIsOnMount() && !hoverCha->IsPlayer() && !g_stUIMap.IsPKSilver()) {
 
 			g_stUIStart.SetTargetInfo(hoverCha);
 		}

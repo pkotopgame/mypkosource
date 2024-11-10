@@ -188,11 +188,12 @@ void CStartMgr::SetMonsterInfo()
 	LabMobMSpeed->SetCaption(buf);
 
 	frmMonsterInfo->Refresh();
+
 }
 
-void CStartMgr::SetTargetInfo(CCharacter* pTargetCha) 
+/*void CStartMgr::SetTargetInfo(CCharacter* pTargetCha)
 {
-	if (!pTargetCha) {
+	if (!pTargetCha && !pChaPointer) {
 		return;
 	}
 	
@@ -212,6 +213,32 @@ void CStartMgr::SetTargetInfo(CCharacter* pTargetCha)
 
 	pChaPointer = pTargetCha;
     RefreshTargetModel(pChaPointer);
+}*/
+void CStartMgr::SetTargetInfo(CCharacter* pTargetCha)
+{
+	if (!pTargetCha && !pChaPointer) {
+		return;
+	}
+	if (pTargetCha && !pTargetCha->IsPlayer()) {
+		char chaLv[5];
+		sprintf(chaLv, "%d", pTargetCha->getLv());
+		labTargetInfoName->SetCaption(pTargetCha->getName());
+		targetInfoID = pTargetCha->getHumanID();
+		RefreshTargetLifeNum(pTargetCha->getHP(), pTargetCha->getHPMax());
+		labTargetLevel->SetCaption(chaLv);
+		frmTargetInfo->Show();
+
+		if (pChaPointer && pTargetCha) {
+			if (pChaPointer->getMobID() != pTargetCha->getMobID()) {
+				frmMonsterInfo->Close();
+			}
+		}
+		pChaPointer = pTargetCha;
+		RefreshTargetModel(pChaPointer);
+	}
+	else {
+		frmTargetInfo->Close();
+	}
 }
 
 void CStartMgr::RefreshTargetModel(CCharacter* pChaPointer) 
