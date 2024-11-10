@@ -40,7 +40,7 @@ public:
 	void	SetIndex( unsigned int n );
 	void	Render( const char* str, int x, int y, DWORD color ,float size = 1.0f);					// ������ʾ		
 	void    RenderScale(const char *str, int x ,int y , DWORD color , float scale);  //������ʾ
-	void	BRender( const char* str, int x, int y, DWORD color, DWORD shadow );	// ��Ӱ��ʾ
+	void	BRender( const char* str, int x, int y, DWORD color, DWORD shadow, bool isOutline = false );	// ��Ӱ��ʾ
 	void	Render3d( const char* str, D3DXVECTOR3& pos, DWORD color=COLOR_RED );
 
 	void    FrameRender( const char* str, int x, int y );
@@ -58,7 +58,7 @@ public:
 public:
 	CMPFont*		GetFont( unsigned int index=0 );
 	void			Render( unsigned int nIndex, const char* str, int x, int y, DWORD color ,float size = 1.0f);
-	void			BRender( unsigned int nIndex, const char* str, int x, int y, DWORD color, DWORD shadow );	// ��Ӱ��ʾ
+	void			BRender( unsigned int nIndex, const char* str, int x, int y, DWORD color, DWORD shadow, bool isOutline = false );	// ��Ӱ��ʾ
 
 public:		
 	static CGuiFont	s_Font;
@@ -250,21 +250,21 @@ inline void CGuiFont::Render( unsigned int nIndex, const char* str, int x, int y
 	}
 }
 
-inline void CGuiFont::BRender( unsigned int nIndex, const char* str, int x, int y, DWORD color, DWORD shadow )
+inline void CGuiFont::BRender( unsigned int nIndex, const char* str, int x, int y, DWORD color, DWORD shadow, bool isOutline )
 {
 	if( nIndex<_nMaxFont) 
 	{		
 		GetRender().DrawConvert( x, y );
-        _fonts[nIndex]->DrawTextShadow( (char*)str, x+1, y+1, x, y, shadow, color );
+        _fonts[nIndex]->DrawTextShadow( (char*)str, x+1, y+1, x, y, shadow, color, isOutline );
 	}
 }
 
 
 
-inline void CGuiFont::BRender( const char* str, int x, int y, DWORD color, DWORD shadow )
+inline void CGuiFont::BRender( const char* str, int x, int y, DWORD color, DWORD shadow, bool isOutline )
 {
 	GetRender().DrawConvert( x, y );
-   _pFont->DrawTextShadow( (char*)str, x+1, y+1, x, y, shadow, color );
+   _pFont->DrawTextShadow( (char*)str, x+1, y+1, x, y, shadow, color, isOutline );
 }
 
 inline void CGuiFont::Render( const char* str, int x, int y, DWORD color,float size )

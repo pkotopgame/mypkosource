@@ -333,23 +333,34 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 			
 		CGuiFont::s_Font.BRender( hpInfo, x  - nOffset - (CGuiFont::s_Font.GetWidth(hpInfo)/2), y1 + 8, hpcolour, COLOR_BLACK );
 		
-		if (g_IsShowStates) {
-			float scale = 0.60;
-			float spacing = scale * 32 + 2;
-			int picX = 0;
-			int picY = 0;
-			int count = 9;
-			if (_pOwn == CGameScene::GetMainCha()) {
-				picX = g_stUIEquip.stateDrags -> GetLeft();
-				picY = g_stUIEquip.stateDrags -> GetTop();
+		if (g_IsShowStates ) {
+		// states icons linked to skill bar @mothannakh
+		float scale = 0.85f; //.045
+		float spacing = scale * 32 + 2;
+		// new code
+		int picX = 0;
+		int picY = 0;
+		int iconqty = 9;
+		bool showTimer = true;
+		if (_pOwn == CGameScene::GetMainCha()) {
+			picX = g_stUIEquip.stateDrags->GetLeft(); // frmFast2 stateDrags
+			picY = g_stUIEquip.stateDrags->GetTop();  //-60
+		}
+		else {
+			scale = 0.45f;
+			spacing = scale * 32 + 2;
+			picX = x - _pImgMana->GetWidth() / 2 - nOffset - 1;
+			picY = y1 + 28;
+			iconqty = 4;
+			if (_IsShowLife) {
+				picY += 12;
 			}
-			RenderStateIcons(_pOwn, picX, picY, scale, spacing, count, true);
+			showTimer = false;
+		}
+		// end of new code
+		RenderStateIcons(_pOwn, picX, picY, scale, spacing, iconqty, showTimer);
 		}
     }
-	
-	
-	
-	
 	
 	if(g_stUIMap.IsPKSilver())
 	{
@@ -561,10 +572,10 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 				}
 			}
 
-			/*if (_pOwn->IsNPC())
+			if (_pOwn->IsNPC())
 			{
-				s_dwNamePartsColors[NAME_INDEX][0] = 0xFF9BA1E9; // D3DXCOLOR(109,87,218,1); 
-			}*/
+				s_dwNamePartsColors[NAME_INDEX][0] = 0xff58fc9e;
+			}
 
 			// �õ����ֵ��ܳ�
 			s_szName[0] = '\0';
@@ -595,7 +606,7 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 			{
 				if( s_dwNamePartsColors[i][1] )
 				{
-					CGuiFont::s_Font.BRender(s_sNamePart[i], x + iStartPosX, y - iNameHeightStep, s_dwNamePartsColors[i][0], s_dwNamePartsColors[i][1] );
+					CGuiFont::s_Font.BRender(s_sNamePart[i], x + iStartPosX, y - iNameHeightStep, s_dwNamePartsColors[i][0], s_dwNamePartsColors[i][1] , true);
 				}
 				else
 				{
@@ -616,7 +627,7 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 				sNameBuf += _pOwn->getName();
 
 				int nNameLength = 0 - CGuiFont::s_Font.GetWidth(sNameBuf.c_str())/2;
-				CGuiFont::s_Font.BRender(sNameBuf.c_str(), x + nNameLength, y - LINE_HEIGHT_STEP, _dwNameColor, COLOR_BLACK );
+				CGuiFont::s_Font.BRender(sNameBuf.c_str(), x + nNameLength, y - LINE_HEIGHT_STEP, _dwNameColor, COLOR_BLACK , true);
 				if (_pOwn->IsShowSecondName())
 				{
 					if (strlen(_pOwn->getSecondName()) > 0)
@@ -631,7 +642,7 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 			else	//��ʾ��ɫ��
 			{
 				int  nNameLength =  0 - CGuiFont::s_Font.GetWidth( _pOwn->getName() )/2;
-				CGuiFont::s_Font.BRender( _pOwn->getName(), x +  nNameLength ,   y - LINE_HEIGHT_STEP, _dwNameColor, COLOR_BLACK );
+				CGuiFont::s_Font.BRender( _pOwn->getName(), x +  nNameLength ,   y - LINE_HEIGHT_STEP, _dwNameColor, COLOR_BLACK , true);
 				if(_pOwn->IsShowSecondName())
 				{
 					if(strlen(_pOwn->getSecondName()) > 0)

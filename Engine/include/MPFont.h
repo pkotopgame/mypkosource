@@ -310,8 +310,8 @@ public:
 	bool DrawText( char* szText, int x, int y, D3DXCOLOR color = 0xFFFFFFFF,float fScale = 1.0f ,DWORD* dwTime = NULL);
 	bool DrawText( int iNumber, int x, int y, D3DXCOLOR color = 0xFFFFFFFF,float fScale = 1.0f );
 	
-	bool DrawTextShadow( char* szText, int x1, int y1, int x2, int y2,
-		D3DXCOLOR color1,D3DXCOLOR color2);
+	bool DrawTextShadow(char* szText, const int x1, const int y1, const int x2, const int y2,
+		const D3DXCOLOR& color1, const D3DXCOLOR& color2, bool isOutline = false);
 
 
 	bool Draw3DText(char* szText,D3DXVECTOR3& vPos, D3DXCOLOR color = 0xFFFFFFFF,float fScale = 0.3f );

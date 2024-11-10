@@ -1369,18 +1369,52 @@ __ret:
 
 }
 
-bool CMPFont::DrawTextShadow( char* szText, int x1, int y1, int x2, int y2,
-							 D3DXCOLOR color1,D3DXCOLOR color2)
-{
-	if( !szText)
+bool CMPFont::DrawTextShadow(char* szText, const int x1, const int y1, const int x2, const int y2,
+							 const D3DXCOLOR& color1, const D3DXCOLOR& color2, bool isOutline) {
+	if (!szText)
 		return false;
-	Begin();
-	Draw(szText, x1, y1, color1);			//Add by mdr.st May 2020 - FPO alpha
-	Draw(szText, x2, y2, color2);
+	Begin();	
+	if (isOutline) {
+		constexpr int offsets[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+		for (const auto& offset : offsets) {
+			Draw(szText, x1 + offset[0], y1 + offset[1], color1);
+		}
+		for (const auto& offset : offsets) {
+			Draw(szText, x1 + offset[0], y1 + offset[1], color1);
+		}		
+	}else {
+		Draw(szText, x2, y2, color1);
+	}
+	Draw(szText, x1, y1, color2);
 	End();
 	return true;
-}
+} //mothanna team
+/*bool CMPFont::DrawTextShadow(char* szText, const int x1, const int y1, const int x2, const int y2,
+	const D3DXCOLOR& color1, const D3DXCOLOR& color2, bool isOutline) {
+	if (!szText)
+		return false;
 
+	Begin();
+
+	if (isOutline) {
+		constexpr int offsets[8][2] = {
+			{-1, 0}, {1, 0}, {0, -1}, {0, 1}, // Straight offsets
+			{-1, -1}, {1, -1}, {-1, 1}, {1, 1}  // Diagonal offsets
+		};
+
+		for (const auto& offset : offsets) {
+			Draw(szText, x1 + offset[0], y1 + offset[1], color1);
+		}
+	}
+	else {
+		Draw(szText, x2, y2, color1);
+	}
+
+	Draw(szText, x1, y1, color2); // Draw the main text on top
+	End();
+	return true;
+}*/
+ 
 bool CMPFont::Draw3DText(char* szText,D3DXVECTOR3& vPos, D3DXCOLOR color,float fScale)
 {
 	if( !szText) 
