@@ -1,134 +1,144 @@
-#ifndef _ZRBLOCK_H_
+ï»¿#ifndef _ZRBLOCK_H_
 #define _ZRBLOCK_H_
 
 #include "MPMap.h"
-#include "assert.h" 
+#include "assert.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "MPMapDef.h"
 #include <array>
-
 #define MAX_BLOCK_SECTION 512
 #define MAX_BLOCK_RANGE 1024
 
 //add by jze 2008.7.16
-class ZRBlockData
-{
+class ZRBlockData {
 public:
-	short           sRegion{};     // ÇøÓòÊôĞÔ
-	BYTE btBlock[4] = {}; // 4¸ö·Ö¸ñµÄÕÏ°­¼ÇÂ¼
+	short sRegion;   // åŒºåŸŸå±æ€§
+	BYTE btBlock[4]; // 4ä¸ªåˆ†æ ¼çš„éšœç¢è®°å½•
 public:
-	ZRBlockData() {}
-	~ZRBlockData(){}
+	ZRBlockData() {
+		sRegion = 0;
+		for (int i = 0; i < 4; i++) {
+			btBlock[i] = 0;
+		}
+	}
 
-    BYTE	IsBlock(BYTE no) const 
-    {
-        if(btBlock[no] & 128) return 1;
-        return 0;
-    }
+	~ZRBlockData() {}
 
-    void	setBlock(BYTE no, BOOL bSet)
-    {
-        if(bSet)
-        {
-            btBlock[no]|=128;
-        }
-        else
-        {
-            btBlock[no]&=127;
-        }
-    }
+	BYTE IsBlock(BYTE no) {
+		if (btBlock[no] & 128)
+			return 1;
+		return 0;
+	}
 
-    BOOL    IsRegion(int nRegionNo) const 
-    {
-        short s = 1;
-        s<<=(nRegionNo - 1);
-        return sRegion & s; 
-    }
+	void setBlock(BYTE no, BOOL bSet) {
+		if (bSet) {
+			btBlock[no] |= 128;
+		}
+		else {
+			btBlock[no] &= 127;
+		}
+	}
 
-    short	GetRegionValue() const { return sRegion; }
+	BOOL IsRegion(int nRegionNo) {
+		short s = 1;
+		s <<= (nRegionNo - 1);
+		return sRegion & s;
+	}
+
+	short GetRegionValue() { return sRegion; }
 };
 
 //add by jze 2008.7.16
-class ZRBlockSection
-{
+class ZRBlockSection {
 public:
-	std::unique_ptr<ZRBlockData[]> blockData{};
-	int			 nX{};									// MapSectionËùÔÚµÄÎ»ÖÃ
-	int			 nY{};
-	DWORD		 dwDataOffset{};						// ÎÄ¼şÊı¾İÖ¸ÕëÎ»ÖÃ = 0, ±íÊ¾Ã»ÓĞÊı¾İ
+	ZRBlockData* pBlockData;
+	int nX; // MapSectionæ‰€åœ¨çš„ä½ç½®
+	int nY;
+	DWORD dwDataOffset; // æ–‡ä»¶æ•°æ®æŒ‡é’ˆä½ç½® = 0, è¡¨ç¤ºæ²¡æœ‰æ•°æ®
 public:
-	ZRBlockSection() = default;
-	~ZRBlockSection() = default;
+	ZRBlockSection() {
+		pBlockData = nullptr;
+		nX = 0;
+		nY = 0;
+		dwDataOffset = 0;
+	}
+
+	~ZRBlockSection() {}
 };
 
-class ZRBlock
-{
+class ZRBlock {
 public:
-	ZRBlock() = default;
-	~ZRBlock() = default;
-	BOOL                Load(const char *pszMapName, BOOL bEdit);
-	void				GetBlockByRange(int CenterX, int CenterY, int range); //¶¯Ì¬¶ÁÈëÒ»¶¨·¶Î§µÄBlockĞÅÏ¢
-	ZRBlockData*		GetBlock(int nX, int nY); //»ñÈ¡BlockÊı¾İ
-    BYTE				IsGridBlock(int x, int y) const;      // x,yÎªĞ¡¸ñ×Ó×ø±ê
-	short				GetTileRegionAttr(int x, int y) const;// x,yÎª´ó¸ñ×ÓÃ××ø±ê
-	void                SetGrid(int GridX, int GridY);
-private:
-	std::unique_ptr<ZRBlockSection>& GetBlockSection(int nSectionX, int nSectionY); //»õÎï´æ·ÅblockµÄ¶¯Ì¬Êı×é
-	std::unique_ptr<ZRBlockSection>& LoadBlockData(int nSectionX, int nSectionY); //¶ÁÈ¡blockÊı¾İ
-	void				ClearSectionArray();
+	ZRBlock();
+	~ZRBlock();
+	BOOL Load(const char* pszMapName, BOOL bEdit);
+	void GetBlockByRange(int CenterX, int CenterY, int range); //åŠ¨æ€è¯»å…¥ä¸€å®šèŒƒå›´çš„Blockä¿¡æ¯
+	ZRBlockData* GetBlock(int nX, int nY);					   //è·å–Blockæ•°æ®
+	BYTE IsGridBlock(int x, int y);							   // x,yä¸ºå°æ ¼å­åæ ‡
+	short GetTileRegionAttr(int x, int y);					   // x,yä¸ºå¤§æ ¼å­ç±³åæ ‡
+	void SetGrid(int GridX, int GridY);
 
-	void				_LoadBlockData(ZRBlockSection& pSection); //´ÓÎÄ¼şÖĞ¶ÁblockÊı¾İ
-	DWORD				_ReadSectionDataOffset(int nSectionX, int nSectionY); //¶ÁÊı¾İ
+private:
+	ZRBlockSection* GetBlockSection(int nSectionX, int nSectionY); //è´§ç‰©å­˜æ”¾blockçš„åŠ¨æ€æ•°ç»„
+	ZRBlockSection* LoadBlockData(int nSectionX, int nSectionY);   //è¯»å–blockæ•°æ®
+	void ClearSectionArray();
+
+	void _LoadBlockData(ZRBlockSection* pSection);				//ä»æ–‡ä»¶ä¸­è¯»blockæ•°æ®
+	DWORD _ReadSectionDataOffset(int nSectionX, int nSectionY); //è¯»æ•°æ®
 
 public:
-	BYTE                m_btBlockBuffer[MAX_BLOCK_RANGE][MAX_BLOCK_RANGE] = {};
-	short				m_sTileRegionAttr[MAX_BLOCK_SECTION][MAX_BLOCK_SECTION] = {};
+	BYTE m_btBlockBuffer[MAX_BLOCK_RANGE][MAX_BLOCK_RANGE];
+	short m_sTileRegionAttr[MAX_BLOCK_SECTION][MAX_BLOCK_SECTION];
+
 private:
-	std::array<std::array<std::unique_ptr<ZRBlockSection>, MAX_BLOCK_SECTION>, MAX_BLOCK_SECTION> m_BlockSectionArray{};
+	ZRBlockSection* m_BlockSectionArray[MAX_BLOCK_SECTION][MAX_BLOCK_SECTION]; //å­˜æ”¾blockçš„åŠ¨æ€æ•°ç»„
 
-	std::unique_ptr<ZRBlockData>        m_pDefaultBlock = std::make_unique<ZRBlockData>();     //Ä¬ÈÏµÄblockÊı¾İ
-	std::fstream fs;
+	ZRBlockData* m_pDefaultBlock; //é»˜è®¤çš„blockæ•°æ®
+	FILE* m_fp;					  // åœ°å›¾æ–‡ä»¶å¥æŸ„
 
-	int					m_fShowCenterX{}; // ¶¯Ì¬¶ÁÈëµÄÖĞĞÄÎ»ÖÃ
-	int					m_fShowCenterY{};
-	int					m_nSectionWidth{};// Ã¿Ò»¿éSectionµÄ¿í¶ÈºÍ¸ß¶È
-	int					m_nSectionHeight{};
-	int					m_nSectionCntX{};// µØÍ¼Ë®Æ½·½ÏòÉÏSectionµÄ¿éÊı
-	int					m_nSectionCntY{};
-	int                 m_nSectionCnt{};
-	int                 m_nLastGridStartX{};
-	int                 m_nLastGridStartY{};
-	int					m_nGridShowWidth{};
-	int					m_nGridShowHeight{};
-	BOOL				m_bEdit{ true };
-	DWORD				m_dwMapPos{};
-	DWORD				m_dwMapDataSize{};
-	std::unique_ptr<BYTE[]> m_pMapData{};
-	int					m_nWidth{};
-	int					m_nHeight{};
-	std::unique_ptr<DWORD[]> m_pOffsetIdx{};
+	int m_fShowCenterX; // åŠ¨æ€è¯»å…¥çš„ä¸­å¿ƒä½ç½®
+	int m_fShowCenterY;
+	int m_nSectionWidth; // æ¯ä¸€å—Sectionçš„å®½åº¦å’Œé«˜åº¦
+	int m_nSectionHeight;
+	int m_nSectionCntX; // åœ°å›¾æ°´å¹³æ–¹å‘ä¸ŠSectionçš„å—æ•°
+	int m_nSectionCntY;
+	int m_nSectionCnt;
+	int m_nLastGridStartX;
+	int m_nLastGridStartY;
+	int m_nGridShowWidth;
+	int m_nGridShowHeight;
+	BOOL m_bEdit;
+	DWORD m_dwMapPos;
+	DWORD m_dwMapDataSize;
+	LPBYTE m_pMapData;
+	int m_nWidth;
+	int m_nHeight;
+	DWORD* m_pOffsetIdx;
 };
 
-inline BYTE ZRBlock::IsGridBlock(int x, int y) const // Ğ¡¸ñ×Ó×ø±ê
+inline BYTE ZRBlock::IsGridBlock(int x, int y) // å°æ ¼å­åæ ‡
 {
-    int offx = x - m_nLastGridStartX;
-    int offy = y - m_nLastGridStartY;
-	
-	if(offx < 0 || offx >= m_nGridShowWidth)  return 1;
-    if(offy < 0 || offy >= m_nGridShowHeight) return 1;
+	int offx = x - m_nLastGridStartX;
+	int offy = y - m_nLastGridStartY;
 
-    return m_btBlockBuffer[offy][offx];
+	if (offx < 0 || offx >= m_nGridShowWidth)
+		return 1;
+	if (offy < 0 || offy >= m_nGridShowHeight)
+		return 1;
+
+	return m_btBlockBuffer[offy][offx];
 }
 
-inline short ZRBlock::GetTileRegionAttr(int x, int y) const // ´ó¸ñ×Ó×ø±ê
+inline short ZRBlock::GetTileRegionAttr(int x, int y) // å¤§æ ¼å­åæ ‡
 {
-    int offx = x - m_nLastGridStartX/2;
-    int offy = y - m_nLastGridStartY/2;
+	int offx = x - m_nLastGridStartX / 2;
+	int offy = y - m_nLastGridStartY / 2;
 
-    if(offx < 0 || offx >= m_nGridShowWidth) return 0;
-    if(offy < 0 || offy >= m_nGridShowHeight) return 0;
+	if (offx < 0 || offx >= m_nGridShowWidth)
+		return 0;
+	if (offy < 0 || offy >= m_nGridShowHeight)
+		return 0;
 
-    return m_sTileRegionAttr[offy][offx];
+	return m_sTileRegionAttr[offy][offx];
 }
 #endif

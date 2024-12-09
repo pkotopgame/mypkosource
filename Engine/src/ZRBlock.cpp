@@ -3,37 +3,53 @@
 #include <filesystem>
 #include <fstream>
 
-BOOL ZRBlock::Load(const char* pszMapName, BOOL bEdit)
-{
-	if (fs.is_open()) {
-		fs.close();
+ZRBlock::ZRBlock() {
+	memset(m_BlockSectionArray, 0, MAX_BLOCK_SECTION * MAX_BLOCK_SECTION * 4);
+	m_pDefaultBlock = new ZRBlockData;
+	m_fp = nullptr;
+	m_nSectionWidth = 8;
+	m_nSectionHeight = 8;
+	m_bEdit = true;
+	m_pOffsetIdx = nullptr;
+	m_pMapData = nullptr;
+	m_dwMapPos = 0;
+}
+
+ZRBlock::~ZRBlock() {
+	delete m_pDefaultBlock;
+	delete m_pOffsetIdx;
+	delete m_pMapData;
+}
+
+BOOL ZRBlock::Load(const char* pszMapName, BOOL bEdit) {
+	if (m_fp != nullptr) {
+		fclose(m_fp);
+		m_fp = nullptr;
 	}
 
+	FILE* fp = nullptr;
 	if (bEdit) {
-		namespace fs = std::filesystem;
-		fs::permissions(pszMapName,
-			fs::perms::owner_write,
-			fs::perm_options::add);
+		_chmod(pszMapName, _S_IWRITE);
+
+		fopen_s(&fp, pszMapName, "r+b");
 	}
-
-	fs.open(pszMapName, [&] {
-		auto flags = std::ios_base::binary | std::ios_base::in;
-		if (bEdit) {
-			flags |= std::ios_base::out;
-		}
-		return flags;
-		}());
-
-	if (!fs.is_open()) {
+	else {
+		fopen_s(&fp, pszMapName, "rb");
+	}
+	if (fp == nullptr) {
 		LG("map", "msgLoad Map [%s] Error!\n", pszMapName);
-		return false;
+		return FALSE;
 	}
 
 	MPMapFileHeader header;
-	fs.read(reinterpret_cast<char*>(&header), sizeof(MPMapFileHeader));
+
+	DWORD dwReadSize = 0;
+
+	fread(&header, sizeof(MPMapFileHeader), 1, fp);
+	dwReadSize += sizeof(MPMapFileHeader);
 
 	if (header.nMapFlag == MP_MAP_FLAG + 1) {
-		fs.close();
+		fclose(fp);
 		LG("map", "msg该地图文件[%s]版本过期, 请使用MapTool打开它来升级版本!", pszMapName);
 		return FALSE;
 	}
@@ -44,7 +60,7 @@ BOOL ZRBlock::Load(const char* pszMapName, BOOL bEdit)
 	if (header.nMapFlag != MP_MAP_FLAG + 2)
 #endif
 	{
-		fs.close();
+		fclose(fp);
 		LG("map", "msg[%s]不是有效的 MindPower Map File!\n", pszMapName);
 		return FALSE;
 	}
@@ -60,187 +76,173 @@ BOOL ZRBlock::Load(const char* pszMapName, BOOL bEdit)
 
 	m_bEdit = bEdit;
 
+	m_fp = fp;
+
 	// 读取全部索引
-	m_pOffsetIdx = std::make_unique<DWORD[]>(m_nSectionCnt);
-	fs.read(reinterpret_cast<char*>(m_pOffsetIdx.get()), sizeof(DWORD) * m_nSectionCnt);
+	m_pOffsetIdx = new DWORD[m_nSectionCnt];
+	fread(m_pOffsetIdx, m_nSectionCnt * 4, 1, m_fp);
+	dwReadSize += m_nSectionCnt * 4;
 
-	/*NOTE:
-	If file is opened without writing permission, read all data to memory?
-	Otherwise we will read data as it is needed?
-	*/
 	if (!m_bEdit) {
-		m_dwMapPos = fs.tellg();
+		m_dwMapPos = ftell(m_fp);
 
-		fs.seekg(0, std::ios_base::end);
-		const DWORD dwPos = fs.tellg();
-		const DWORD dwMapDataSize = dwPos - m_dwMapPos;
+		fseek(m_fp, 0, SEEK_END);
+		DWORD dwPos = ftell(m_fp);
+
+		DWORD dwMapDataSize = dwPos - dwReadSize;
+
 		if (dwMapDataSize > m_dwMapDataSize) {
-			m_pMapData = std::make_unique<BYTE[]>(dwMapDataSize);
+			SAFE_DELETE_ARRAY(m_pMapData);
+			m_pMapData = new BYTE[dwMapDataSize];
 			m_dwMapDataSize = dwMapDataSize;
 		}
-		fs.seekg(m_dwMapPos);
-		fs.read(reinterpret_cast<char*>(m_pMapData.get()), dwMapDataSize);
+		fseek(m_fp, dwReadSize, SEEK_SET);
+		fread(m_pMapData, dwMapDataSize, 1, m_fp);
 	}
-
 	ClearSectionArray();
 
 	return TRUE;
 }
 
-void ZRBlock::GetBlockByRange(int CenterX, int CenterY, int range)
-{
-	if (!fs.is_open())
+void ZRBlock::GetBlockByRange(int CenterX, int CenterY, int range) {
+	if (m_fp == nullptr)
 		return;
-	
-	m_nGridShowWidth  = range * 2;
+
+	m_nGridShowWidth = range * 2;
 	m_nGridShowHeight = range * 2;
 
 	m_fShowCenterX = CenterX;
 	m_fShowCenterY = CenterY;
 
-    MPTimer t;
-    t.Begin();
-    int nCurSectionX = (int)(m_fShowCenterX - (float)range / 2.0f)  / m_nSectionWidth;
-	int nCurSectionY = (int)(m_fShowCenterY - (float)range / 2.0f)  / m_nSectionHeight;
+	MPTimer t;
+	t.Begin();
+	int nCurSectionX = (int)(m_fShowCenterX - (float)range / 2.0f) / m_nSectionWidth;
+	int nCurSectionY = (int)(m_fShowCenterY - (float)range / 2.0f) / m_nSectionHeight;
 
-    int nEndSectionX = (int)(m_fShowCenterX + (float)range / 2.0f)  / m_nSectionWidth;
-	int nEndSectionY = (int)(m_fShowCenterY + (float)range / 2.0f)  / m_nSectionHeight;
+	int nEndSectionX = (int)(m_fShowCenterX + (float)range / 2.0f) / m_nSectionWidth;
+	int nEndSectionY = (int)(m_fShowCenterY + (float)range / 2.0f) / m_nSectionHeight;
 
 	int nShowSectionCntX = nEndSectionX - nCurSectionX;
 	int nShowSectionCntY = nEndSectionY - nCurSectionY;
-	
-	if(range  % m_nSectionWidth!=0)   nShowSectionCntX++;
-	if(range  % m_nSectionHeight!=0)  nShowSectionCntY++;
-	
-    for(int y = 0; y < nShowSectionCntY; y++)
-	{
+
+	if (range % m_nSectionWidth != 0)
+		nShowSectionCntX++;
+	if (range % m_nSectionHeight != 0)
+		nShowSectionCntY++;
+
+	int y = 0;
+	for (y = 0; y < nShowSectionCntY; y++) {
 		int nSectionY = nCurSectionY + y;
 
-		if(nSectionY < 0 || nSectionY >= m_nSectionCntY) continue;
-		for(int x = 0; x < nShowSectionCntX; x++)
-		{
+		if (nSectionY < 0 || nSectionY >= m_nSectionCntY)
+			continue;
+		int x = 0;
+		for (x = 0; x < nShowSectionCntX; x++) {
 			int nSectionX = nCurSectionX + x;
 
-			if(nSectionX < 0 || nSectionX >= m_nSectionCntX) continue;
-		
-			if (!GetBlockSection(nSectionX, nSectionY))
-			{
-				LoadBlockData(nSectionX, nSectionY);
+			if (nSectionX < 0 || nSectionX >= m_nSectionCntX)
+				continue;
+
+			ZRBlockSection* pBlock = GetBlockSection(nSectionX, nSectionY);
+			if (!pBlock) {
+				pBlock = LoadBlockData(nSectionX, nSectionY);
 			}
 		}
 	}
 }
 
-std::unique_ptr<ZRBlockSection>& ZRBlock::GetBlockSection(int nSectionX, int nSectionY)
-{
+ZRBlockSection* ZRBlock::GetBlockSection(int nSectionX, int nSectionY) {
 	return m_BlockSectionArray[nSectionX][nSectionY];
 }
 
-std::unique_ptr<ZRBlockSection>& ZRBlock::LoadBlockData(int nSectionX, int nSectionY)
-{
-	auto block = std::make_unique<ZRBlockSection>();
-	block->nX = nSectionX;
-	block->nY = nSectionY;
-	
-    _LoadBlockData(*block);
-	m_BlockSectionArray[nSectionX][nSectionY] = std::move(block);
+ZRBlockSection* ZRBlock::LoadBlockData(int nSectionX, int nSectionY) {
+	auto* pBlock = new ZRBlockSection;
+	pBlock->nX = nSectionX;
+	pBlock->nY = nSectionY;
 
-	return m_BlockSectionArray[nSectionX][nSectionY];
+	_LoadBlockData(pBlock);
+	m_BlockSectionArray[nSectionX][nSectionY] = pBlock;
+
+	return pBlock;
 }
 
+void ZRBlock::_LoadBlockData(ZRBlockSection* pBlock) {
+	int nSectionX = pBlock->nX;
+	int nSectionY = pBlock->nY;
 
-void ZRBlock::_LoadBlockData(ZRBlockSection& block)
-{
-	int nSectionX = block.nX;
-	int nSectionY = block.nY;
+	pBlock->dwDataOffset = _ReadSectionDataOffset(nSectionX, nSectionY);
 
-	block.dwDataOffset = _ReadSectionDataOffset(nSectionX, nSectionY);
-    
-    if(block.dwDataOffset==0) return;
+	if (pBlock->dwDataOffset == 0)
+		return;
 
 	DWORD dwPos = 0;
-	if( m_bEdit )
-	{
-		fs.seekg(block.dwDataOffset, std::ios_base::beg);
+	if (m_bEdit) {
+		fseek(m_fp, pBlock->dwDataOffset, SEEK_SET);
 	}
-	else
-	{
-		dwPos = block.dwDataOffset - m_dwMapPos;
+	else {
+		dwPos = pBlock->dwDataOffset - m_dwMapPos;
 	}
-	
-	block.blockData = std::make_unique<ZRBlockData[]>(m_nSectionWidth * m_nSectionHeight);
+
+	pBlock->pBlockData = new ZRBlockData[m_nSectionWidth * m_nSectionHeight];
 
 #ifdef NEW_VERSION
 	SNewFileTile tile;
 #else
 	SFileTile tile;
 #endif
-	
-	for(int y = 0; y < m_nSectionHeight; y++)
-	{
-		for(int x = 0; x < m_nSectionWidth; x++)
-		{
-			ZRBlockData* pB = block.blockData.get() + m_nSectionWidth * y + x;
-			if( m_bEdit )
-			{
-				fs.read(reinterpret_cast<char*>(&tile), sizeof(tile));
+
+	int y = 0;
+	for (y = 0; y < m_nSectionHeight; y++) {
+		int x = 0;
+		for (x = 0; x < m_nSectionWidth; x++) {
+			ZRBlockData* pB = pBlock->pBlockData + m_nSectionWidth * y + x;
+			if (m_bEdit) {
+				fread(&tile, sizeof(tile), 1, m_fp);
 			}
-			else
-			{
-				memcpy( &tile, m_pMapData.get() + dwPos, sizeof(tile) );
+			else {
+				memcpy(&tile, m_pMapData + dwPos, sizeof(tile));
 				dwPos += sizeof(tile);
 			}
-			pB->sRegion  = tile.sRegion;
-            memcpy(&pB->btBlock[0], &tile.btBlock[0], 4); 
-        }
+			pB->sRegion = tile.sRegion;
+			memcpy(&pB->btBlock[0], &tile.btBlock[0], 4);
+		}
 	}
 }
 
-
-ZRBlockData*	ZRBlock::GetBlock(int nX, int nY)
-{
-	if(nX >= m_nWidth || nY >= m_nHeight || nX < 0 || nY < 0) 
-	{
-		return m_pDefaultBlock.get();
+ZRBlockData* ZRBlock::GetBlock(int nX, int nY) {
+	if (nX >= m_nWidth || nY >= m_nHeight || nX < 0 || nY < 0) {
+		return m_pDefaultBlock;
 	}
 
 	int nSectionX = nX / m_nSectionWidth;
 	int nSectionY = nY / m_nSectionHeight;
 
-	auto& pBlock = GetBlockSection(nSectionX, nSectionY);
-	 
-	if(pBlock && pBlock->blockData)
-	{
+	ZRBlockSection* pBlock = GetBlockSection(nSectionX, nSectionY);
+
+	if (pBlock && pBlock->pBlockData) {
 		int nOffX = nX % m_nSectionWidth;
 		int nOffY = nY % m_nSectionHeight;
-		return pBlock->blockData.get() + nOffY * m_nSectionWidth + nOffX;
+		return pBlock->pBlockData + nOffY * m_nSectionWidth + nOffX;
 	}
 
-	return m_pDefaultBlock.get();	
+	return m_pDefaultBlock;
 }
 
-DWORD ZRBlock::_ReadSectionDataOffset(int nSectionX, int nSectionY)
-{
+DWORD ZRBlock::_ReadSectionDataOffset(int nSectionX, int nSectionY) {
 	DWORD dwLoc = (nSectionY * m_nSectionCntX + nSectionX);
-	return m_pOffsetIdx[dwLoc];
+	return *(m_pOffsetIdx + dwLoc);
 
-	fs.seekg(sizeof(MPMapFileHeader) + 4 * dwLoc, std::ios_base::beg);
-
+	fseek(m_fp, sizeof(MPMapFileHeader) + 4 * dwLoc, SEEK_SET);
 	DWORD dwDataOffset;
-	fs.read(reinterpret_cast<char*>(&dwDataOffset), sizeof(dwDataOffset));
+	fread(&dwDataOffset, 4, 1, m_fp);
 	return dwDataOffset;
 }
 
-void ZRBlock::SetGrid(int GridX, int GridY)
-{
+void ZRBlock::SetGrid(int GridX, int GridY) {
 	m_nLastGridStartX = GridX;
 	m_nLastGridStartY = GridY;
 }
 
-void ZRBlock::ClearSectionArray()
-{
-	for (auto& section : m_BlockSectionArray)
-	{
-		section = {};
-	}
+void ZRBlock::ClearSectionArray() {
+	memset(&m_BlockSectionArray, 0, MAX_BLOCK_SECTION * MAX_BLOCK_SECTION * 4);
 }
