@@ -40,7 +40,7 @@
 #include "UIItemCommand.h"
 #include "UIMiniMapForm.h"
 #include "MountInfo.h"
-
+#include <sstream>
 #include "PacketCmd.h"
 #include "GameConfig.h"
 
@@ -60,6 +60,9 @@ void RespawnAllPlayerMounts()
 {
 	for (auto& cha : std::span{ g_pGameApp->GetCurScene()->_pChaArray, g_pGameApp->GetCurScene()->_nChaCnt })
 	{
+		if (cha.GetIsForUI()) {
+			continue;
+		}
 		//if (cha.IsPlayer() && cha.GetIsMountEquipped())
 		if (cha.IsPlayer() && cha.GetIsMountEquipped() && !cha.GetIsPK() && !cha.IsBoat())
 		{
@@ -152,10 +155,24 @@ inline int GetWeaponBackDummy( int nWeaponType, bool isLeftHand )
     return nBackDummy;
 }
 
-inline void SetPreName( int nItem, char* szName, DWORD& dwColor )
+inline void SetPreName(const int nItem, char* szName, DWORD& dwColor )
 {
 	DWORD COLOR_SKYBLUE = D3DCOLOR_ARGB(255, 168, 168, 255);
-
+	if (nItem >= 6963 && nItem <= 7000) {
+		CItemRecord* pInfo = GetItemRecordInfo(nItem);
+		std::string model = pInfo->chModule[1];
+		unsigned int m_dwIP;
+		std::istringstream color(model);
+		color >> std::hex >> m_dwIP;
+		strncpy_s(szName, 16, pInfo->szDescriptor, _TRUNCATE);
+		//strcpy(szName, pInfo->szDescriptor);
+		//szName[sizeof(szName) - 1] = '\0'; // Ensure null-termination
+		dwColor = m_dwIP;
+		return;
+	}
+	dwColor = COLOR_WHITE;
+	szName[0] = '\0';
+/*
 	switch( nItem )
 	{
 	case 3936:	strcpy( szName, g_oLangRec.GetString(7) );   dwColor = D3DCOLOR_ARGB(255,192,192,192); return;
@@ -188,6 +205,7 @@ inline void SetPreName( int nItem, char* szName, DWORD& dwColor )
 	case 823:	strcpy( szName, g_oLangRec.GetString(15) );  dwColor = D3DCOLOR_ARGB(255,241,014,240); return;	// �Ƹ�ѫ��
 	default: szName[0] = '\0';
 	}
+	*/
 }
 
 static void __keyframe_proc( DWORD type, DWORD pose_id, DWORD key_id, DWORD key_frame, void* param )
@@ -1569,7 +1587,10 @@ void CCharacter::UpdataFace(const stNetChangeChaPart& stPart)
 	//look = stPart;
 	if( IsPlayer() && !IsBoat() )
 	{
-		SetPreName( stPart.SLink[enumEQUIP_NECK].sID, _szPreName, _szPreColor );
+		const auto glowID = stPart.SLink[enumEQUIP_GLOWAPP].sID;
+	
+		SetPreName( stPart.SLink[enumEQUIP_GLOWAPP].sID, _szPreName, _szPreColor );
+		MatchNameColors = glowID >= 6963 && glowID <= 7000;
 	}
 	else
 	{
@@ -1717,7 +1738,10 @@ bool CCharacter::SpawnMount(int mountID) {
 		g_pGameApp->SysInfo("Missing Mount info report to admin , itemID %d",mountID);
 		return false;
 	}
-
+	//test value
+	if (GetIsForUI()) {
+		return false;
+	}
     if (!chaMount) {
 		if (const CChaRecord* MountInfoX = GetChaRecordInfo(MountInfo->CharID); !MountInfoX)
 		{

@@ -255,13 +255,23 @@ void CMiniMapMgr::SetClockStringClientSide()
 	// Convert to UTC time
 	std::tm* ptm = std::gmtime(&rawtime);
 
-	// Format the time in UTC
+	// Adjust for GMT-8 (PST/PDT)
+	const int GMT_OFFSET = -8;  // GMT-8 for PST/PDT
+
+	// Subtract 8 hours from UTC (adjust hours accordingly)
+	ptm->tm_hour += GMT_OFFSET;
+
+	// Normalize the time structure (e.g., handle possible overflow or underflow)
+	std::mktime(ptm); // This will adjust tm_hour, tm_min, tm_sec, etc., for overflow/underflow.
+
+	// Format the time for GMT-8 (PST/PDT)
 	char date[32];
 	std::strftime(date, sizeof(date), "%H:%M:%S", ptm);
 
 	// Update the clock caption
 	labClock->SetCaption(date);
 }
+
 
 void CMiniMapMgr::_MiniFormMouseEvent(CCompent *pSender, int nMsgType, int x, int y, DWORD dwKey)
 {

@@ -555,7 +555,7 @@ _nRowHeight(14),_nTitleHeight(24),_nIconHeight(18),_nPhraseNum(0), evtClickItem(
 	m_bUpdate = FALSE;
 	m_pPrizePic = NULL;
 	m_pPrizeSelPic = NULL;
-	m_bIsSelect = FALSE;
+	m_bIsSelect = TRUE;
 }
 
 CMemoEx::CMemoEx( const CMemoEx& rhs )
@@ -574,7 +574,7 @@ CMemoEx::CMemoEx( const CMemoEx& rhs )
 	evtClickItem =rhs.evtClickItem;
 	m_pPrizePic = NULL;
 	m_pPrizeSelPic = NULL;
-	m_bIsSelect = FALSE;
+	m_bIsSelect = TRUE;
 	_Copy(rhs);
 }
 
@@ -601,7 +601,7 @@ void  CMemoEx::Clear()
 	m_sNumInfo = 0;
 	m_bUpdate = FALSE;
 	m_bySelPrize = -1;
-	m_bIsSelect = FALSE;
+	m_bIsSelect = TRUE;
 }
 
 CMemoEx& CMemoEx::operator=(const CMemoEx& rhs)
@@ -618,7 +618,7 @@ CMemoEx& CMemoEx::operator=(const CMemoEx& rhs)
 	evtClickItem =rhs.evtClickItem;
 	m_pPrizePic = NULL;
 	m_pPrizeSelPic = NULL;
-	m_bIsSelect = FALSE;
+	m_bIsSelect = TRUE;
 
 	_Copy(rhs);
     return *this;

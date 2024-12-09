@@ -148,7 +148,7 @@ public:
 	void				ShowNotify1( const char *szStr,int setnum, DWORD dwColor );//Add by sunny.sun20080804
 	void				ShowHint( int x, int y, const char *szStr, DWORD dwColor );
 	void				ShowStateHint( int x, int y, CChaStateMgr::stChaState stateData);
-	
+	void				RenderStateHint(int x, int y, CChaStateMgr::stChaState stateData);
     static void         SetMusicSize( float fVol );         // 0~1,0������,1�������
     static float        GetMusicSize()                      { return (float)_nMusicSize / 128.0f;   }
 

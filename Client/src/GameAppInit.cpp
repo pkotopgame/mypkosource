@@ -203,12 +203,13 @@ BOOL CGameApp::_Init()
 	CreateScriptDebugWindow(g_hInstance, g_pGameApp->GetHWND());
 #endif
 
-	if(!LoadTerrainSet("scripts/table/TerrainInfo", FALSE))
+	/*if (!LoadTerrainSet("scripts/table/TerrainInfo", FALSE))
         return 0;
 
 	// �ڳ�ʼ����Դ����󣬳�ʼ����Դ -- Michael Chen
 	if(!LoadResourceSet("scripts/table/ResourceInfo", g_Config.m_nMaxResourceNum, FALSE))
 		return 0;
+		*/
 	if (!LoadResource() || !LoadRes2() /*|| !LoadRes3()*/)
 	{
 		return 0;

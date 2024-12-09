@@ -304,6 +304,7 @@ private:
 
 	long			_lSideID;			// ������һ��,�췽,�̷�,����������սʱʹ��
 	CShadeEff*		_pSideShade;		// ������ʾ�췽,�̷�
+	bool			MatchNameColors{ false };
 
 public:	// Ӧ�ò�
 	void			setSideID( long v );

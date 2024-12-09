@@ -174,194 +174,196 @@ void CHeadSay::SetName( const char* name )
 }
 
 void CHeadSay::RenderStateIcons(CCharacter* cha, int x, int y, float scale, float spacing, int rowSize, bool Rendertimer) {
-    if (!cha->IsMainCha()) 
+	if (!cha->IsMainCha())
 		Rendertimer = false;
 
-    CGuiPic stateIcon;
-    int stateCount = 0;
-    int nTotalState = CSkillStateRecordSet::I()->GetLastID() + 1;
-    bool IsStatesPerLevel = false;
-    bool RenderIcon = false;
-    CSkillStateRecord* pState;
-    for (int i = 0; i < nTotalState; i++) {
-        if (cha->GetStateMgr()->HasSkillState(i)) {
-            pState = GetCSkillStateRecordInfo(i);
-            if (pState) {
-                if (0 != stricmp(pState->szIcon[0], "0")) {
-                    if (0 == stricmp(pState->szIcon[cha->GetStateMgr()->GetStateLv(i) - 1], "0")) {
-                        IsStatesPerLevel = false;
-                    } else IsStatesPerLevel = true;
-                    RenderIcon = true;
-                }
-                if (RenderIcon) {
+	CGuiPic stateIcon;
+	int stateCount = 0;
+	int nTotalState = CSkillStateRecordSet::I()->GetLastID() + 1;
+	bool IsStatesPerLevel = false;
+	bool RenderIcon = false;
+	CSkillStateRecord* pState;
+	for (int i = 0; i < nTotalState; i++) {
+		if (cha->GetStateMgr()->HasSkillState(i)) {
+			pState = GetCSkillStateRecordInfo(i);
+			if (pState) {
+				if (0 != stricmp(pState->szIcon[0], "0")) {
+					if (0 == stricmp(pState->szIcon[cha->GetStateMgr()->GetStateLv(i) - 1], "0")) {
+						IsStatesPerLevel = false;
+					}
+					else IsStatesPerLevel = true;
+					RenderIcon = true;
+				}
+				if (RenderIcon) {
 
-                    char buf[64];
+					char buf[64];
 
-                    sprintf(buf, "texture/icon/%s.png", (IsStatesPerLevel ? pState->szIcon[cha->GetStateMgr()->GetStateLv(i) - 1] : pState->szIcon[0]));
-                    stateIcon.LoadImage(buf, 32, 32, 0, 0, 0, scale, scale);
+					sprintf(buf, "texture/icon/%s.png", (IsStatesPerLevel ? pState->szIcon[cha->GetStateMgr()->GetStateLv(i) - 1] : pState->szIcon[0]));
+					stateIcon.LoadImage(buf, 32, 32, 0, 0, 0, scale, scale);
 
-                    int yspace = 0;
-                    if (Rendertimer) yspace = 22;
+					int yspace = 0;
+					if (Rendertimer) yspace = 22;
 
-                    int xi = x + ((stateCount % rowSize) * spacing);
-                    int yi = y + ((stateCount / rowSize) * (spacing + yspace));
-                    stateIcon.Render(xi, yi);
+					int xi = x + ((stateCount % rowSize) * spacing);
+					int yi = y + ((stateCount / rowSize) * (spacing + yspace));
+					stateIcon.Render(xi, yi);
 
 
 					CChaStateMgr::stChaState stateData = cha->GetStateMgr()->GetStateData(i);
 
-					if (stateData.lTimeRemaining > 0) {
-
+					if (Rendertimer && stateData.lTimeRemaining > 0) {
 						int hours = stateData.lTimeRemaining / 3600;
 						int minutes = stateData.lTimeRemaining / 60;
 						int seconds = stateData.lTimeRemaining % 60;
 						int centeredX;
 						char szTime[32];
-						if (minutes >= 10) {
-							sprintf(szTime, "%dm", minutes);
-							centeredX = (xi + (32 * scale) / 2) - 8;
-						} else {
-							sprintf(szTime, "%dm", minutes);
+
+						// If time remaining is less than 60 seconds, show countdown in seconds (59s, 58s, etc.)
+						if (stateData.lTimeRemaining < 60) {
+							sprintf(szTime, "%ds", seconds);  // Show seconds remaining
 							centeredX = (xi + (32 * scale) / 2) - 5;
 						}
+						else {
+							// If time remaining is 1 minute or more, show countdown in minutes (1m, 2m, etc.)
+							if (minutes == 1 && seconds == 0) {
+								sprintf(szTime, "1m");  // Exactly 1 minute left
+							}
+							else {
+								sprintf(szTime, "%dm", minutes);  // Show minutes remaining
+							}
+							centeredX = (xi + (32 * scale) / 2) - 8;
+						}
+
+						// Render the background frame and the time text
 						GetRender().FillFrame(xi, yi + (32 * scale), xi + (32 * scale) + 1, yi + (32 * scale) + CGuiFont::s_Font.GetHeight("3"));
-						CGuiFont::s_Font.Render(0, szTime, centeredX, yi + (32 * scale), COLOR_WHITE, 1.0f); //szTime
+						CGuiFont::s_Font.Render(0, szTime, centeredX, yi + (32 * scale), COLOR_WHITE, 1.0f); // Render the timer
 					}
 
-                    stateCount++;
+					stateCount++;
 
-                    int xm = g_pGameApp->GetMouseX();
-                    int ym = g_pGameApp->GetMouseY();
+					int xm = g_pGameApp->GetMouseX();
+					int ym = g_pGameApp->GetMouseY();
 
-                    //check if we need to render hint.
-                    if (xm >= xi && xm <= xi + (32 * scale)) {
-                        if (ym >= yi && ym <= yi + (32 * scale)) {
-                            char desc[300];
-                            g_pGameApp->ShowStateHint(xm, ym, stateData);
-                        }
-                    }
-                }
-            }
-        }
-    }
+					//check if we need to render hint.
+					if (xm >= xi && xm <= xi + (32 * scale)) {
+						if (ym >= yi && ym <= yi + (32 * scale)) {
+							char desc[300];
+							g_pGameApp->ShowStateHint(xm, ym, stateData);
+						}
+					}
+				}
+			}
+		}
+	}
 
-    //hide states form if has 0 active states 
-    if (stateCount > 0 && g_IsShowStates) {
-        int w = 32 * stateCount;
-        int h = stateCount <= 9 ? 45 : stateCount >= 18 ? 120 : 94;
-        if (w > 250) w = 250;
-        g_stUIEquip.stateDrags->SetSize(w, h);
-        g_stUIEquip.stateDrags->Refresh();
-        g_stUIEquip.stateDrags->SetIsShow(true);
-    } else {
-        g_stUIEquip.stateDrags->SetIsShow(false);
-    }	
+	//hide states form if has 0 active states 
+	if (stateCount > 0 && g_IsShowStates) {
+		int w = 32 * stateCount;
+		int h = stateCount <= 9 ? 45 : stateCount >= 18 ? 120 : 94;
+		if (w > 250) w = 250;
+		g_stUIEquip.stateDrags->SetSize(w, h);
+		g_stUIEquip.stateDrags->Refresh();
+		g_stUIEquip.stateDrags->SetIsShow(true);
+	}
+	else {
+		g_stUIEquip.stateDrags->SetIsShow(false);
+	}
 }
 
-void CHeadSay::Render( D3DXVECTOR3& pos )
+void CHeadSay::Render(D3DXVECTOR3& pos)
 {
-    static int x=0, y=0;
-    static int nSayTotalWidth =  32 * CGuiFont::s_Font.GetWidth("a") ; //32���ַ��ĳ���
-    g_Render.WorldToScreen( pos.x, pos.y, pos.z + _pOwn->GetDefaultChaInfo()->fHeight, &x, &y );    
+	static int x = 0, y = 0;
+	static int nSayTotalWidth = 32 * CGuiFont::s_Font.GetWidth("a"); //32���ַ��ĳ���
+	g_Render.WorldToScreen(pos.x, pos.y, pos.z + _pOwn->GetDefaultChaInfo()->fHeight, &x, &y);
 
 	/*
 	if(_pOwn->getHumanID() == g_stUIStart.targetInfoID && g_stUIStart.frmTargetInfo->GetIsShow()){
 		float scale = 0.45;
 		float spacing = scale * 32 + 2;
 		RenderStateIcons(_pOwn,200,40, scale,spacing,10);
-	}	
+	}
 	*/
 
-	if( _ShowBars && (_IsShowLife || (_pOwn->IsPlayer() && _ShowInfo) ) && !_fLifeW <= 0 ) //Ѫ��
-    {
-		static int x1 = 0, y1 =0;
-		g_Render.WorldToScreen( pos.x, pos.y, pos.z , &x1, &y1 );
+	if (_ShowBars && (_IsShowLife || (_pOwn->IsPlayer() && _ShowInfo)) && !_fLifeW <= 0) //Ѫ��
+	{
+		static int x1 = 0, y1 = 0;
+		g_Render.WorldToScreen(pos.x, pos.y, pos.z, &x1, &y1);
 
-        int nLifeWidth   = _pImgLife->GetWidth();
-        _pImgLife->SetScaleW(1,_fLifeW);	
-		int nOffset =  (int)(( x - g_Render.GetScrWidth()/2 ) * 0.02f );
-		
+		int nLifeWidth = _pImgLife->GetWidth();
+		_pImgLife->SetScaleW(1, _fLifeW);
+		int nOffset = (int)((x - g_Render.GetScrWidth() / 2) * 0.02f);
+
 		DWORD hpcolour = 0xA0FF0000;
 		int red, green;
-		if(_fLifeW > 0.5f){
-			 red = 510 - (_fLifeW *2 * 255);
-			green =  255;
-			hpcolour = 0xB3000000 + (256*green) + (65536 * red);
-		}else if (_fLifeW <= 0.5f && _fLifeW > 0){
+		if (_fLifeW > 0.5f) {
+			red = 510 - (_fLifeW * 2 * 255);
+			green = 255;
+			hpcolour = 0xB3000000 + (256 * green) + (65536 * red);
+		}
+		else if (_fLifeW <= 0.5f && _fLifeW > 0) {
 			red = 255;
 			green = _fLifeW * 2 * 255;
-			hpcolour = 0xB3000000 + (256*green) + (65536 * red); //B3
+			hpcolour = 0xB3000000 + (256 * green) + (65536 * red); //B3
 		}
-		
-		_pImgLife->RenderAll( x - nLifeWidth/2 - nOffset , y1 + 20, hpcolour );
-		
+
+		_pImgLife->RenderAll(x - nLifeWidth / 2 - nOffset, y1 + 20, hpcolour);
+
 		char hpInfo[32];
 
 		if (_ShowPercentages || (_pOwn->GetIsPK() && !isTeamMember)) {
-		  sprintf(hpInfo, "%.0f%%", _fLifeW * 100);
-		} else {
-		  sprintf(hpInfo, "%d/%d", _fCurHp, _fMxHp);
-		}
-		
-		if (_pOwn->GetStateMgr()->HasSkillState(83)) {
-		  if (isTeamMember || isGuildMember || (_ShowInfo && _pOwn->IsPlayer()) || _IsShowLife) {
-
-		    if (_pOwn->IsPlayer()) {
-		      int nManaWidth = _pImgMana->GetWidth();
-		      _pImgMana->SetScaleW(1, _fManaW);
-
-		      DWORD spcolour = 0xA0FF0000;
-		      if (_fManaW > 0) {
-		        int red = 255 - (_fManaW * 255);
-		        int blue = _fManaW * 255;
-		        spcolour = 0xB3000000 + blue + (65536 * red);
-		      }
-
-		      _pImgMana->RenderAll(x - nManaWidth / 2 - nOffset, y1 + 28, spcolour);
-
-		      char spInfo[32];
-
-		      if (_ShowPercentages || (_pOwn->GetIsPK() && !isTeamMember)) {
-		        sprintf(spInfo, "%.0f%%", _fManaW * 100);
-		      } else {
-		        sprintf(spInfo, "%d/%d", _fCurSp, _fMxSp);
-		      }
-		      CGuiFont::s_Font.BRender(spInfo, x - nOffset - (CGuiFont::s_Font.GetWidth(spInfo) / 2), y1 + 32, spcolour, COLOR_BLACK);
-		    }
-		  }
-		}
-			
-		CGuiFont::s_Font.BRender( hpInfo, x  - nOffset - (CGuiFont::s_Font.GetWidth(hpInfo)/2), y1 + 8, hpcolour, COLOR_BLACK );
-		
-		if (g_IsShowStates ) {
-		// states icons linked to skill bar @mothannakh
-		float scale = 0.85f; //.045
-		float spacing = scale * 32 + 2;
-		// new code
-		int picX = 0;
-		int picY = 0;
-		int iconqty = 9;
-		bool showTimer = true;
-		if (_pOwn == CGameScene::GetMainCha()) {
-			picX = g_stUIEquip.stateDrags->GetLeft(); // frmFast2 stateDrags
-			picY = g_stUIEquip.stateDrags->GetTop();  //-60
+			sprintf(hpInfo, "%.0f%%", _fLifeW * 100);
 		}
 		else {
-			scale = 0.45f;
-			spacing = scale * 32 + 2;
-			picX = x - _pImgMana->GetWidth() / 2 - nOffset - 1;
-			picY = y1 + 28;
-			iconqty = 4;
-			if (_IsShowLife) {
-				picY += 12;
+			sprintf(hpInfo, "%d/%d", _fCurHp, _fMxHp);
+		}
+
+		if (_pOwn->GetStateMgr()->HasSkillState(83)) {
+			if (isTeamMember || isGuildMember || (_ShowInfo && _pOwn->IsPlayer()) || _IsShowLife) {
+
+				if (_pOwn->IsPlayer()) {
+					int nManaWidth = _pImgMana->GetWidth();
+					_pImgMana->SetScaleW(1, _fManaW);
+
+					DWORD spcolour = 0xA0FF0000;
+					if (_fManaW > 0) {
+						int red = 255 - (_fManaW * 255);
+						int blue = _fManaW * 255;
+						spcolour = 0xB3000000 + blue + (65536 * red);
+					}
+
+					_pImgMana->RenderAll(x - nManaWidth / 2 - nOffset, y1 + 28, spcolour);
+
+					char spInfo[32];
+
+					if (_ShowPercentages || (_pOwn->GetIsPK() && !isTeamMember)) {
+						sprintf(spInfo, "%.0f%%", _fManaW * 100);
+					}
+					else {
+						sprintf(spInfo, "%d/%d", _fCurSp, _fMxSp);
+					}
+					CGuiFont::s_Font.BRender(spInfo, x - nOffset - (CGuiFont::s_Font.GetWidth(spInfo) / 2), y1 + 32, spcolour, COLOR_BLACK);
+				}
 			}
-			showTimer = false;
 		}
-		// end of new code
-		RenderStateIcons(_pOwn, picX, picY, scale, spacing, iconqty, showTimer);
+
+		CGuiFont::s_Font.BRender(hpInfo, x - nOffset - (CGuiFont::s_Font.GetWidth(hpInfo) / 2), y1 + 8, hpcolour, COLOR_BLACK);
+
+		if (g_IsShowStates) {
+			float scale = 0.75;
+			float spacing = scale * 32 + 2;
+			int picX = 0;
+			int picY = 0;
+			int count = 9;
+			if (_pOwn == CGameScene::GetMainCha()) {
+				picX = g_stUIEquip.stateDrags->GetLeft();
+				picY = g_stUIEquip.stateDrags->GetTop();
+				RenderStateIcons(_pOwn, picX, picY, scale, spacing, count, true);
+			}
+			//if(activeoption)
+			//RenderStateIcons(_pOwn, picX, picY, scale, spacing, count, true);
 		}
-    }
-	
+	}
+
 	if(g_stUIMap.IsPKSilver())
 	{
 		// ���Ҷ������������ͷ�ϲ���ʾ�κ����ݣ�����ʾ��һ�ֵ�Ѫ��
@@ -497,24 +499,29 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 
 			//��ɫ������
 
-			// Added by NINJAツ#5684 June 2021 credits to Igor Silva#2195
-			if (_ShowEnemyNames == true && _pOwn->IsPlayer() && CGameScene::GetMainCha()) {
-			  if (!_pOwn->IsMainCha() && _pOwn->GetIsPK()) {
-			    if (_pOwn->GetTeamLeaderID() && _pOwn->GetTeamLeaderID() == CGameApp::GetCurScene()->GetMainCha()->GetTeamLeaderID())
-			      SetNameColor(COLOR_GREEN);
-			    else if (_pOwn->getGuildID() && _pOwn->getGuildID() == CGameApp::GetCurScene()->GetMainCha()->getGuildID())
-			      SetNameColor(COLOR_GREEN);
-			    else
-			      SetNameColor(COLOR_RED);
-			  } else {
-			    SetNameColor(COLOR_WHITE);
-			  }
-			}
+			// Added by NINJAツ#5684 June 2021 credits to Igor Silva#2195 //this is useless 
+			//if (_ShowEnemyNames == true && _pOwn->IsPlayer() && CGameScene::GetMainCha()) {
+			//  if (!_pOwn->IsMainCha() && _pOwn->GetIsPK()) {
+			//    if (_pOwn->GetTeamLeaderID() && _pOwn->GetTeamLeaderID() == CGameApp::GetCurScene()->GetMainCha()->GetTeamLeaderID())
+			//      SetNameColor(COLOR_GREEN);
+			//    else if (_pOwn->getGuildID() && _pOwn->getGuildID() == CGameApp::GetCurScene()->GetMainCha()->getGuildID())
+			//      SetNameColor(COLOR_GREEN);
+			//    else
+			//      SetNameColor(COLOR_RED);
+			//  } else {
+			//    SetNameColor(COLOR_WHITE);
+			//  }
+			//}
 		
 			s_dwNamePartsColors[NAME_INDEX][0] = _dwNameColor;
-		
+			//MatchNameColors
+			if (_pOwn->IsPlayer() && _pOwn->MatchNameColors)
+			{
+				s_dwNamePartsColors[NAME_INDEX][0] = _pOwn->GetPreColor();
+			}
+			//its alreay here 
 			//is enemy/friend mode@moth
-			if (_pOwn->GetIsPK())
+			if (_ShowEnemyNames && _pOwn->GetIsPK())
 			{
 				if (_pOwn->IsPlayer())
 				{
@@ -525,6 +532,7 @@ void CHeadSay::Render( D3DXVECTOR3& pos )
 					{
 						(_pOwn->getSideID() == 1) ? s_dwNamePartsColors[NAME_INDEX][0] = COLOR_GREEN : s_dwNamePartsColors[NAME_INDEX][0] = COLOR_RED;
 					}
+					s_dwNamePartsColors[PRENAME_INDEX][0] = s_dwNamePartsColors[NAME_INDEX][0];
 				}
 			}
 			//mod end @

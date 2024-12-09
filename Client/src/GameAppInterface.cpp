@@ -939,7 +939,37 @@ void CGameApp::ShowStateHint(int x, int y, CChaStateMgr::stChaState stateData) {
     }
     _pNotify->ReadyForHint(x, y);
 }
+void CGameApp::RenderStateHint(int x, int y, CChaStateMgr::stChaState stateData) {
+	if (stateData.lTimeRemaining > 0) {
+		//background icon
+		CGuiPic* timericon = new CGuiPic;
+		timericon->LoadImage("texture/ui/upo/colourpreview.png", 20, 16, 0, 0, 0, 1, 1);
+		timericon->Render(x + 2, y + 30);
+		//background end
+		char szTime[32];
+		int minutes = stateData.lTimeRemaining / 60;
+		int seconds = stateData.lTimeRemaining % 60;
+		if (minutes >= 1)
+		{
+			if (minutes >= 60) {
+				int hours = minutes / 60;
+				if (hours > 100)  hours = 1;
+				//	if (hours > 100)  return;
+				sprintf(szTime, "%dh", hours);
+			}
+			else
+				sprintf(szTime, "%dm", minutes);
+			//	CGuiFont::s_Font.BRender(1, szTime, x+2, y+30, COLOR_BLACK, COLOR_WHITE);
+		}
+		else
+		{
+			sprintf(szTime, "%2ds", seconds);
 
+		}
+		CGuiFont::s_Font.BRender(1, szTime, x + 2, y + 30, COLOR_BLACK, COLOR_WHITE);
+	}
+
+}
 void CGameApp::ShowHint( int x, int y, const char *szStr, DWORD dwColor )
 {
 	_pNotify->SetFixWidth( 0 );

@@ -39,7 +39,7 @@
 
 #include "LootFilter.h"
 
-
+#include "SehException.h"
 using namespace client_udp;
 
 std::string g_serverset;
@@ -112,6 +112,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
 {
+	SehExceptionBase::InitializeSehTranslator();
 	// Add by lark.li 20080909 begin
 	ErrorHandler::Initialize();
 	ErrorHandler::DisableErrorDialogs();
@@ -478,7 +479,8 @@ T_B
 		}
 	}
 
-	if(!g_pGameApp->Init(hInstance, szWindowClass, nWidth, nHeight, nDepth, FALSE /*g_Config.m_bFullScreen*/))
+	//if(!g_pGameApp->Init(hInstance, szWindowClass, nWidth, nHeight, nDepth, FALSE /*g_Config.m_bFullScreen*/))
+	if (!g_pGameApp->Init(hInstance, szWindowClass, nWidth, nHeight, nDepth))
     {
         LG("init", g_oLangRec.GetString(191));
         g_pGameApp->End();
@@ -1055,8 +1057,8 @@ void MakeBinTable()
 
 	g_pGameApp->InitAllTable();
 
-	MPResourceSet* pResourceSet = new MPResourceSet(0, g_Config.m_nMaxResourceNum);
-	pResourceSet->LoadRawDataInfo("scripts/table/ResourceInfo", g_bBinaryTable);
+	/*MPResourceSet* pResourceSet = new MPResourceSet(0, g_Config.m_nMaxResourceNum);
+	pResourceSet->LoadRawDataInfo("scripts/table/ResourceInfo", g_bBinaryTable);*/
 
 //	MessageBox( NULL, g_oLangRec.GetString(193), "Info", 0 );
 }
