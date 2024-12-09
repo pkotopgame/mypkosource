@@ -1,6 +1,7 @@
 #include "util2.h"
 #include <time.h>
 #include <list>
+#include <filesystem>
 #include "Iphlpapi.h"
 
 #pragma comment(lib, "Iphlpapi.lib")
@@ -254,12 +255,18 @@ void Util_Sleep(int ms)
     usleep(ms * 1000);
 #endif
 }
-
-bool Util_IsFileExist(char *pszName)
-{
-    if(access(pszName , 0)== -1) return false;
+bool Util_IsFileExist(const char* pszName) {
+    return std::filesystem::exists(pszName);
+    /* if (_access(pszName, 0) == -1)
+        return false;
     return true;
+    */
 }
+//bool Util_IsFileExist_old(char *pszName)
+//{
+//    if(access(pszName , 0)== -1) return false;
+//    return true;
+//}
 
 bool Util_MakeDir(const char* lpPath)
 {

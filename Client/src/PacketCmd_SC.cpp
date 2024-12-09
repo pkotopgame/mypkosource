@@ -69,7 +69,6 @@ _DBC_USING
 //--------------------------------------------------
 extern char g_szSendKey[4];
 extern char g_szRecvKey[4];
-
 static unsigned long g_ulWorldID = 0;
 
 using namespace std;
@@ -188,16 +187,17 @@ BOOL SC_Disconnect(LPRPACKET pk)
 //--------------------
 BOOL SC_EnterMap(LPRPACKET pk)
 {T_B
-	g_LogName.Init();
+	//g_LogName.Init();
 
 	g_listguild_begin	=false;
 
-	stNetSwitchMap SMapInfo{};
+	stNetSwitchMap SMapInfo;
+	memset(&SMapInfo, 0, sizeof(SMapInfo));
 	SMapInfo.sEnterRet = pk.ReadShort();
 	if (SMapInfo.sEnterRet != ERR_SUCCESS)
 	{
-		NetSwitchMap(SMapInfo);
-		return FALSE;
+	NetSwitchMap(SMapInfo);
+	return FALSE;
 	}
 
 	auto const bAutoLock = static_cast<bool>(pk.ReadChar());

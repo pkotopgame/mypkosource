@@ -126,7 +126,7 @@ long            Util_GetFileSize(FILE *fp);
 long            Util_GetFileSizeByName(char *pszFileName);
 unsigned long   Util_GetSysTick();
 void            Util_Sleep(int ms);
-bool            Util_IsFileExist(char *pszName);
+bool            Util_IsFileExist(const char* pszName);
 bool            Util_MakeDir(const char* lpPath);
 int             Util_ResolveTextLine(const char *pszText , std::string strListp[], int nMax, int nSep = ' ', int nSep2 = '\t');
 

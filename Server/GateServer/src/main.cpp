@@ -2,6 +2,8 @@
 //
 
 #include "gateserver.h"
+#include "SehException.h"
+
 _DBC_USING;
 
 BYTE g_wpe = 0;
@@ -22,7 +24,7 @@ int main(int argc, char* argv[])
 
 	C_TITLE("GateServer.exe")
 	C_PRINT("Loading GateServer.cfg...\n");
-
+	SehExceptionBase::InitializeSehTranslator();//this will create dump file if it crashed
 	SEHTranslator translator;
 
 	T_B

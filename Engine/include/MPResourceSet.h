@@ -78,7 +78,8 @@ protected:
 
 	virtual void* _CreateNewRawData(CRawDataInfo *pInfo)
 	{
-		return NULL;
+		//return NULL;
+		return nullptr;
 	}
 
 	virtual void  _DeleteRawData(CRawDataInfo *pInfo)

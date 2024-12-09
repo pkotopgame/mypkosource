@@ -125,6 +125,7 @@
     </ClCompile>
     <ClCompile Include="playsound.cpp" />
     <ClCompile Include="SectionData.cpp" />
+    <ClCompile Include="SehException.cpp" />
     <ClCompile Include="se_translator.cpp" />
     <ClCompile Include="Stacktrace.cpp" />
     <ClCompile Include="sym_engine.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="..\include\playsound.h" />
     <ClInclude Include="..\include\ReturnValues.h" />
     <ClInclude Include="..\include\SectionData.h" />
+    <ClInclude Include="..\include\SehException.h" />
     <ClInclude Include="..\include\se_translator.h" />
     <ClInclude Include="..\include\singleton.h" />
     <ClInclude Include="..\include\Stacktrace.h" />

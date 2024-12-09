@@ -28,9 +28,9 @@ using namespace std;
 
 LW_USING
 
-MPTexSet*		MPTexSet::_Instance		= NULL;
-MPTerrainSet*	MPTerrainSet::_Instance = NULL;
-MPResourceSet*  MPResourceSet::m_pInstance = NULL;
+NewMPTexSet* NewMPTexSet::Instancex = nullptr;
+MPTerrainSet* MPTerrainSet::_Instance = nullptr;
+MPResourceSet* MPResourceSet::m_pInstance = nullptr;
 
 
 MPGameApp::MPGameApp()
@@ -80,25 +80,33 @@ BOOL MPGameApp::Init(HINSTANCE hInst,const char *pszClassName, int nScrWidth, in
 
 	DWORD dwWindowStyle = WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX; 
 	
-    if(bFullScreen==2 ||bFullScreen==1) // αȫ��
+    /*if (bFullScreen == 2 || bFullScreen == 1) // αȫ��
     {
         dwWindowStyle = WS_VISIBLE|WS_POPUP|WS_CLIPCHILDREN;
-    }
+    }*/
+	if (bFullScreen) // 伪全屏
+	{
+		dwWindowStyle = WS_VISIBLE | WS_POPUP | WS_CLIPCHILDREN;
+	}
+
 
     RECT rc; SetRect( &rc, 0, 0, nScrWidth, nScrHeight);
 	AdjustWindowRect( &rc, dwWindowStyle, FALSE );
     
-    int nFrameSize   = GetSystemMetrics(SM_CYSIZEFRAME);
+    /*int nFrameSize = GetSystemMetrics(SM_CYSIZEFRAME);
 	int nCaptionSize = GetSystemMetrics(SM_CXSIZE);
 
     int nWindowWidth = rc.right - rc.left;
-    int nWindowHeight = rc.bottom - rc.top; // nScrHeight + nFrameSize + nCaptionSize;
+    int nWindowHeight = rc.bottom - rc.top; // nScrHeight + nFrameSize + nCaptionSize;*/
+	const int nWindowWidth = rc.right - rc.left;
+	const int nWindowHeight = rc.bottom - rc.top; // nScrHeight + nFrameSize + nCaptionSize;
+
 	_hWnd = CreateWindow(pszClassName, "MindPower3D Application", dwWindowStyle, 
 	CW_USEDEFAULT, CW_USEDEFAULT, nWindowWidth, nWindowHeight, NULL, NULL, hInst, NULL);
 
 	if(!_hWnd)
 	{
-		return FALSE;
+		return false;
 	}
 
     GetClientRect(_hWnd, &rc);
@@ -124,14 +132,14 @@ BOOL MPGameApp::Init(HINSTANCE hInst,const char *pszClassName, int nScrWidth, in
 
    	if(!g_Render.Init(_hWnd, dev_width, dev_height, nColorBit, bFullScreen))
     {
-        return FALSE;
+        return false;
     }
 
-	MPTexSet *pTextureSet = new MPTexSet(0, 2048);
+	auto pTextureSet = new NewMPTexSet();
 	
 	_nLogoTexID = GetTextureID("texture/logo.BMP");
 
-    pTextureSet->EnableRequest(FALSE);
+    //pTextureSet->EnableRequest(FALSE);
 
 	_InitInput();
 
@@ -139,13 +147,18 @@ BOOL MPGameApp::Init(HINSTANCE hInst,const char *pszClassName, int nScrWidth, in
 	// Added by clp
 	//FontModule::FontSystem::getSingleton().init();
 
-    if( _Init() == 0 ) 
-        return 0;
+    /*if (_Init() == 0)
+        return 0;*/
+	if (_Init() == 0) {
+		return 0;
+	}
+
 
 	ShowWindow(_hWnd, SW_SHOW);
 	UpdateWindow(_hWnd);
 
-    return 1;
+    //return 1;
+	return true;
 }
 
 BOOL MPGameApp::LoadResource()

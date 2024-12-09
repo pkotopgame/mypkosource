@@ -1286,7 +1286,7 @@ void MPMap::_RenderVB(BOOL bWireframe)
 {
     if(_pLandVB==NULL) return;
     
-    g_Render.GetDevice()->SetStreamSource(0, _pLandVB, sizeof(MPTileVertex));
+	g_Render.GetDevice()->SetStreamSourceX(0, _pLandVB, NULL, sizeof(MPTileVertex));
     //g_Render.SetTexture(0, NULL);
         
     int nStartVertex = 0;

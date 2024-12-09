@@ -658,26 +658,23 @@ void CEquipMgr::_evtSkillUpgrade(CSkillList *pSender, CSkillCommand* pSkill)
 	return;
 }
 
-void CEquipMgr::LoadingCall()
-{
-	CCharacter* pMain = CGameScene::GetMainCha();
-	if ( pMain )
-	{
-		int nJob = pMain->getGameAttr()->get(ATTR_JOB);
+void CEquipMgr::LoadingCall() {
+	if (CCharacter* pMain = CGameScene::GetMainCha(); pMain) {
+		const int nJob = pMain->getGameAttr()->get(ATTR_JOB);
 
-		for( int i=0; i<4; i++ )
-		{
-			CSkillList* pSkillList = GetSkillList( i );
-			if(!pSkillList) continue;
+		for (int i = 0; i < 4; i++) {
+			 CSkillList* pSkillList = GetSkillList(i);
+			if (!pSkillList)
+				continue;
 
-			int nCount = pSkillList->GetCount();
-			CSkillCommand* pObj = NULL;
-			for( int j=0; j<nCount; j++ )
-			{
-				pObj = pSkillList->GetCommand( j );
-				if( pObj )
-				{
-					pObj->GetSkillRecord()->Refresh( nJob );
+			 int nCount = pSkillList->GetCount();
+			for (int j = 0; j < nCount; j++) {
+				if (CSkillCommand* pObj = pSkillList->GetCommand(j)) {
+					pObj->GetSkillRecord()->Refresh(nJob);
+					//for sake to not delete skills icons with other used icons we set them active for ever
+					std::string file = "texture/icon/";
+					file += pObj->GetSkillRecord()->szICON;
+					SetTextureAsSkillIcon(true, file);
 				}
 			}
 		}
@@ -965,6 +962,8 @@ void CEquipMgr::SwitchMap(){
 	spyModel = 0;
 	refreshChaModel = true;
 	refreshSpyModel = true;
+	//this important so when player switch map delete all unused icons
+	NewMPTexSet::Instance()->ReleaseUnusedIcons();
 }
 	
 void CEquipMgr::RenderModel(int x, int y, CCharacter* original, CCharacter* model, int rotation, bool refresh)
@@ -991,7 +990,7 @@ void CEquipMgr::RenderModel(int x, int y, CCharacter* original, CCharacter* mode
 	}
 
 	model->SetMatrix(&matrix);
-
+	model->DespawnMount();
 	g_Render.SetTransformView(&g_Render.GetWorldViewMatrix());
 
 	model->RenderForUI(x, y, true);

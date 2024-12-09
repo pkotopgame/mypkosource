@@ -659,6 +659,9 @@
     <ClCompile Include="..\src\MPStringUtil.cpp">
       <Filter>effect</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\MPTextureSet.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\include\lwMath.inl">

@@ -15,6 +15,7 @@
 //#include "BillThread.h"
 #include "BTIService.h"
 #include "GlobalVariable.h"
+#include "SehException.h"
 
 #include "inifile.h"
 
@@ -405,6 +406,7 @@ int main(int argc, char* argv[])
 
 	C_TITLE("AccountServer.exe")
 	C_PRINT("Loading AccountServer.cfg...\n");
+    SehExceptionBase::InitializeSehTranslator();
 
 	SEHTranslator translator;
 

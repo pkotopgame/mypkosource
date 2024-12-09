@@ -88,7 +88,7 @@
     <ClCompile>
       <AdditionalOptions>/EHa %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\include;$(ProjectDir)..\..\Libraries\Common\include;$(ProjectDir)..\..\Libraries\Util\include;$(ProjectDir)..\..\Libraries\DirectX\Include;$(ProjectDir)..\..\Libraries\CryptoPP\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\include;$(ProjectDir)..\..\Libraries\Common\include;$(ProjectDir)..\..\Libraries\Util\include;$(ProjectDir)..\..\Libraries\DirectX\Include;$(ProjectDir)..\..\Libraries\CryptoPP\;$(ProjectDir)..\..\Libraries\ICUHelper\inc;$(ProjectDir)..\..\Libraries\icu\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;USE_MINDPOWER;MINDPOWER_USE_DLL;MINDPOWER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -314,6 +314,7 @@
     <ClCompile Include="..\src\MPSceneObject.cpp" />
     <ClCompile Include="..\src\MPShadeMap.cpp" />
     <ClCompile Include="..\src\MPStringUtil.cpp" />
+    <ClCompile Include="..\src\MPTextureSet.cpp" />
     <ClCompile Include="..\src\MPTile.cpp" />
     <ClCompile Include="..\src\mygraph.cpp" />
     <ClCompile Include="..\src\ShaderLoad.cpp" />

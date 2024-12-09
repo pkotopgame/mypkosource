@@ -76,14 +76,16 @@ public:
     CItemCommand( CItemRecord* pItem );
     CItemCommand( const CItemCommand& rhs );
     CItemCommand& operator=( const CItemCommand& rhs );
-    ~CItemCommand();
+	~CItemCommand() override = default;
     ITEM_CLONE(CItemCommand)
 
 	virtual void	RenderEnergy(int x, int y);
 	virtual	void	SaleRender( int x, int y, int nWidth, int nHeight );
     virtual void    Render( int x, int y );
 	virtual void	OwnDefRender( int x, int y, int nWidth, int nHeight );
-	
+
+	void FormatStoredGold(const char* pattern, int divider);
+
 	virtual bool    UseCommand(bool isRightClick = false);
 	virtual bool	StartCommand();
 	virtual bool 	IsAllowUse();
@@ -98,7 +100,7 @@ public:
 
 	virtual bool GetCanDrag(){return _canDrag;};
 	virtual void SetCanDrag(bool drag){_canDrag = drag;};
-	CGuiPic*	GetIcon() 	{return _pImage;}
+	CGuiPic*	GetIcon() 	{return _pImage.get();}
     void		SetData( const SItemGrid& item );
 	SItemGrid & GetData() {return _ItemData; }
 
@@ -155,7 +157,7 @@ protected:
 	int     _GetSkillTime();
 
 private:
-    CGuiPic*        _pImage;
+	std::unique_ptr<CGuiPic> _pImage{ nullptr };
     CItemRecord*	_pItem;
 
 	//
@@ -171,9 +173,10 @@ private:
 	bool 				_canDrag;
 private:
     DWORD           _dwColor;           // ��Ч��ɫ��ʾ, ��ʵ���͸��
-	NET_CHARTRADE_BOATDATA*		_pBoatHint;
+	std::unique_ptr<NET_CHARTRADE_BOATDATA> _pBoatHint;
 
 	static std::map<int, DWORD>		_mapCoolDown;	// ������һ�ηŵĵ��߼��ܵ�ʱ��
+	std::string ImagePath;
 };
 
 // ��������

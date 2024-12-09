@@ -22,6 +22,9 @@
     <Filter Include="MapData">
       <UniqueIdentifier>{ca1e3b01-985d-48dc-917a-17fa1fa88e01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dumpfiles">
+      <UniqueIdentifier>{bfc1c2aa-5149-4294-be41-434d7a6c24d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="algo.cpp">
@@ -80,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="SectionData.cpp">
       <Filter>MapData</Filter>
+    </ClCompile>
+    <ClCompile Include="SehException.cpp">
+      <Filter>dumpfiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="..\include\TerrainData.h">
       <Filter>MapData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SehException.h">
+      <Filter>dumpfiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

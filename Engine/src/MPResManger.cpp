@@ -348,12 +348,12 @@ bool	CMPResManger::InitRes(LPDIRECT3DDEVICE8		pDev, D3DXMATRIX* pmat, D3DXMATRIX
 	if(!CEffectScript::m_cEffScript.InitScript())
 		return false;
 #else
-	bool	bBinary = false;
+	/*bool	bBinary = false;
 	CEff_ParamSet* pEffSet = new CEff_ParamSet(0, 100);
 	pEffSet->LoadRawDataInfo("scripts/table/MagicSingleinfo", bBinary);
 
 	CGroup_ParamSet* pGroupSet = new CGroup_ParamSet(0, 10);
-	pGroupSet->LoadRawDataInfo("scripts/table/MagicGroupinfo", bBinary);
+	pGroupSet->LoadRawDataInfo("scripts/table/MagicGroupinfo", bBinary);*/
 #endif
 
 	if(!_bMagr)

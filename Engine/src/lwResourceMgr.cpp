@@ -1,7 +1,5 @@
-//
+﻿//
 #include "stdafx.h"
-
-
 #include "lwResourceMgr.h"
 #include "lwSystem.h"
 #include "lwSysGraphics.h"
@@ -423,7 +421,7 @@ LW_RESULT lwTex::LoadTexInfo(const lwTexInfo* info, const char* tex_path)
         goto __ret;
     }
 
-    // ���ݾɰ汾format
+    // ¼æÈÝ¾É°æ±¾format
     if(_format == D3DFMT_UNKNOWN)
     {
         _format = D3DFMT_A1R5G5B5;
@@ -560,7 +558,7 @@ LW_RESULT lwTex::LoadVideoMemory()
 
 //#undef USE_DDS_FILE
 #if(defined USE_DDS_FILE)
-        // ����汾��Ϊ�˼��ݷ�dds�ļ����
+        // Õâ¸ö°æ±¾ÊÇÎªÁË¼æÈÝ·ÇddsÎÄ¼þ¼ì²é
         lwDDSHeader* dds_header = 0;
         BOOL dds_flag = 1;
         char dds_file[LW_MAX_FILE];
@@ -785,19 +783,19 @@ __load_it:
 		else
         {
             if(FAILED(D3DXCreateTextureFromFileEx(dev_obj->GetDevice(),
-                this->_file_name, //�ļ���
-                0, //�ļ�����������Ϊ�Զ�
-                0, //�ļ��ߣ�������Ϊ�Զ�
-                _level, //��Ҫ���ټ�mipmap��������Ϊ1
-                0, //����������;
-                (D3DFORMAT)_format, //�Զ�����ļ���ʽ
-                _pool, //D3DPOOL_MANAGED, //��DXGraphics����
-                D3DX_FILTER_LINEAR, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //�������˷���
-                D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmap�������˷���
-                _colorkey.color,//0xffff00ff, //͸��ɫ��ɫ
-                NULL, //������ͼ���ʽ�洢�ںα�����
-                NULL, //�����ĵ�ɫ��洢�ںα�����
-                &_tex)))//Ҫ����������
+                this->_file_name, //ÎÄ¼þÃû
+                0, //ÎÄ¼þ¿í£¬ÕâÀïÉèÎª×Ô¶¯
+                0, //ÎÄ¼þ¸ß£¬ÕâÀïÉèÎª×Ô¶¯
+                _level, //ÐèÒª¶àÉÙ¼¶mipmap£¬ÕâÀïÉèÎª1
+                0, //´ËÎÆÀíµÄÓÃÍ¾
+                (D3DFORMAT)_format, //×Ô¶¯¼ì²âÎÄ¼þ¸ñÊ½
+                _pool, //D3DPOOL_MANAGED, //ÓÉDXGraphics¹ÜÀí
+                D3DX_FILTER_LINEAR, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //ÎÆÀí¹ýÂË·½·¨
+                D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmapÎÆÀí¹ýÂË·½·¨
+                _colorkey.color,//0xffff00ff, //Í¸Ã÷É«ÑÕÉ«
+                NULL, //¶Á³öµÄÍ¼Ïñ¸ñÊ½´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+                NULL, //¶Á³öµÄµ÷É«°å´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+                &_tex)))//Òª´´½¨µÄÎÆÀí
             {
                 goto __ret;
             }
@@ -806,19 +804,19 @@ __load_it:
 #if 0
         IDirect3DTextureX* t;
         if(FAILED(D3DXCreateTextureFromFileEx(dev_obj->GetDevice(),
-            this->_file_name, //�ļ���
-            0, //�ļ�����������Ϊ�Զ�
-            0, //�ļ��ߣ�������Ϊ�Զ�
-            _level, //��Ҫ���ټ�mipmap��������Ϊ1
-            0, //����������;
-            (D3DFORMAT)_format, //�Զ�����ļ���ʽ
-             D3DPOOL_SYSTEMMEM, //D3DPOOL_MANAGED, //��DXGraphics����
-            D3DX_DEFAULT, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //�������˷���
-            D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmap�������˷���
-            _colorkey.color,//0xffff00ff, //͸��ɫ��ɫ
-            NULL, //������ͼ���ʽ�洢�ںα�����
-            NULL, //�����ĵ�ɫ��洢�ںα�����
-            &t)))//Ҫ����������
+            this->_file_name, //ÎÄ¼þÃû
+            0, //ÎÄ¼þ¿í£¬ÕâÀïÉèÎª×Ô¶¯
+            0, //ÎÄ¼þ¸ß£¬ÕâÀïÉèÎª×Ô¶¯
+            _level, //ÐèÒª¶àÉÙ¼¶mipmap£¬ÕâÀïÉèÎª1
+            0, //´ËÎÆÀíµÄÓÃÍ¾
+            (D3DFORMAT)_format, //×Ô¶¯¼ì²âÎÄ¼þ¸ñÊ½
+             D3DPOOL_SYSTEMMEM, //D3DPOOL_MANAGED, //ÓÉDXGraphics¹ÜÀí
+            D3DX_DEFAULT, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //ÎÆÀí¹ýÂË·½·¨
+            D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmapÎÆÀí¹ýÂË·½·¨
+            _colorkey.color,//0xffff00ff, //Í¸Ã÷É«ÑÕÉ«
+            NULL, //¶Á³öµÄÍ¼Ïñ¸ñÊ½´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+            NULL, //¶Á³öµÄµ÷É«°å´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+            &t)))//Òª´´½¨µÄÎÆÀí
         {
             goto __ret;
         }
@@ -833,19 +831,19 @@ __load_it:
 
 #else
         if(FAILED(D3DXCreateTextureFromFileEx(dev_obj->GetDevice(),
-            this->_file_name, //�ļ���
-            0, //�ļ�����������Ϊ�Զ�
-            0, //�ļ��ߣ�������Ϊ�Զ�
-            _level, //��Ҫ���ټ�mipmap��������Ϊ1
-            0, //����������;
-            (D3DFORMAT)_format, //�Զ�����ļ���ʽ
-            _pool, //D3DPOOL_MANAGED, //��DXGraphics����
-            D3DX_FILTER_LINEAR, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //�������˷���
-            D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmap�������˷���
-            _colorkey.color,//0xffff00ff, //͸��ɫ��ɫ
-            NULL, //������ͼ���ʽ�洢�ںα�����
-            NULL, //�����ĵ�ɫ��洢�ںα�����
-            &_tex)))//Ҫ����������
+            this->_file_name, //ÎÄ¼þÃû
+            0, //ÎÄ¼þ¿í£¬ÕâÀïÉèÎª×Ô¶¯
+            0, //ÎÄ¼þ¸ß£¬ÕâÀïÉèÎª×Ô¶¯
+            _level, //ÐèÒª¶àÉÙ¼¶mipmap£¬ÕâÀïÉèÎª1
+            0, //´ËÎÆÀíµÄÓÃÍ¾
+            (D3DFORMAT)_format, //×Ô¶¯¼ì²âÎÄ¼þ¸ñÊ½
+            _pool, //D3DPOOL_MANAGED, //ÓÉDXGraphics¹ÜÀí
+            D3DX_FILTER_LINEAR, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //ÎÆÀí¹ýÂË·½·¨
+            D3DX_DEFAULT,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmapÎÆÀí¹ýÂË·½·¨
+            _colorkey.color,//0xffff00ff, //Í¸Ã÷É«ÑÕÉ«
+            NULL, //¶Á³öµÄÍ¼Ïñ¸ñÊ½´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+            NULL, //¶Á³öµÄµ÷É«°å´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+            &_tex)))//Òª´´½¨µÄÎÆÀí
         {
             goto __ret;
         }
@@ -2635,19 +2633,19 @@ LW_RESULT lwResBufMgr::RegisterSysMemTex(LW_HANDLE* handle, const lwSysMemTexInf
     IDirect3DTextureX* tex;
 
     if(FAILED(D3DXCreateTextureFromFileEx(dev_obj->GetDevice(),
-        info->file_name, //�ļ���
-        0, //�ļ�����������Ϊ�Զ�
-        0, //�ļ��ߣ�������Ϊ�Զ�
-        info->level, //��Ҫ���ټ�mipmap��������Ϊ1
-        0, //����������;
-        (D3DFORMAT)info->format, //�Զ�����ļ���ʽ
+        info->file_name, //ÎÄ¼þÃû
+        0, //ÎÄ¼þ¿í£¬ÕâÀïÉèÎª×Ô¶¯
+        0, //ÎÄ¼þ¸ß£¬ÕâÀïÉèÎª×Ô¶¯
+        info->level, //ÐèÒª¶àÉÙ¼¶mipmap£¬ÕâÀïÉèÎª1
+        0, //´ËÎÆÀíµÄÓÃÍ¾
+        (D3DFORMAT)info->format, //×Ô¶¯¼ì²âÎÄ¼þ¸ñÊ½
         D3DPOOL_SYSTEMMEM,//forced
-        info->filter, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //�������˷���
-        info->mip_filter,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmap�������˷���
-        info->colorkey,//0xffff00ff, //͸��ɫ��ɫ
-        NULL, //������ͼ���ʽ�洢�ںα�����
-        NULL, //�����ĵ�ɫ��洢�ںα�����
-        &tex)))//Ҫ����������
+        info->filter, //D3DX_FILTER_TRIANGLE|D3DX_FILTER_MIRROR, //ÎÆÀí¹ýÂË·½·¨
+        info->mip_filter,//D3DX_DEFAULT,//D3DX_FILTER_NONE, //mipmapÎÆÀí¹ýÂË·½·¨
+        info->colorkey,//0xffff00ff, //Í¸Ã÷É«ÑÕÉ«
+        NULL, //¶Á³öµÄÍ¼Ïñ¸ñÊ½´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+        NULL, //¶Á³öµÄµ÷É«°å´æ´¢ÔÚºÎ±äÁ¿ÖÐ
+        &tex)))//Òª´´½¨µÄÎÆÀí
     {
         goto __ret;
     }

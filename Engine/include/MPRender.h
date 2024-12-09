@@ -1,6 +1,6 @@
-// D3D Render ·â×°D3DµÄÏà¹Ø²Ù×÷
-// ¼¸¸öÖ÷Òª¹¦ÄÜÎª :  View Type¹ÜÀí
-//                   WorldViewRegion¹ÜÀí
+ï»¿// D3D Render Â·Ã¢Ã—Â°D3DÂµÃ„ÃÃ Â¹Ã˜Â²Ã™Ã—Ã·
+// Â¼Â¸Â¸Ã¶Ã–Ã·Ã’ÂªÂ¹Â¦Ã„ÃœÃÂª :  View TypeÂ¹ÃœÃ€Ã­
+//                   WorldViewRegionÂ¹ÃœÃ€Ã­
 // 					 BeginRender, EndRender()
 //                   Ray Tracing
 //                   Draw Basic Geometry 
@@ -31,12 +31,12 @@
 
 enum INFO_TYPE
 {
-// ÊäÈëĞÅÏ¢ÀàĞÍ¶¨Òå
-	 INFO_DEBUG  = 0,  // µ÷ÊÔ×¨ÓÃ
-	 INFO_PERF      ,  // ÏÔÊ¾Performance×¨ÓÃ
-	 INFO_CMD       ,  // ÏÔÊ¾ConsoleÎÄ×Ö×¨ÓÃ
-	 INFO_FPS       ,  // FPS×¨ÓÃ
-	 INFO_GAME         // ÓÎÏ·×¨ÓÃ
+// ÃŠÃ¤ÃˆÃ«ÃÃ…ÃÂ¢Ã€Ã ÃÃÂ¶Â¨Ã’Ã¥
+	 INFO_DEBUG  = 0,  // ÂµÃ·ÃŠÃ”Ã—Â¨Ã“Ãƒ
+	 INFO_PERF      ,  // ÃÃ”ÃŠÂ¾PerformanceÃ—Â¨Ã“Ãƒ
+	 INFO_CMD       ,  // ÃÃ”ÃŠÂ¾ConsoleÃÃ„Ã—Ã–Ã—Â¨Ã“Ãƒ
+	 INFO_FPS       ,  // FPSÃ—Â¨Ã“Ãƒ
+	 INFO_GAME         // Ã“ÃÃÂ·Ã—Â¨Ã“Ãƒ
 };
 
 
@@ -49,8 +49,8 @@ struct MPLine
 
 struct MPCullInfo              
 {
-    D3DXVECTOR3 vecFrustum[8];    // Æ½½ØÍ·µÄ8¸ö¶¥µã
-    D3DXPLANE planeFrustum[6];    // Æ½½ØÍ·µÄ6¸öÃæ
+    D3DXVECTOR3 vecFrustum[8];    // Ã†Â½Â½Ã˜ÃÂ·ÂµÃ„8Â¸Ã¶Â¶Â¥ÂµÃ£
+    D3DXPLANE planeFrustum[6];    // Ã†Â½Â½Ã˜ÃÂ·ÂµÃ„6Â¸Ã¶ÃƒÃ¦
 };  //added by billy 
 
 //class  CMPFont;
@@ -150,7 +150,7 @@ public:
     void		GetScreenPos(int &nOutX, int &nOutY, VECTOR3 &vWorldPos);
 	void		GetRay(int nScrPosX, int nScrPosY, VECTOR3 &vRayStart, VECTOR3 &vRayEnd);
     void        GetPickRayVector(int nScrPosX, int nScrPosY, VECTOR3* pPickRayOrig, VECTOR3* pPickRayDir);
-    BOOL        WorldToScreen(float fX, float fY, float fZ, int *pnX = NULL, int *pnY = NULL);
+    BOOL WorldToScreen(float fX, float fY, float fZ, int* pnX = nullptr, int* pnY = nullptr);
     BOOL        IsLineInWorldView(float fX1, float fY1, float fX2, float fY2);
     BOOL        IsRectIntersectWorldView(int *pnPosX, int *pnPosY);
     bool        IsInWorldView(int nPosX, int nPosY);
@@ -216,7 +216,7 @@ public:
     void GetInvViewMatrix( D3DXMATRIX* mat )
     {
         GetDevice()->GetTransform( D3DTS_VIEW, mat );
-        D3DXMatrixInverse( mat, NULL, mat );
+        D3DXMatrixInverse(mat, nullptr, mat);
     }
 	CMPFont*		GetDeviceFont()		{ return _pFont;}
     void            UpdateLight();
@@ -224,10 +224,10 @@ public:
     
     enum VIEW_TYPE
 	{
-		VIEW_SCREEN = 0, // ÒÔÕû¸öÆÁÄ»×öÎªView
-		VIEW_WORLD     , // ÒÔWorldViewµÄÇøÓò×÷ÎªView
-		VIEW_UI ,         // ½çÃæÍ¨³£ĞèÒªµÄÆ½ÃæäÖÈ¾View
-        VIEW_3DUI ,      // 3D½çÃæ
+		VIEW_SCREEN = 0, // Ã’Ã”Ã•Ã»Â¸Ã¶Ã†ÃÃ„Â»Ã—Ã¶ÃÂªView
+		VIEW_WORLD     , // Ã’Ã”WorldViewÂµÃ„Ã‡Ã¸Ã“Ã²Ã—Ã·ÃÂªView
+		VIEW_UI ,         // Â½Ã§ÃƒÃ¦ÃÂ¨Â³Â£ÃÃ¨Ã’ÂªÂµÃ„Ã†Â½ÃƒÃ¦Ã¤Ã–ÃˆÂ¾View
+        VIEW_3DUI ,      // 3DÂ½Ã§ÃƒÃ¦
 	};
 
 	void	AddLine(const VECTOR3& v1, const VECTOR3& v2, DWORD dwColor = 0xFFFFFFFF);
@@ -260,43 +260,45 @@ protected:
 protected:
     
     // Direct 3D
-    IDirect3DX*             _pD3D;
-    HWND                    _hWnd;
-	//CD3DFont*				_pFont; // ÄÚ²¿±£ÁôÒ»¸öFont¶ÔÏó×öÒ»Ğ©Êä³ö²Ù×÷D3DXMATRIXA16			_matWorld;
+    IDirect3DX* _pD3D{ nullptr };
+    HWND _hWnd{ nullptr };
+	//CD3DFont*				_pFont; // Ã„ÃšÂ²Â¿Â±Â£ÃÃ´Ã’Â»Â¸Ã¶FontÂ¶Ã”ÃÃ³Ã—Ã¶Ã’Â»ÃÂ©ÃŠÃ¤Â³Ã¶Â²Ã™Ã—Ã·D3DXMATRIXA16			_matWorld;
 	//{lemon modify@2004.9.3
 	CMPFont*				_pFont;
 	//@}
-	LPDIRECT3DDEVICE8		_pD3DDevice;
+    LPDIRECT3DDEVICE8 _pD3DDevice{ nullptr };
     D3DVIEWPORT8            _view;
-    int                     _nScrWidth;         // ÆÁÄ»¿í¶È
-    int                     _nScrHeight;        // ÆÁÄ»¸ß¶È
+    int                     _nScrWidth;         // Ã†ÃÃ„Â»Â¿Ã­Â¶Ãˆ
+    int                     _nScrHeight;        // Ã†ÃÃ„Â»Â¸ÃŸÂ¶Ãˆ
     int                     _nColorBit;
     BOOL                    _bFullScreen;
     D3DXMATRIXA16		    _matProjWorld;
-	D3DXMATRIXA16			_matViewWorld;		// µ±Ç°ÊÀ½çView	Matrix
-	D3DXMATRIXA16			_matUIView;			// µ±Ç°½çÃæÓÃView Matrix
-	D3DXMATRIXA16			_matUIProj;			// µ±Ç°½çÃæÓÃProj Matrix
-	D3DXMATRIXA16			_matViewProj;		// = Proj * View, ÎªÁËÌá¸ßGetRayµÄËÙ¶È¶øÁÙÊ±´æ·Å		
+	D3DXMATRIXA16			_matViewWorld;		// ÂµÂ±Ã‡Â°ÃŠÃ€Â½Ã§View	Matrix
+	D3DXMATRIXA16			_matUIView;			// ÂµÂ±Ã‡Â°Â½Ã§ÃƒÃ¦Ã“ÃƒView Matrix
+	D3DXMATRIXA16			_matUIProj;			// ÂµÂ±Ã‡Â°Â½Ã§ÃƒÃ¦Ã“ÃƒProj Matrix
+	D3DXMATRIXA16			_matViewProj;		// = Proj * View, ÃÂªÃÃ‹ÃŒÃ¡Â¸ÃŸGetRayÂµÃ„Ã‹Ã™Â¶ÃˆÂ¶Ã¸ÃÃ™ÃŠÂ±Â´Ã¦Â·Ã…		
     D3DXMATRIXA16           _mat3DUIView;
     D3DXMATRIXA16           _mat3DUIProj;
 	
-	int                     _nWorldViewStartX;  // ÆÁÄ»ÉÏÏÔÊ¾ÓÎÏ·ÊÀ½çµÄÆğµãÎ»ÖÃ
+	int                     _nWorldViewStartX;  // Ã†ÃÃ„Â»Ã‰ÃÃÃ”ÃŠÂ¾Ã“ÃÃÂ·ÃŠÃ€Â½Ã§ÂµÃ„Ã†Ã°ÂµÃ£ÃÂ»Ã–Ãƒ
     int                     _nWorldViewStartY;  
-    int                     _nWorldViewWidth;   // ÆÁÄ»ÉÏÏÔÊ¾ÓÎÏ·ÊÀ½çµÄ³ß´ç
+    int                     _nWorldViewWidth;   // Ã†ÃÃ„Â»Ã‰ÃÃÃ”ÃŠÂ¾Ã“ÃÃÂ·ÃŠÃ€Â½Ã§ÂµÃ„Â³ÃŸÂ´Ã§
     int                     _nWorldViewHeight;
-    DWORD                   _dwBackgroundColor; // ÆÁÄ»±³¾°Çå³ıÑÕÉ«
+    DWORD _dwBackgroundColor{ D3DCOLOR_XRGB(128, 128, 128) }; // Ã†ÃÃ„Â»Â±Â³Â¾Â°Ã‡Ã¥Â³Ã½Ã‘Ã•Ã‰Â«
     DWORD                   _dwClearFlag;
-    BOOL                    _bClearTarget;
-    BOOL                    _bClearStencil;
-    BOOL                    _bClearZBuffer;
-	float                   _fWorldViewFOV;
+    BOOL _bClearTarget{ true };
+    BOOL _bClearStencil{ false };
+    BOOL _bClearZBuffer{ true };
+
+	 float                   _fWorldViewFOV;
 	 float					_fAspect;
-	int						_nCurViewType;      // ±ÜÃâSetCurrentViewÖĞÖØ¸´ÉèÖÃ
-	float					_fNearClip;
-	float					_fFarClip;
+     int _nCurViewType{ -1 }; // é¿å…SetCurrentViewä¸­é‡å¤è®¾ç½®
+     float _fNearClip{ 1.0f };
+     float _fFarClip{ 1000.0f };
+
 	
 
-	LPSPRITE				_p2DSprite;
+    LPSPRITE _p2DSprite{ nullptr };
     MPCullInfo              _CullInfo;
     RECT                    _rcDeskTop;
 
@@ -308,15 +310,18 @@ protected:
     char						_szInfo[512];
 
 	// FPS
-	DWORD							_dwFPS;
-    DWORD							_dwFrameCnt;
-    DWORD							_dwLastTick;
+    BOOL _bRealFPS{ false }; //å®é™…èƒ½è¿è¡Œå¤šå¿«ï¼Œå°±è·‘å¤šå¿«ï¼Œé€‚ç”¨æœºå™¨è¾ƒæ…¢çš„ï¼Œä¾‹å¦‚845é›†æˆæ˜¾å¡
+    DWORD _dwFPS{ 0 };
+    DWORD _dwFrameCnt{ 0 };
+    DWORD _dwLastTick{ 0 };
+
 
 	std::vector<MPLine*>					_LineList;
 
 	//CMPEffectFile					_CEffectFile;
-    BOOL                            _bEnableCaptureAVI;
-    BOOL                            _bCaptureScreen;
+    BOOL _bEnableCaptureAVI{ false };
+    BOOL _bCaptureScreen{ false };
+
     D3DCAPS8                        _d3dCaps;
     lwInterfaceMgr               _IMgr;
     lwD3DCreateParamAdjustInfo      _d3dCPAdjustInfo;
@@ -628,7 +633,7 @@ inline void MPRender::UpdateCullInfo( )
 	D3DXMATRIX mat;
 
     D3DXMatrixMultiply( &mat,& _matViewWorld,& _matProjWorld );
-    D3DXMatrixInverse( &mat, NULL, &mat );
+    D3DXMatrixInverse(&mat, nullptr, &mat);
 
     _CullInfo.vecFrustum[0] = D3DXVECTOR3(-1.0f, -1.0f,  0.0f); // xyz
     _CullInfo.vecFrustum[1] = D3DXVECTOR3( 1.0f, -1.0f,  0.0f); // Xyz

@@ -13,30 +13,10 @@ using namespace std;
 
 bool bUsePixelShader = true;
 
-MPRender::MPRender()
-:_hWnd(0),
- _pD3D(NULL),
- _pD3DDevice(NULL),
- _p2DSprite(NULL),
- _dwBackgroundColor(0),
- _bClearTarget(true), 
- _bClearZBuffer(true),
- _bClearStencil(false),
- _dwFPS(0),
- _dwLastTick(0),
- _dwFrameCnt(0),
- _bEnableCaptureAVI(FALSE),
- _bCaptureScreen(FALSE)
-{
-	_nCurViewType = -1;
-    SetWorldViewFOV(D3DX_PI /4.0f * 0.90f);
-	_dwBackgroundColor = D3DCOLOR_XRGB(128, 128, 128);
-	_fNearClip = 1.0f;
-	_fFarClip  = 1000.0f;	// Original 1000f
-
-    _d3dCPAdjustInfo.multi_sample_type = D3DMULTISAMPLE_NONE;
-
-	ZeroMemory(&_Light, sizeof(_Light));	
+MPRender::MPRender() {
+	SetWorldViewFOV(D3DX_PI / 4.0f * 0.90f);
+	_d3dCPAdjustInfo.multi_sample_type = D3DMULTISAMPLE_NONE;
+	ZeroMemory(&_Light, sizeof(_Light));
 }
 
 MPRender::~MPRender()

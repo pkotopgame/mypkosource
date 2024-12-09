@@ -53,12 +53,14 @@ std::map<int, DWORD>	CItemCommand::_mapCoolDown;	// ������һ�ηŵ�
 
 
 CItemCommand::CItemCommand( CItemRecord* pItem )
-: _pItem(pItem), _dwColor(COLOR_WHITE), _pBoatHint(NULL),
+:_pImage(std::make_unique<CGuiPic>()), _pItem(pItem), _dwColor(COLOR_WHITE), 
 _pAniClock(NULL), _pSkill(NULL), _dwPlayTime(0),_canDrag(true)
 {
-    if( !_pItem )  LG( "error", "msgCItemCommand::CItemCommand(CItemRecord* pItem) pItem is NULL" );
+	if (!_pItem) {
+		LG("error", "msgCItemCommand::CItemCommand(CItemRecord* pItem) pItem is nullptr");
+		return;
+	}
 
-    _pImage = new CGuiPic;
 
     const char* file = pItem->GetIconFile();
 
@@ -67,12 +69,14 @@ _pAniClock(NULL), _pSkill(NULL), _dwPlayTime(0),_canDrag(true)
     if( INVALID_HANDLE_VALUE == hFile ) 
     {
         _pImage->LoadImage( "texture/icon/error.png", ITEM_WIDTH, ITEM_HEIGHT, 0 );
+		ImagePath = "texture/icon/error.png";
     }
     else
     {
         CloseHandle(hFile);
 
         _pImage->LoadImage( file, ITEM_WIDTH, ITEM_HEIGHT, 0 );
+		ImagePath = file;
     }
 
 	int nSkillID = 0;
@@ -92,7 +96,7 @@ _pAniClock(NULL), _pSkill(NULL), _dwPlayTime(0),_canDrag(true)
 }
 
 CItemCommand::CItemCommand( const CItemCommand& rhs )
-: _pImage( new CGuiPic(*rhs._pImage) ), _pBoatHint(NULL),
+:_pImage(std::make_unique<CGuiPic>(*rhs._pImage)),
 _pAniClock(NULL), _dwPlayTime(0)
 {
     _Copy( rhs );
@@ -109,7 +113,7 @@ CItemCommand& CItemCommand::operator=( const CItemCommand& rhs )
 void CItemCommand::_Copy( const CItemCommand& rhs )
 {
     memcpy( &_ItemData, &rhs._ItemData, sizeof(_ItemData) );
-	SetBoatHint( rhs._pBoatHint );
+	SetBoatHint(rhs._pBoatHint.get());
 
 	_pItem = rhs._pItem;
 	_pSkill = rhs._pSkill;
@@ -117,17 +121,7 @@ void CItemCommand::_Copy( const CItemCommand& rhs )
 	_nPrice = rhs._nPrice;
 }
 
-CItemCommand::~CItemCommand()
-{
-    //delete _pImage;
-	SAFE_DELETE(_pImage); // UI��������
 
-	if( _pBoatHint )
-	{
-		delete _pBoatHint;
-		_pBoatHint = NULL;
-	}
-}
 
 void CItemCommand::PUSH_HINT( const char* str, int value, DWORD color )
 {
@@ -147,7 +141,28 @@ void CItemCommand::SaleRender( int x, int y, int nWidth, int nHeight )
 	int yOffset = 25;
 	
 	_pImage->Render( nX, nY, _ItemData.IsValid() ? _dwColor : (DWORD)0xff757575);
+	if (_ItemData.sID == 9956) {
+		// static int xNum, yNum;
 
+		if (const auto gold = static_cast<float>(_ItemData.lDBParam[0]); gold >= 1000000000.f) {
+			FormatStoredGold("%sb", 1000000000);
+		}
+		else if (gold >= 1000000) {
+			FormatStoredGold("%sm", 1000000);
+		}
+		else if (gold >= 1000) {
+			FormatStoredGold("%sk", 1000);
+		}
+		else {
+			_snprintf_s(buf, _TRUNCATE, "%.0fg", gold);
+		}
+
+		static int w, h;
+		CGuiFont::s_Font.GetSize(buf, w, h);
+
+		GetRender().FillFrame(x + xOffset, y + yOffset, x + w + xOffset, y + h + yOffset, 0xE0ADF6F7);
+		CGuiFont::s_Font.Render(buf, x + xOffset, y + yOffset, COLOR_BLACK);
+	}
 	short sType = _pItem->sType;
 	// render gem level on icon
 	if( sType == 49 || sType == 50){
@@ -258,6 +273,10 @@ void CItemCommand::SaleRender( int x, int y, int nWidth, int nHeight )
 
 void CItemCommand::Render( int x, int y )
 {
+	//reload inventory item icoms in render when its opened due dynamic release function free them on teleport 
+	if (g_stUIEquip.frmInv->GetIsShow() && !NewMPTexSet::Instance()->GetMPtexSetNameAndKeys().contains(ImagePath)) {
+		_pImage->LoadImage(ImagePath.c_str(), _pImage->GetWidth(), _pImage->GetHeight(), 0, _pImage->GetImage()->nTexSX, _pImage->GetImage()->nTexSY, _pImage->GetImage()->fScaleX, _pImage->GetImage()->fScaleY);
+	}
 	if ((_ItemData.expiration - std::time(0)) <= 0 && _ItemData.expiration != 0 && _ItemData.sID != 32767) {
 	    _pImage->Render(x, y, (DWORD) 0xff757575);
 	} else {
@@ -272,7 +291,28 @@ void CItemCommand::Render( int x, int y )
             _pAniClock = NULL;
         }
     }
-	
+	if (_ItemData.sID == 9956) {
+		// static int xNum, yNum;
+
+		if (const auto gold = static_cast<float>(_ItemData.lDBParam[0]); gold >= 1000000000) {
+			FormatStoredGold("%sb", 1000000000);
+		}
+		else if (gold >= 1000000) {
+			FormatStoredGold("%sm", 1000000);
+		}
+		else if (gold >= 1000) {
+			FormatStoredGold("%sk", 1000);
+		}
+		else {
+			_snprintf_s(buf, _TRUNCATE, "%.0fg", gold);
+		}
+
+		static int w, h;
+		CGuiFont::s_Font.GetSize(buf, w, h);
+
+		GetRender().FillFrame(x, y + h + 8, x + w, y + h + h + 8, 0xE0ADF6F7);
+		CGuiFont::s_Font.Render(buf, x, y + h + 8, COLOR_BLACK);
+	}
 	short sType = _pItem->sType;
 	// render gem level on icon
 	if( sType == 49 || sType == 50){
@@ -491,7 +531,15 @@ void CItemCommand::AddHint( int x, int y ){
 	memset( &item, 0, sizeof(SItemHint) );
 	CItemRecord* pEquipItem(0);		
 	item.Convert( _ItemData, _pItem );
-	
+
+	// gold store item
+	if (_ItemData.sID == 9956) {
+		char buffer[54];
+		_snprintf_s(buffer, _TRUNCATE, _pItem->szDescriptor, StringSplitNum(_ItemData.lDBParam[0]));
+		PushHint(buffer, COLOR_WHITE, 5, 1);
+		return;
+	}
+
 	if(_ItemData.sEndure[1] == 25000 && _ItemData.sEnergy[1] == 0){
 		PushHint( _pItem->szName, COLOR_WHITE, 5, 1 );
 		_ShowBody();
@@ -2499,26 +2547,18 @@ void CItemCommand::_ShowFusionBody(CItemRecord* pEquipItem)
 	PushHint( str.str(), _pItem->IsAllowEquip(nBodyType) ? GENERIC_COLOR : VALID_COLOR );			
 }
 
-
-void CItemCommand::SetBoatHint( const NET_CHARTRADE_BOATDATA* const pBoat )
-{
-	if( pBoat )
-	{
-		if( !_pBoatHint )
-		{
-			_pBoatHint = new NET_CHARTRADE_BOATDATA;
+void CItemCommand::SetBoatHint(const NET_CHARTRADE_BOATDATA* const pBoat) {
+	if (pBoat) {
+		if (!_pBoatHint) {
+			_pBoatHint = std::make_unique<NET_CHARTRADE_BOATDATA>();
 		}
-		memcpy( _pBoatHint, pBoat, sizeof(NET_CHARTRADE_BOATDATA) );
+		*_pBoatHint = *pBoat;
 	}
-	else
-	{
-		if( _pBoatHint )
-		{
-			delete _pBoatHint;
-			_pBoatHint = NULL;
-		}
+	else {
+		_pBoatHint.reset();
 	}
 }
+
 
 SItemForge&	CItemCommand::GetForgeInfo()
 {
@@ -2702,4 +2742,20 @@ float SItemForge::GetAlpha( int nTotalLevel )
 	--nTotalLevel;
 	int nLevel = nTotalLevel / 4;
 	return ( fLevelAlpha[ nLevel ] + (float)(nTotalLevel % 4) / 4.0f * fLevelBase[ nLevel ] ) / 255.0f;
+}
+
+void CItemCommand::FormatStoredGold(const char* pattern, const int divider) {
+	const int gold = _ItemData.lDBParam[0];
+	_snprintf_s(buf, _TRUNCATE, "%d", gold / divider);
+	/*for (int i = 0;i<10;i++){
+		if(buf[i] == 46){ //"."
+			if(buf[i+1] == 48){ //"0"
+				buf[i] = '\0';
+			}else{
+				buf[i+2] = '\0';
+			}
+			break;
+		}
+	}*/
+	_snprintf_s(buf, _TRUNCATE, pattern, buf);
 }

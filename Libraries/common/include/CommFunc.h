@@ -8,19 +8,20 @@
 
 #ifndef COMMFUNC_H
 #define COMMFUNC_H
-
-#include "CompCommand.h"
-#include "SkillRecord.h"
 #include "CharacterRecord.h"
-#include "ItemRecord.h"
+#include "CompCommand.h"
+#include "i18n.h"
 #include "ItemAttrType.h"
+#include "ItemRecord.h"
 #include "JobType.h"
 #include "NetRetCode.h"
-#include <regex>
-#include <string_view>
+#include "SkillRecord.h"
 #include <algorithm>
 #include <bitset>
-#include "i18n.h"
+#include <random>
+#include <regex>
+#include <string_view>
+
 
 
 extern bool KitbagStringConv(short sKbCapacity, std::string &strData);
@@ -403,6 +404,13 @@ inline bool isAlphanumeric(std::string_view text)
 {
 	return std::all_of(text.begin(), text.end(), ::isalnum);
 
+}
+//new function for safty thread generte random number in range@mothannakh
+inline int GenerateRandNumberInrange(const int min, const int max) {
+	thread_local std::random_device rd;
+	thread_local std::mt19937 rng(rd());
+	thread_local std::uniform_int_distribution<int> uid;
+	return uid(rng, decltype(uid)::param_type{ min, max });
 }
 
 inline bool isNumeric(std::string_view text)

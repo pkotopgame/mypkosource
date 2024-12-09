@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "lwHeader.h"
 #include "lwStdInc.h"
@@ -360,11 +360,11 @@ public:
 };
 
 // remarks by lsh
-// �й�lwMesh��lwMeshInfo֮��Ĺ�ϵ
-// 1��lwMeshInfo��Ϊ�����C���ͽṹ�壬�ٹ���һ��construct��destruct�ȵĸ���������
-//    lwMesh�ۺϸýṹ��
-// 2��lwMeshInfo��һ��class��ͬʱӵ��lwIMeshInfo�Ľӿڷ�ʽ
-//    lwMesh�̳У������ýӿ�ָ�룩���࣬��Ч���ϲ��ܽ���
+// ÓÐ¹ØlwMeshºÍlwMeshInfoÖ®¼äµÄ¹ØÏµ
+// 1¡£lwMeshInfo×÷Îª´¿´âµÄCÀàÐÍ½á¹¹Ìå£¬ÔÙ¹ØÁªÒ»×éconstructºÍdestructµÈµÄ¸¨Öúº¯Êý¡£
+//    lwMesh¾ÛºÏ¸Ã½á¹¹Ìå
+// 2¡£lwMeshInfoÊÇÒ»¸öclass£¬Í¬Ê±ÓµÓÐlwIMeshInfoµÄ½Ó¿Ú·½Ê½
+//    lwMesh¼Ì³Ð£¨»òÒýÓÃ½Ó¿ÚÖ¸Õë£©¸ÃÀà£¬ÔÚÐ§ÂÊÉÏ²»ÄÜ½ÓÊÜ
 // 
 class lwMesh : public lwIMesh
 {
@@ -715,8 +715,8 @@ public:
     LW_RESULT GetTex( lwITex** ret_obj, DWORD id );
     LW_RESULT GetAnimCtrl( lwIAnimCtrl** ret_obj, DWORD id );
 
-    // ֱ��ע�ᣬ��ͨ���ļ���ʽ���ң������������һ���ڴ����ݱ�ɾ�����Դ����ݽ�����ʧ��
-    // ������һЩ�����Ե����壬��BoundingBox��
+    // Ö±½Ó×¢²á£¬²»Í¨¹ýÎÄ¼þ·½Ê½²éÕÒ£¬ÔÚÕâÖÖÇé¿öÏÂÒ»µ©ÄÚ´æÊý¾Ý±»É¾³ý£¬ÏÔ´æÊý¾Ý½«´´½¨Ê§°Ü
+    // ÊÊÓÃÓÚÒ»Ð©°ïÖúÐÔµÄÎïÌå£¬ÈçBoundingBoxµÈ
     LW_RESULT RegisterMesh( lwIMesh* obj );
     LW_RESULT RegisterTex( lwITex* obj );
     LW_RESULT RegisterAnimCtrl( lwIAnimCtrl* obj );
@@ -738,7 +738,7 @@ public:
 
     LW_RESULT QueryMesh( DWORD* ret_id, const lwResFileMesh* rfm );
     LW_RESULT QueryTex( DWORD* ret_id, const char* file_name );
-    // Ŀǰֻ��RegisterAnimDataʱ��ʹ��RES_FILE_TYPE_GENERIC��RES_FILE_TYPE_GEOMETRY�ļ����͵���Դ����Ч
+    // Ä¿Ç°Ö»ÓÐRegisterAnimDataÊ±ºòÊ¹ÓÃRES_FILE_TYPE_GENERIC»òRES_FILE_TYPE_GEOMETRYÎÄ¼þÀàÐÍµÄ×ÊÔ´²ÅÓÐÐ§
     LW_RESULT QueryAnimCtrl( DWORD* ret_id, const lwResFileAnimData* info );
 
     LW_VOID ReleaseObject();

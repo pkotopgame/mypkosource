@@ -8,7 +8,7 @@
 #include "SystemDialog.h"
 #include "Config.h"
 #include "GameDB.h"
-
+#include "SehException.h"
 
 // #pragma comment( linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" ) // 设置入口地址 
 
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 	C_PRINT("Loading %s\n", szConfigFileN);
 
 	DisableCloseButton();
-
+	SehExceptionBase::InitializeSehTranslator(); //this will create dump files we try keep old one too?
 	SEHTranslator translator;
 
 	T_B

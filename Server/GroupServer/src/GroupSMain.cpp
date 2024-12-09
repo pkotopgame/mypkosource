@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "GroupServerApp.h"
+#include "SehException.h"
 
 HANDLE hConsole = NULL;
 
@@ -18,6 +19,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	C_TITLE("GroupServer.exe")
 	C_PRINT("Loading GroupServer.cfg...\n");
+	SehExceptionBase::InitializeSehTranslator(); //to create dump file if it crashed
 
 	//SEHTranslator translator;
 

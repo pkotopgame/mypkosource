@@ -91,8 +91,11 @@ inline bool fEquat( float f1, float f2)
 class  MINDPOWER_API CMPResManger
 {
 public:
-	CMPResManger(void);
-	~CMPResManger(void);
+	//CMPResManger(void);
+	//~CMPResManger(void);
+	CMPResManger();
+	~CMPResManger();
+
 
 public:
 	bool					LoadTotalVShader(lwISysGraphics* sys_graphics);
@@ -160,7 +163,7 @@ public:
 	void					Render();
 	void					UpdateMatrix()
 	{
-		D3DXMatrixInverse( &_MatBBoard, NULL, _pMatView );
+		D3DXMatrixInverse(&_MatBBoard, nullptr, _pMatView);
 		_MatBBoard._41 = 0.0f;
 		_MatBBoard._42 = 0.0f;
 		_MatBBoard._43 = 0.0f;
@@ -274,13 +277,14 @@ protected:
 	VEC_string				_vecMeshName;
 	VEC_string				_vecEffectName;
 
-	typedef std::map<std::string, int> MESH_MAP;
-		MESH_MAP _mapMesh;
+	using MESH_MAP = std::map<std::string, int>;
+	MESH_MAP _mapMesh;
 
-	typedef std::map<std::string, int> EFFECT_MAP;
+
+	using EFFECT_MAP = std::map<std::string, int>;
 		EFFECT_MAP _mapEffect;
 
-	typedef std::map<std::string, int> TEXTURE_MAP;
+		using TEXTURE_MAP = std::map<std::string, int>;
 		TEXTURE_MAP _mapTexture;
 
 	std::vector<lwITex*>			_vecTexList;

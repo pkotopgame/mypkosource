@@ -169,7 +169,7 @@ void	CUIPanel::Draw( LPDIRECT3DTEXTURE8  pSrcTexture,
 	//m_pDev->SetTexture(1,NULL);
 
 	m_pDev->SetVertexShader(UI_FVF);
-	m_pDev->SetStreamSource(0, _lpVB, sizeof(UI_VERTEX));
+	m_pDev->SetStreamSourceX(0, _lpVB, NULL, sizeof(UI_VERTEX));
 	m_pDev->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
 }
 void	CUIPanel::End()
